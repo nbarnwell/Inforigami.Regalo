@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Neil Barnwell</authors>
+    <owners>Neil Barnwell</owners>
+    <projectUrl>https://github.com/nbarnwell/Inforigami.Regalo</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A RavenDB event store implementation for Inforigami.Regalo.Core.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2012</copyright>
+    <tags>CQRS EventSourcing</tags>
+    <dependencies>
+        <dependency id="Inforigami.Regalo.Core" version="$version$" />
+    </dependencies>
+  </metadata>
+</package>

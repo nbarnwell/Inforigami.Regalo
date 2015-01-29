@@ -1,0 +1,7 @@
+namespace Inforigami.Regalo.Core
+{
+    public interface ICommandHandler<TCommand>
+    {
+        void Handle(TCommand command);
+    }
+}
