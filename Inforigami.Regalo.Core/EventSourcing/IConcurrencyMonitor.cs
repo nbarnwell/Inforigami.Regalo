@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Core.EventSourcing
 {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.Interfaces;
 using NUnit.Framework;
 using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;

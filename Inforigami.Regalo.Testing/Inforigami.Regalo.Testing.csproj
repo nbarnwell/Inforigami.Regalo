@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -74,6 +74,10 @@
     <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj">
       <Project>{80473978-8D0F-4AD4-983E-600E516D49AB}</Project>
       <Name>Inforigami.Regalo.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj">
+      <Project>{890D6FBB-4264-4A33-AAA5-302CB201B090}</Project>
+      <Name>Inforigami.Regalo.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj">
       <Project>{bdc34219-6e54-4580-958e-dcc93b1676e3}</Project>

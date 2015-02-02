@@ -1,4 +1,6 @@
 using System;
+using Inforigami.Regalo.Core.Tests.Unit;
+using Inforigami.Regalo.Interfaces;
 using Moq;
 using NUnit.Framework;
 using Raven.Client;
@@ -53,12 +55,10 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
                 {
                     var customerId = Guid.NewGuid();
 
-                    var storedEvents = new IEvent[]
-                    {
-                        new CustomerSignedUp(customerId),
-                        new SubscribedToNewsletter("latest"),
-                        new SubscribedToNewsletter("top")
-                    };
+                    var storedEvents = new EventChain();
+                    storedEvents.Add(new CustomerSignedUp(customerId));
+                    storedEvents.Add(new SubscribedToNewsletter("latest"));
+                    storedEvents.Add(new SubscribedToNewsletter("top"));
 
                     eventStore.Add(customerId, storedEvents);
                 }

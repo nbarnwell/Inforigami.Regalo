@@ -1,4 +1,5 @@
 using System;
+using Inforigami.Regalo.Interfaces;
 using NUnit.Framework;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.ObjectCompare;

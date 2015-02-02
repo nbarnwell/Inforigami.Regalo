@@ -78,6 +78,10 @@
       <Project>{80473978-8D0F-4AD4-983E-600E516D49AB}</Project>
       <Name>Inforigami.Regalo.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj">
+      <Project>{890D6FBB-4264-4A33-AAA5-302CB201B090}</Project>
+      <Name>Inforigami.Regalo.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj">
       <Project>{BDC34219-6E54-4580-958E-DCC93B1676E3}</Project>
       <Name>Inforigami.Regalo.ObjectCompare</Name>

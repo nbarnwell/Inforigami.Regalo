@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.Interfaces;
 using Moq;
 using NUnit.Framework;
 using Raven.Abstractions.Data;
@@ -58,7 +59,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
 
             // Act
-            IEnumerable<object> events = store.Load(Guid.NewGuid());
+            IEnumerable<IEvent> events = store.Load(Guid.NewGuid());
 
             // Assert
             CollectionAssert.IsEmpty(events);

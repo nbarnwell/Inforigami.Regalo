@@ -1,5 +1,6 @@
 using System;
 using Inforigami.Regalo.Core;
+using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers
 {

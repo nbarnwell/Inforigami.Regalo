@@ -1,8 +1,5 @@
-using System;
-using System.Diagnostics;
-
-namespace Inforigami.Regalo.Core
-{ 
+namespace Inforigami.Regalo.Interfaces
+{
     public abstract class Event : Message, IEvent
     {
         public int Version { get; set; }
@@ -33,10 +30,5 @@ namespace Inforigami.Regalo.Core
             Version = evt.Version + 1;
             return this;
         }
-    }
-
-    public interface IEvent : IMessage
-    {
-        int Version { get; set; }
     }
 }

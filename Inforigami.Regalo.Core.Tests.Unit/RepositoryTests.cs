@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.Interfaces;
 using Moq;
 using NUnit.Framework;
 using Inforigami.Regalo.Core.EventSourcing;
@@ -54,7 +55,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var userId = Guid.NewGuid();
             eventStore.Update(
                 userId,
-                new IEvent[]
+                new EventChain()
                 {
                     new UserRegistered(userId),
                     new UserChangedPassword("newpassword"),
@@ -75,7 +76,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var eventStore = new InMemoryEventStore();
             var userId = Guid.NewGuid();
-            var events = new IEvent[]
+            var events = new EventChain
             {
                 new UserRegistered(userId), 
                 new UserChangedPassword("newpassword"), 

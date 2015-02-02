@@ -42,15 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AggregateRoot.cs" />
-    <Compile Include="ICommand.cs" />
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="Conventions.cs" />
     <Compile Include="DateTimeOffsetProvider.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="IEvent.cs" />
     <Compile Include="EventBus.cs" />
     <Compile Include="EventHandlingFailedEvent.cs" />
-    <Compile Include="EventHandlingResultEvent.cs" />
     <Compile Include="EventHandlingSucceededEvent.cs" />
     <Compile Include="EventSourcing\ConcurrencyConflict.cs" />
     <Compile Include="EventSourcing\ConcurrencyConflictsDetectedException.cs" />
@@ -67,12 +64,9 @@
     <Compile Include="IdNotSetException.cs" />
     <Compile Include="IEventBus.cs" />
     <Compile Include="IEventHandler.cs" />
-    <Compile Include="IEventHandlingFailedEvent.cs" />
-    <Compile Include="IEventHandlingSucceededEvent.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="IMessageHandlerContext.cs" />
     <Compile Include="IRepository.cs" />
-    <Compile Include="IMessage.cs" />
     <Compile Include="MessageHandlerContext.cs" />
     <Compile Include="MessageProcessorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,6 +76,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Inforigami.Regalo.Core.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj">
+      <Project>{890D6FBB-4264-4A33-AAA5-302CB201B090}</Project>
+      <Name>Inforigami.Regalo.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

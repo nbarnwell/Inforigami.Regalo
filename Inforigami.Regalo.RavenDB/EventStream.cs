@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Inforigami.Regalo.Core;
+using Inforigami.Regalo.Interfaces;
 using Newtonsoft.Json;
 
 namespace Inforigami.Regalo.RavenDB

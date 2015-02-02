@@ -1,4 +1,5 @@
 using System;
+using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Core
 {
@@ -12,18 +13,9 @@ namespace Inforigami.Regalo.Core
 
         private static object WrapEvent(IEvent evt)
         {
-            var wrapperType = typeof(EventHandlingSucceededEventImpl<>).MakeGenericType(evt.GetType());
+            var wrapperType = typeof(EventHandlingSucceededEvent<>).MakeGenericType(evt.GetType());
             return Activator.CreateInstance(wrapperType, evt);
         }
 
-        private class EventHandlingSucceededEventImpl<TEvent> : EventHandlingResultEvent, IEventHandlingSucceededEvent<TEvent>
-        {
-            public TEvent Evt { get; private set; }
-
-            public EventHandlingSucceededEventImpl(TEvent evt)
-            {
-                Evt = evt;
-            }
-        }
     }
 }

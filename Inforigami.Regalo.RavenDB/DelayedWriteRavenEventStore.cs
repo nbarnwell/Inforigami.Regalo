@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.Interfaces;
 using Raven.Abstractions.Data;
 using Raven.Client;
 using Raven.Client.Document;

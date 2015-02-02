@@ -1,4 +1,5 @@
 using System;
+using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 {
