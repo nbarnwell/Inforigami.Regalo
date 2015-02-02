@@ -8,12 +8,9 @@
     <owners>Neil Barnwell</owners>
     <projectUrl>https://github.com/nbarnwell/Inforigami.Regalo</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A simple DDD event sourcing library based entirely on my learnings from Greg Young's DDD, CQRS and Event Sourcing course.</description>
+    <description>Interfaces definitions for basic CQRS/event-sourcing library Inforigami.Regalo.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>CQRS EventSourcing</tags>
-    <dependencies>
-        <dependency id="Inforigami.Regalo.Interfaces" version="$version$" />
-    </dependencies>
   </metadata>
 </package>
