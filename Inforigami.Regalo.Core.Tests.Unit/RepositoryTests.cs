@@ -54,7 +54,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var userId = Guid.NewGuid();
             eventStore.Update(
                 userId,
-                new Event[]
+                new IEvent[]
                 {
                     new UserRegistered(userId),
                     new UserChangedPassword("newpassword"),
@@ -75,7 +75,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var eventStore = new InMemoryEventStore();
             var userId = Guid.NewGuid();
-            var events = new Event[]
+            var events = new IEvent[]
             {
                 new UserRegistered(userId), 
                 new UserChangedPassword("newpassword"), 
@@ -85,10 +85,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
 
             // Act
-            User user = repository.Get(userId, ((Event)events[1]).Version);
+            User user = repository.Get(userId, ((IEvent)events[1]).Version);
 
             // Assert
-            Assert.AreEqual(((Event)events[1]).Version, user.BaseVersion);
+            Assert.AreEqual(((IEvent)events[1]).Version, user.BaseVersion);
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var userId = Guid.NewGuid();
             eventStore.Update(
                 userId,
-                new Event[]
+                new IEvent[]
                 {
                     new UserRegistered(userId) { Version = 1 },
                     new UserChangedPassword("newpassword"){Version = 2},
@@ -141,7 +141,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             repository.Save(user);
 
             // Assert
-            concurrencyMonitor.Verify(monitor => monitor.CheckForConflicts(It.IsAny<IEnumerable<Event>>(), It.IsAny<IEnumerable<Event>>()), Times.Never());
+            concurrencyMonitor.Verify(monitor => monitor.CheckForConflicts(It.IsAny<IEnumerable<IEvent>>(), It.IsAny<IEnumerable<IEvent>>()), Times.Never());
         }
 
         [Test]
@@ -157,7 +157,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             repository.Save(user);
 
             // Assert
-            concurrencyMonitor.Verify(monitor => monitor.CheckForConflicts(It.IsAny<IEnumerable<Event>>(), It.IsAny<IEnumerable<Event>>()), Times.Never());
+            concurrencyMonitor.Verify(monitor => monitor.CheckForConflicts(It.IsAny<IEnumerable<IEvent>>(), It.IsAny<IEnumerable<IEvent>>()), Times.Never());
         }
 
         [Test]
@@ -193,7 +193,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var user = repository.Get(userId);
             user.ChangePassword("newpassword");
 
-            var currentVersion = user.GetUncommittedEvents().Cast<Event>().Last().Version;
+            var currentVersion = user.GetUncommittedEvents().Cast<IEvent>().Last().Version;
 
             // Act
             repository.Save(user);

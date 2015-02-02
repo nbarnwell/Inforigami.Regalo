@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
-using System.Text;
 
 namespace Inforigami.Regalo.Core
 {
-    public abstract class Message
+    public abstract class Message : IMessage
     {
         public Guid Id { get; set; }
         public Guid CausationId { get; set; }
@@ -12,9 +10,16 @@ namespace Inforigami.Regalo.Core
 
         protected Message()
         {
-            Id            = GuidProvider.NewGuid();
-            CausationId   = Id;
+            Id = GuidProvider.NewGuid();
+            CausationId = Id;
             CorrelationId = Id;
         }
+    }
+
+    public interface IMessage
+    {
+        Guid Id { get; set; }
+        Guid CausationId { get; set; }
+        Guid CorrelationId { get; set; }
     }
 }

@@ -7,23 +7,23 @@ namespace Inforigami.Regalo.RavenDB
 {
     public class EventStream
     {
-        private List<Event> _events;
+        private List<IEvent> _events;
 
         public EventStream(string id)
         {
             Id = id;
-            _events = new List<Event>();
+            _events = new List<IEvent>();
         }
 
         public string Id { get; private set; }
 
-        public IEnumerable<Event> Events
+        public IEnumerable<IEvent> Events
         {
             get { return _events.ToArray(); }
-            private set { _events = new List<Event>(value); }
+            private set { _events = new List<IEvent>(value); }
         }
 
-        public void Append(IEnumerable<Event> events)
+        public void Append(IEnumerable<IEvent> events)
         {
             _events.AddRange(events);
         }

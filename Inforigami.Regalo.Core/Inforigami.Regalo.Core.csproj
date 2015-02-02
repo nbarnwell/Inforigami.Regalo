@@ -42,12 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AggregateRoot.cs" />
-    <Compile Include="Command.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="Conventions.cs" />
     <Compile Include="DateTimeOffsetProvider.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="Event.cs" />
+    <Compile Include="IEvent.cs" />
     <Compile Include="EventBus.cs" />
     <Compile Include="EventHandlingFailedEvent.cs" />
     <Compile Include="EventHandlingResultEvent.cs" />
@@ -72,7 +72,7 @@
     <Compile Include="ILogger.cs" />
     <Compile Include="IMessageHandlerContext.cs" />
     <Compile Include="IRepository.cs" />
-    <Compile Include="Message.cs" />
+    <Compile Include="IMessage.cs" />
     <Compile Include="MessageHandlerContext.cs" />
     <Compile Include="MessageProcessorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

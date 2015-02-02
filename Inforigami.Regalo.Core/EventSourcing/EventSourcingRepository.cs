@@ -54,7 +54,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
             if (_loaded.Contains(item.Id))
             {
-                Event[] baseAndUnseenEvents = _eventStore.Load(item.Id).ToArray();
+                IEvent[] baseAndUnseenEvents = _eventStore.Load(item.Id).ToArray();
 
                 if (baseAndUnseenEvents.Length > 0)
                 {
@@ -79,7 +79,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
             item.AcceptUncommittedEvents();
         }
 
-        private static IEnumerable<Event> GetUnseenEvents(TAggregateRoot item, IEnumerable<Event> baseAndUnseenEvents)
+        private static IEnumerable<IEvent> GetUnseenEvents(TAggregateRoot item, IEnumerable<IEvent> baseAndUnseenEvents)
         {
             return baseAndUnseenEvents.Where(x => x.Version > item.BaseVersion);
         }

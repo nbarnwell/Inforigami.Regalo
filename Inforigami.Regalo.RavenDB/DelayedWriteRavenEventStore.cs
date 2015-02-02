@@ -22,7 +22,7 @@ namespace Inforigami.Regalo.RavenDB
             _documentSession.Advanced.UseOptimisticConcurrency = true;
         }
 
-        public void Add(Guid aggregateId, IEnumerable<Event> events)
+        public void Add(Guid aggregateId, IEnumerable<IEvent> events)
         {
             var stream = new EventStream(aggregateId.ToString());
             stream.Append(events);
@@ -33,7 +33,7 @@ namespace Inforigami.Regalo.RavenDB
             _hasChanges = true;
         }
 
-        public void Update(Guid aggregateId, IEnumerable<Event> events)
+        public void Update(Guid aggregateId, IEnumerable<IEvent> events)
         {
             var aggregateIdAsString = aggregateId.ToString();
 
@@ -71,7 +71,7 @@ namespace Inforigami.Regalo.RavenDB
             _documentSession.Load<EventStream>(idValues);
         }
 
-        public IEnumerable<Event> Load(Guid aggregateId)
+        public IEnumerable<IEvent> Load(Guid aggregateId)
         {
             var aggregateIdAsString = aggregateId.ToString();
 
@@ -81,13 +81,13 @@ namespace Inforigami.Regalo.RavenDB
             {
                 var events = stream.Events;
 
-                return events.Any() ? events : Enumerable.Empty<Event>();
+                return events.Any() ? events : Enumerable.Empty<IEvent>();
             }
 
-            return Enumerable.Empty<Event>();
+            return Enumerable.Empty<IEvent>();
         }
 
-        public IEnumerable<Event> Load(Guid aggregateId, int maxVersion)
+        public IEnumerable<IEvent> Load(Guid aggregateId, int maxVersion)
         {
             var events = Load(aggregateId).ToList();
 
@@ -102,7 +102,7 @@ namespace Inforigami.Regalo.RavenDB
             return GetEventsForVersion(events, maxVersion).ToList();
         }
 
-        private static IEnumerable<Event> GetEventsForVersion(IEnumerable<Event> events, int maxVersion)
+        private static IEnumerable<IEvent> GetEventsForVersion(IEnumerable<IEvent> events, int maxVersion)
         {
             return events.Where(x => x.Version <= maxVersion);
         }

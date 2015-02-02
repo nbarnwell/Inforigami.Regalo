@@ -10,7 +10,7 @@ namespace Inforigami.Regalo.Core
         private static readonly ILogger __logger = Resolver.Resolve<ILogger>();
         
         private readonly IDictionary<RuntimeTypeHandle, MethodInfo> _applyMethodCache = new Dictionary<RuntimeTypeHandle, MethodInfo>();
-        private readonly IList<Event> _uncommittedEvents = new List<Event>();
+        private readonly IList<IEvent> _uncommittedEvents = new List<IEvent>();
 
         public Guid Id { get; protected set; }
 
@@ -24,7 +24,7 @@ namespace Inforigami.Regalo.Core
         /// </summary>
         public int Version { get; private set; }
 
-        public IEnumerable<Event> GetUncommittedEvents()
+        public IEnumerable<IEvent> GetUncommittedEvents()
         {
             return _uncommittedEvents.ToList();
         }
@@ -39,9 +39,9 @@ namespace Inforigami.Regalo.Core
             __logger.Debug(this, "Accepted {0} uncommitted events. Now at base version {1}", eventCount, BaseVersion);
         }
 
-        public void ApplyAll(IEnumerable<Event> events)
+        public void ApplyAll(IEnumerable<IEvent> events)
         {
-            var eventList = events as IList<Event> ?? events.ToList();
+            var eventList = events as IList<IEvent> ?? events.ToList();
 
             foreach (var evt in eventList)
             {
@@ -53,7 +53,7 @@ namespace Inforigami.Regalo.Core
             __logger.Debug(this, "Applied {0} events. Now at base version {1}", eventList.Count, BaseVersion);
         }
 
-        protected void Record(Event evt)
+        protected void Record(IEvent evt)
         {
             evt.Version = Version + 1;
 
@@ -66,7 +66,7 @@ namespace Inforigami.Regalo.Core
             __logger.Debug(this, "Recorded new event: {0}", evt);
         }
 
-        private void ApplyEvent(Event evt)
+        private void ApplyEvent(IEvent evt)
         {
             Version = evt.Version;
 

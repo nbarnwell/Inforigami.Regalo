@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace Inforigami.Regalo.Core.Tests.Unit
 {
-    public class EventChain : IEnumerable<Event>
+    public class EventChain : IEnumerable<IEvent>
     {
-        private readonly IList<Event> _events = new List<Event>();
+        private readonly IList<IEvent> _events = new List<IEvent>();
 
-        private Event _lastEvent;
+        private IEvent _lastEvent;
 
-        public EventChain Add(Event evt)
+        public EventChain Add(IEvent evt)
         {
             if (_lastEvent != null)
             {
-                evt.Follows(_lastEvent);
+                evt.Version = _lastEvent.Version + 1;
             }
 
             _lastEvent = evt;
@@ -23,7 +23,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             return this;
         }
 
-        public IEnumerator<Event> GetEnumerator()
+        public IEnumerator<IEvent> GetEnumerator()
         {
             return _events.GetEnumerator();
         }
@@ -33,7 +33,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             return GetEnumerator();
         }
 
-        public Event this[int index]
+        public IEvent this[int index]
         {
             get { return _events[index]; }
         }

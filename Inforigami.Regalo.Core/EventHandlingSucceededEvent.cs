@@ -5,12 +5,12 @@ namespace Inforigami.Regalo.Core
     public static class EventHandlingSucceededEvent
     {
         public static IEventHandlingSucceededEvent<TEvent> Create<TEvent>(TEvent evt)
-            where TEvent : Event
+            where TEvent : IEvent
         {
             return (IEventHandlingSucceededEvent<TEvent>)WrapEvent(evt);
         }
 
-        private static object WrapEvent(Event evt)
+        private static object WrapEvent(IEvent evt)
         {
             var wrapperType = typeof(EventHandlingSucceededEventImpl<>).MakeGenericType(evt.GetType());
             return Activator.CreateInstance(wrapperType, evt);

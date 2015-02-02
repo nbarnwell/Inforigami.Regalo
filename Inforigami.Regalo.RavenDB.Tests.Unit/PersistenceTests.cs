@@ -135,7 +135,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
 
             // Act
             var id = Guid.NewGuid();
-            store.Add(id, Enumerable.Empty<Event>());
+            store.Add(id, Enumerable.Empty<IEvent>());
             var events = store.Load(id);
 
             // Assert
@@ -166,7 +166,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             // Arrange
             IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
             var customerId = Guid.NewGuid();
-            var storedEvents = new Event[]
+            var storedEvents = new IEvent[]
                               {
                                   new CustomerSignedUp(customerId), 
                                   new SubscribedToNewsletter("latest"), 
@@ -196,7 +196,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
                         return typeof(EventStream);
                     });
 
-                var storedEvents = new Event[]
+                var storedEvents = new IEvent[]
                 {
                     new CustomerSignedUp(customerId),
                     new SubscribedToNewsletter("latest"),

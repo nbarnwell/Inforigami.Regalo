@@ -11,13 +11,13 @@ namespace Inforigami.Regalo.Testing
         public IEnumerable<object> Events { get { return _events; } }
 
         public void Publish<TEvent>(TEvent evt)
-            where TEvent : Event
+            where TEvent : IEvent
         {
             _events.Add(evt);
         }
 
         public void Publish<TEvent>(IEnumerable<TEvent> events)
-            where TEvent : Event
+            where TEvent : IEvent
         {
             foreach (var evt in events)
             {

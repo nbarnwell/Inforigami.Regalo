@@ -47,12 +47,16 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var expected = new[]
             {
                 typeof(IEventHandler<object>),
+                typeof(IEventHandler<IMessage>),
                 typeof(IEventHandler<Message>),
+                typeof(IEventHandler<IEvent>),
                 typeof(IEventHandler<Event>),
                 typeof(IEventHandler<SimpleEventBase>),
                 typeof(IEventHandler<SimpleEvent>),
                 typeof(IEventHandler<IEventHandlingSucceededEvent<object>>),
+                typeof(IEventHandler<IEventHandlingSucceededEvent<IMessage>>),
                 typeof(IEventHandler<IEventHandlingSucceededEvent<Message>>),
+                typeof(IEventHandler<IEventHandlingSucceededEvent<IEvent>>),
                 typeof(IEventHandler<IEventHandlingSucceededEvent<Event>>),
                 typeof(IEventHandler<IEventHandlingSucceededEvent<SimpleEventBase>>),
                 typeof(IEventHandler<IEventHandlingSucceededEvent<SimpleEvent>>)

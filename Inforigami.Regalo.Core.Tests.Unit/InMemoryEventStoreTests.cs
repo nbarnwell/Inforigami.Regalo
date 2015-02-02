@@ -110,7 +110,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             store.Update(id, allEvents);
 
             // Act
-            IEnumerable<Event> version3 = store.Load(id, allEvents[2].Version).ToArray();
+            IEnumerable<IEvent> version3 = store.Load(id, allEvents[2].Version).ToArray();
 
             // Assert
             CollectionAssert.AreEqual(allEvents.Take(3).ToArray(), version3);

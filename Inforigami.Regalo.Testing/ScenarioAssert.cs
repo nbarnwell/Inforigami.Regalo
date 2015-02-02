@@ -34,9 +34,9 @@ namespace Inforigami.Regalo.Testing
 
             var eventsStoredToEventStore = _context.GetGeneratedEvents();
 
-            var comparer = new ObjectComparer().Ignore<Event, Guid>(x => x.Id)
-                                               .Ignore<Event, Guid>(x => x.CausationId)
-                                               .Ignore<Event, Guid>(x => x.CorrelationId);
+            var comparer = new ObjectComparer().Ignore<IEvent, Guid>(x => x.Id)
+                                               .Ignore<IEvent, Guid>(x => x.CausationId)
+                                               .Ignore<IEvent, Guid>(x => x.CorrelationId);
 
             ObjectComparisonResult result = comparer.AreEqual(_expected, eventsStoredToEventStore);
             if (!result.AreEqual)

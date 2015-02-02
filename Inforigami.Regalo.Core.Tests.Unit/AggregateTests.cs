@@ -15,9 +15,9 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [SetUp]
         public void SetUp()
         {
-            comparer = new ObjectComparer().Ignore<Event, Guid>(x => x.Id)
-                                                 .Ignore<Event, Guid>(x => x.CausationId)
-                                                 .Ignore<Event, Guid>(x => x.CorrelationId);
+            comparer = new ObjectComparer().Ignore<IEvent, Guid>(x => x.Id)
+                                                 .Ignore<IEvent, Guid>(x => x.CausationId)
+                                                 .Ignore<IEvent, Guid>(x => x.CorrelationId);
 
             ObjectComparisonResult.ThrowOnFail = true;
         }
@@ -31,12 +31,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
 
             // Act
             user.ChangePassword("newpassword");
-            IEnumerable<Event> actual = user.GetUncommittedEvents();
+            IEnumerable<IEvent> actual = user.GetUncommittedEvents();
 
             var userRegisteredEvent = new UserRegistered(user.Id);
             var userChangedPasswordEvent = new UserChangedPassword("newpassword").Follows(userRegisteredEvent);
 
-            IEnumerable<Event> expected = new[] { userRegisteredEvent, userChangedPasswordEvent };
+            IEnumerable<IEvent> expected = new[] { userRegisteredEvent, userChangedPasswordEvent };
             
             ObjectComparisonResult result = comparer.AreEqual(expected, actual);
             if (!result.AreEqual)
@@ -56,12 +56,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Act
             var userRegisteredEvent = new UserRegistered(user.Id);
             var userChangedPasswordEvent = new UserChangedPassword("newpassword").Follows(userRegisteredEvent);
-            IEnumerable<Event> expectedBefore = new Event[] { userRegisteredEvent, userChangedPasswordEvent };
-            IEnumerable<Event> expectedAfter = new Event[0];
+            IEnumerable<IEvent> expectedBefore = new IEvent[] { userRegisteredEvent, userChangedPasswordEvent };
+            IEnumerable<IEvent> expectedAfter = new IEvent[0];
 
-            IEnumerable<Event> before = user.GetUncommittedEvents();
+            IEnumerable<IEvent> before = user.GetUncommittedEvents();
             user.AcceptUncommittedEvents();
-            IEnumerable<Event> after = user.GetUncommittedEvents();
+            IEnumerable<IEvent> after = user.GetUncommittedEvents();
             
             // Assert
             var result = comparer.AreEqual(expectedBefore, before);
@@ -91,7 +91,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var user = new User();
 
             // Act
-            user.ApplyAll(Enumerable.Empty<Event>());
+            user.ApplyAll(Enumerable.Empty<IEvent>());
 
             // Assert
             Assert.That(user.BaseVersion, Is.EqualTo(0));
@@ -102,7 +102,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         {
             // Arrange
             var user = new User();
-            var events = new Event[] { new UserRegistered(user.Id), new UserChangedPassword("newpassword"), new UserChangedPassword("newerpassword") };
+            var events = new IEvent[] { new UserRegistered(user.Id), new UserChangedPassword("newpassword"), new UserChangedPassword("newerpassword") };
 
             // Act
             user.ApplyAll(events);
@@ -117,7 +117,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var user = new User();
             user.Register();
-            var events = new Event[] {new UserRegistered(user.Id), new UserChangedPassword("newpassword"), new UserChangedPassword("newerpassword") };
+            var events = new IEvent[] {new UserRegistered(user.Id), new UserChangedPassword("newpassword"), new UserChangedPassword("newerpassword") };
 
             // Act
             user.ApplyAll(events);
@@ -132,7 +132,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var userId = Guid.Parse("{42B90234-926D-4AA6-A960-F610D52F8F88}");
             var user = new User();
-            var events = new Event[] {new UserRegistered(userId), new UserChangedPassword("newpassword"), new UserChangedPassword("newpassword") };
+            var events = new IEvent[] {new UserRegistered(userId), new UserChangedPassword("newpassword"), new UserChangedPassword("newpassword") };
             
             // Act
             user.ApplyAll(events);
@@ -153,7 +153,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void InvokingBehaviourOnObjectWithNoIdThatDoesntSetTheId_ShouldFail()
         {
             var user = new User();
-            var events = new Event[] { /*new UserRegistered(user.Id), */new UserChangedPassword("newpassword"), new UserChangedPassword("newpassword") };
+            var events = new IEvent[] { /*new UserRegistered(user.Id), */new UserChangedPassword("newpassword"), new UserChangedPassword("newpassword") };
             user.ApplyAll(events);
 
             Assert.Throws<IdNotSetException>(() => user.ChangePassword("newnewpassword"));

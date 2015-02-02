@@ -22,7 +22,7 @@ namespace Inforigami.Regalo.Core
                 AddTypeAndInterfaces(stack, baseType);
             }
 
-            return stack.ToList();
+            return stack.Distinct().ToList();
         }
 
         private static void AddTypeAndInterfaces(Stack<Type> stack, Type type)

@@ -30,7 +30,7 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
             var eventBus = new FakeEventBus();
 
             // Act
-            eventBus.Publish((IEnumerable<Event>)(new Event[] { new SomethingHappened(), new SomethingElseHappened() }));
+            eventBus.Publish((IEnumerable<IEvent>)(new IEvent[] { new SomethingHappened(), new SomethingElseHappened() }));
 
             // Assert
             CollectionAssert.AreEqual(new object[] { new SomethingHappened(), new SomethingElseHappened() }, eventBus.Events.ToArray());

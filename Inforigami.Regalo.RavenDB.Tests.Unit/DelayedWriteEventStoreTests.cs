@@ -53,7 +53,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
                 {
                     var customerId = Guid.NewGuid();
 
-                    var storedEvents = new Event[]
+                    var storedEvents = new IEvent[]
                     {
                         new CustomerSignedUp(customerId),
                         new SubscribedToNewsletter("latest"),
