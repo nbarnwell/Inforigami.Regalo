@@ -30,7 +30,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             IEventStore store = new InMemoryEventStore();
 
             // Act
-            IEnumerable<object> events = store.Load(Guid.NewGuid(), default(Guid));
+            IEnumerable<object> events = store.Load(Guid.NewGuid(), 1);
 
             // Assert
             CollectionAssert.IsEmpty(events);
@@ -101,21 +101,19 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             IEventStore store = new InMemoryEventStore();
             var id = Guid.NewGuid();
-            var allEvents = new object[]
-                                {
-                                    new UserRegistered(id),          // v1
-                                    new UserChangedPassword("pwd1"), // v2
-                                    new UserChangedPassword("pwd2"), // v3
-                                    new UserChangedPassword("pwd3"), // v4
-                                    new UserChangedPassword("pwd4"), // v5
-                                };
+            var allEvents = new EventChain().Add(new UserRegistered(id))
+                                            .Add(new UserChangedPassword("pwd1"))
+                                            .Add(new UserChangedPassword("pwd2"))
+                                            .Add(new UserChangedPassword("pwd3"))
+                                            .Add(new UserChangedPassword("pwd4"));
+
             store.Update(id, allEvents);
 
             // Act
-            IEnumerable<object> version3 = store.Load(id, ((Event)allEvents[2]).Version);
+            IEnumerable<Event> version3 = store.Load(id, allEvents[2].Version).ToArray();
 
             // Assert
-            CollectionAssert.AreEqual(allEvents.Take(3), version3);
+            CollectionAssert.AreEqual(allEvents.Take(3).ToArray(), version3);
         }
     }
 }

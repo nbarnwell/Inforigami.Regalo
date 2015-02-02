@@ -15,8 +15,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         {
             // Arrange
             IConcurrencyMonitor monitor = new StrictConcurrencyMonitor();
-            IEnumerable<object> unseenEvents = Enumerable.Empty<object>();
-            IEnumerable<object> uncommittedEvents = Enumerable.Empty<object>();
+            IEnumerable<Event> unseenEvents = Enumerable.Empty<Event>();
+            IEnumerable<Event> uncommittedEvents = Enumerable.Empty<Event>();
 
             // Act
             IEnumerable<ConcurrencyConflict> conflicts = monitor.CheckForConflicts(unseenEvents, uncommittedEvents);
@@ -30,8 +30,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         {
             // Arrange
             IConcurrencyMonitor monitor = new StrictConcurrencyMonitor();
-            IEnumerable<object> unseenEvents = Enumerable.Empty<object>();
-            IEnumerable<object> uncommittedEvents = new[]
+            IEnumerable<Event> unseenEvents = Enumerable.Empty<Event>();
+            IEnumerable<Event> uncommittedEvents = new[]
                                                         {
                                                             new UserRegistered(Guid.NewGuid())
                                                         };
@@ -48,8 +48,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         {
             // Arrange
             IConcurrencyMonitor monitor = new StrictConcurrencyMonitor();
-            IEnumerable<object> unseenEvents = new[] { new UserRegistered(Guid.NewGuid()) };
-            IEnumerable<object> uncommittedEvents = Enumerable.Empty<object>();
+            IEnumerable<Event> unseenEvents = new[] { new UserRegistered(Guid.NewGuid()) };
+            IEnumerable<Event> uncommittedEvents = Enumerable.Empty<Event>();
 
             // Act
             IEnumerable<ConcurrencyConflict> conflicts = monitor.CheckForConflicts(unseenEvents, uncommittedEvents);
@@ -64,8 +64,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var userId = Guid.NewGuid();
             IConcurrencyMonitor monitor = new StrictConcurrencyMonitor();
-            IEnumerable<object> unseenEvents = new[] { new UserChangedPassword("newpassword") };
-            IEnumerable<object> uncommittedEvents = new[] { new UserChangedPassword("differentnewpassword") };
+            IEnumerable<Event> unseenEvents = new[] { new UserChangedPassword("newpassword") };
+            IEnumerable<Event> uncommittedEvents = new[] { new UserChangedPassword("differentnewpassword") };
 
             // Act
             IList<ConcurrencyConflict> conflicts = monitor.CheckForConflicts(unseenEvents, uncommittedEvents).ToList();

@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple DDD event sourcing library based entirely on my learnings from Greg Young's DDD, CQRS and Event Sourcing course.</description>
     <releaseNotes></releaseNotes>
-    <copyright>Copyright 2012</copyright>
+    <copyright>Copyright 2015</copyright>
     <tags>CQRS EventSourcing</tags>
   </metadata>
 </package>

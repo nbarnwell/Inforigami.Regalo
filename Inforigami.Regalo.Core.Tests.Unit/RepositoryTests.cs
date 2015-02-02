@@ -54,7 +54,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var userId = Guid.NewGuid();
             eventStore.Update(
                 userId,
-                new object[]
+                new Event[]
                 {
                     new UserRegistered(userId),
                     new UserChangedPassword("newpassword"),
@@ -75,7 +75,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var eventStore = new InMemoryEventStore();
             var userId = Guid.NewGuid();
-            var events = new object[]
+            var events = new Event[]
             {
                 new UserRegistered(userId), 
                 new UserChangedPassword("newpassword"), 
@@ -112,14 +112,13 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var eventStore = new InMemoryEventStore();
             var userId = Guid.NewGuid();
-            var latestVersion = Guid.NewGuid();
             eventStore.Update(
                 userId,
-                new object[]
+                new Event[]
                 {
-                    new UserRegistered(userId),
-                    new UserChangedPassword("newpassword"),
-                    new UserChangedPassword("newnewpassword") { Version = latestVersion }
+                    new UserRegistered(userId) { Version = 1 },
+                    new UserChangedPassword("newpassword"){Version = 2},
+                    new UserChangedPassword("newnewpassword") { Version = 3 }
                 });
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
 
@@ -127,7 +126,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             User user = repository.Get(userId);
 
             // Assert
-            Assert.AreEqual(latestVersion, user.BaseVersion);
+            Assert.AreEqual(3, user.BaseVersion);
         }
 
         [Test]
@@ -142,7 +141,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             repository.Save(user);
 
             // Assert
-            concurrencyMonitor.Verify(monitor => monitor.CheckForConflicts(It.IsAny<IEnumerable<object>>(), It.IsAny<IEnumerable<object>>()), Times.Never());
+            concurrencyMonitor.Verify(monitor => monitor.CheckForConflicts(It.IsAny<IEnumerable<Event>>(), It.IsAny<IEnumerable<Event>>()), Times.Never());
         }
 
         [Test]
@@ -158,7 +157,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             repository.Save(user);
 
             // Assert
-            concurrencyMonitor.Verify(monitor => monitor.CheckForConflicts(It.IsAny<IEnumerable<object>>(), It.IsAny<IEnumerable<object>>()), Times.Never());
+            concurrencyMonitor.Verify(monitor => monitor.CheckForConflicts(It.IsAny<IEnumerable<Event>>(), It.IsAny<IEnumerable<Event>>()), Times.Never());
         }
 
         [Test]
@@ -169,8 +168,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var eventStore = new InMemoryEventStore();
             eventStore.Update(userId, new UserRegistered(userId));
 
-            var concurrencyMonitor = new Mock<IConcurrencyMonitor>();
-            var repository = new EventSourcingRepository<User>(eventStore, concurrencyMonitor.Object);
+            var concurrencyMonitor = new StrictConcurrencyMonitor();
+            var repository = new EventSourcingRepository<User>(eventStore, concurrencyMonitor);
             var user = repository.Get(userId);
 
             // Now another user changes the password before we get chance to save our changes:
@@ -178,17 +177,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
 
             user.ChangePassword("newpassword");
 
-            // Act
-            repository.Save(user);
-
-            // Assert
-            concurrencyMonitor.Verify(
-                monitor =>
-                monitor.CheckForConflicts(
-                    It.Is<IEnumerable<object>>(
-                        unseenEvents => (unseenEvents.Single() as UserChangedPassword).NewPassword == "adifferentpassword"),
-                    It.Is<IEnumerable<object>>(
-                        uncommittedEvents => (uncommittedEvents.Single() as UserChangedPassword).NewPassword == "newpassword")));
+            Assert.Throws<ConcurrencyConflictsDetectedException>(() => repository.Save(user));
         }
 
         [Test]

@@ -19,7 +19,6 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
     public class PersistenceTests
     {
         private IDocumentStore _documentStore;
-        private Mock<IVersionHandler> _versionHandlerMock;
 
         [SetUp]
         public void SetUp()
@@ -32,16 +31,13 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             //};
             _documentStore.Initialize();
 
-            _versionHandlerMock = new Mock<IVersionHandler>();
-            _versionHandlerMock.Setup(x => x.GetVersion(It.IsAny<Event>())).Returns<Event>(x => x.Version);
-            _versionHandlerMock.Setup(x => x.SetParentVersion(It.IsAny<Event>(), It.IsAny<Guid?>())).Callback<object, Guid?>((x, v) => ((Event)x).ParentVersion = v);
-            Resolver.SetResolvers(type =>
+            Resolver.Configure(type =>
             {
-                if (type == typeof(IVersionHandler)) return _versionHandlerMock.Object;
                 if (type == typeof(ILogger)) return new NullLogger();
                 throw new InvalidOperationException(string.Format("No type of {0} registered.", type));
             },
-            type => null);
+            type => null,
+            o => { });
         }
 
         [TearDown]
@@ -49,7 +45,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         {
             Conventions.SetFindAggregateTypeForEventType(null);
 
-            Resolver.ClearResolvers();
+            Resolver.Reset();
 
             _documentStore.Dispose();
             _documentStore = null;
@@ -59,8 +55,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Loading_GivenEmptyStore_ShouldReturnNull()
         {
             // Arrange
-            var versionHandlerMock = new Mock<IVersionHandler>();
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore, versionHandlerMock.Object);
+            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
 
             // Act
             IEnumerable<object> events = store.Load(Guid.NewGuid());
@@ -73,8 +68,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenSingleEvent_ShouldAllowReloading()
         {
             // Arrange
-            var versionHandlerMock = new Mock<IVersionHandler>();
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore, versionHandlerMock.Object);
+            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
 
             // Act
             var id = Guid.NewGuid();
@@ -94,8 +88,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenEventWithGuidProperty_ShouldAllowReloadingToGuidType()
         {
             // Arrange
-            var versionHandlerMock = new Mock<IVersionHandler>();
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore, versionHandlerMock.Object);
+            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
 
             var customer = new Customer();
             customer.Signup();
@@ -120,7 +113,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenEvents_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore, _versionHandlerMock.Object);
+            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
 
             // Act
             var customer = new Customer();
@@ -138,12 +131,11 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenNoEvents_ShouldDoNothing()
         {
             // Arrange
-            var versionHandlerMock = new Mock<IVersionHandler>();
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore, versionHandlerMock.Object);
+            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
 
             // Act
             var id = Guid.NewGuid();
-            store.Add(id, Enumerable.Empty<object>());
+            store.Add(id, Enumerable.Empty<Event>());
             var events = store.Load(id);
 
             // Assert
@@ -154,18 +146,15 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersion_ThenShouldOnlyReturnRequestedEvents()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore, _versionHandlerMock.Object);
+            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
             var customerId = Guid.NewGuid();
-            var storedEvents = new object[]
-                              {
-                                  new CustomerSignedUp(customerId), 
-                                  new SubscribedToNewsletter("latest"), 
-                                  new SubscribedToNewsletter("top")
-                              };
+            var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
+                                               .Add(new SubscribedToNewsletter("latest"))
+                                               .Add(new SubscribedToNewsletter("top"));
             store.Add(customerId, storedEvents);
             
             // Act
-            var events = store.Load(customerId, ((Event)storedEvents[1]).Version);
+            var events = store.Load(customerId, storedEvents[1].Version);
 
             // Assert
             CollectionAssert.AreEqual(storedEvents.Take(2), events, "Events loaded from store do not match version requested.");
@@ -175,9 +164,9 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersionThatNoEventHas_ThenShouldFail()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore, _versionHandlerMock.Object);
+            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
             var customerId = Guid.NewGuid();
-            var storedEvents = new object[]
+            var storedEvents = new Event[]
                               {
                                   new CustomerSignedUp(customerId), 
                                   new SubscribedToNewsletter("latest"), 
@@ -186,7 +175,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             store.Add(customerId, storedEvents);
 
             // Act / Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => store.Load(customerId, Guid.Parse("00000000-0000-0000-0000-000000000001")));
+            Assert.Throws<ArgumentOutOfRangeException>(() => store.Load(customerId, 4));
         }
 
         [Test]
@@ -194,7 +183,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         {
             var customerId = Guid.NewGuid();
             
-            using (var eventStore = new DelayedWriteRavenEventStore(_documentStore, _versionHandlerMock.Object))
+            using (var eventStore = new DelayedWriteRavenEventStore(_documentStore))
             {
                 Conventions.SetFindAggregateTypeForEventType(
                     type =>
@@ -207,7 +196,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
                         return typeof(EventStream);
                     });
 
-                var storedEvents = new object[]
+                var storedEvents = new Event[]
                 {
                     new CustomerSignedUp(customerId),
                     new SubscribedToNewsletter("latest"),

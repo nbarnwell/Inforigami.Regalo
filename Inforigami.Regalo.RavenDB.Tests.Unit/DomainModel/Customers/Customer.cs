@@ -39,7 +39,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers
         }
     }
 
-    public class AssignedAccountManager
+    public class AssignedAccountManager : Event
     {
         public Guid AccountManagerId { get; private set; }
 

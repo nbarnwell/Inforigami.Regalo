@@ -6,7 +6,7 @@ namespace Inforigami.Regalo.Core
         where T : AggregateRoot, new()
     {
         T Get(Guid id);
-        T Get(Guid id, Guid version);
+        T Get(Guid id, int version);
         void Save(T item);
     }
 }

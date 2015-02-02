@@ -12,14 +12,9 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
         [SetUp]
         public void SetUp()
         {
-            Resolver.SetResolvers(
+            Resolver.Configure(
                 type =>
                 {
-                    if (type == typeof(IVersionHandler))
-                    {
-                        return new DefaultVersionHandler();
-                    }
-
                     if (type == typeof(ILogger))
                     {
                         return new ConsoleLogger();
@@ -27,10 +22,8 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
 
                     throw new InvalidOperationException(string.Format("No resolver registered for {0}", type));
                 },
-                type =>
-                {
-                    return null;
-                });
+                type => null,
+                o => { });
 
             ObjectComparisonResult.ThrowOnFail = true;
         }
@@ -40,7 +33,7 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
         {
             ObjectComparisonResult.ThrowOnFail = false;
 
-            Resolver.ClearResolvers();
+            Resolver.Reset();
         }
 
         [Test]
@@ -50,7 +43,7 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
                     .HandledBy<PlaceSalesOrderCommandHandler>(CreateHandler())
                     .Given(SalesOrderTestDataBuilder.NewOrder().WithSingleLineItem())
                     .When(c => new PlaceSalesOrder(c.Id))
-                    .Then((a, c) => new[] { new SalesOrderPlaced(a.Id) })
+                    .Then((a, c) => new[] { new SalesOrderPlaced(a.Id) { Version = a.BaseVersion + 1 } })
                     .Assert();
         }
 

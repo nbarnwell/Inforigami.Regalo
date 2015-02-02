@@ -11,23 +11,18 @@ namespace Inforigami.Regalo.RavenDB
 {
     public class DelayedWriteRavenEventStore : IDelayedWriteEventStore, IEventStoreWithPreloading, IDisposable
     {
-        private readonly IVersionHandler _versionHandler;
-
         private bool _hasChanges;
         private IDocumentSession _documentSession;
 
-        public DelayedWriteRavenEventStore(IDocumentStore documentStore, IVersionHandler versionHandler)
+        public DelayedWriteRavenEventStore(IDocumentStore documentStore)
         {
             if (documentStore == null) throw new ArgumentNullException("documentStore");
-            if (versionHandler == null) throw new ArgumentNullException("versionHandler");
 
             _documentSession = documentStore.OpenSession();
             _documentSession.Advanced.UseOptimisticConcurrency = true;
-
-            _versionHandler = versionHandler;
         }
 
-        public void Add(Guid aggregateId, IEnumerable<object> events)
+        public void Add(Guid aggregateId, IEnumerable<Event> events)
         {
             var stream = new EventStream(aggregateId.ToString());
             stream.Append(events);
@@ -38,7 +33,7 @@ namespace Inforigami.Regalo.RavenDB
             _hasChanges = true;
         }
 
-        public void Update(Guid aggregateId, IEnumerable<object> events)
+        public void Update(Guid aggregateId, IEnumerable<Event> events)
         {
             var aggregateIdAsString = aggregateId.ToString();
 
@@ -76,7 +71,7 @@ namespace Inforigami.Regalo.RavenDB
             _documentSession.Load<EventStream>(idValues);
         }
 
-        public IEnumerable<object> Load(Guid aggregateId)
+        public IEnumerable<Event> Load(Guid aggregateId)
         {
             var aggregateIdAsString = aggregateId.ToString();
 
@@ -86,36 +81,30 @@ namespace Inforigami.Regalo.RavenDB
             {
                 var events = stream.Events;
 
-                return events.Any() ? events : Enumerable.Empty<object>();
+                return events.Any() ? events : Enumerable.Empty<Event>();
             }
 
-            return Enumerable.Empty<object>();
+            return Enumerable.Empty<Event>();
         }
 
-        public IEnumerable<object> Load(Guid aggregateId, Guid maxVersion)
+        public IEnumerable<Event> Load(Guid aggregateId, int maxVersion)
         {
             var events = Load(aggregateId).ToList();
 
-            if (events.All(x => _versionHandler.GetVersion(x) != maxVersion))
+            if (events.All(x => x.Version != maxVersion))
             {
                 throw new ArgumentOutOfRangeException(
                     "maxVersion",
                     maxVersion,
-                    string.Format("Version {0} not found for aggregate {1}", maxVersion, aggregateId));
+                    string.Format("BaseVersion {0} not found for aggregate {1}", maxVersion, aggregateId));
             }
 
             return GetEventsForVersion(events, maxVersion).ToList();
         }
 
-        private IEnumerable<object> GetEventsForVersion(IEnumerable<object> events, Guid maxVersion)
+        private static IEnumerable<Event> GetEventsForVersion(IEnumerable<Event> events, int maxVersion)
         {
-            foreach (var evt in events)
-            {
-                yield return evt;
-
-                var eventVersion = _versionHandler.GetVersion(evt);
-                if (eventVersion == maxVersion) break;
-            }
+            return events.Where(x => x.Version <= maxVersion);
         }
 
         public void Dispose()

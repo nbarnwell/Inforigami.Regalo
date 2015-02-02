@@ -6,11 +6,15 @@ namespace Inforigami.Regalo.Core
 {
     public abstract class Message
     {
+        public Guid Id { get; set; }
+        public Guid CausationId { get; set; }
+        public Guid CorrelationId { get; set; }
+
         protected Message()
         {
-            Id = Guid.NewGuid();
+            Id            = GuidProvider.NewGuid();
+            CausationId   = Id;
+            CorrelationId = Id;
         }
-
-        public Guid Id { get; set; }
     }
 }

@@ -15,6 +15,7 @@ namespace Inforigami.Regalo.Core
         }
 
         public void Publish<TEvent>(TEvent evt)
+            where TEvent : Event
         {
             var eventType = evt.GetType();
 
@@ -56,6 +57,7 @@ namespace Inforigami.Regalo.Core
         }
 
         public void Publish<TEvent>(IEnumerable<TEvent> events)
+            where TEvent : Event
         {
             foreach (var evt in events)
             {

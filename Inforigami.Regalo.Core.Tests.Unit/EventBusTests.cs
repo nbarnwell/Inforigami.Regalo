@@ -25,7 +25,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             _eventHandlerB = new EventHandlerB();
             _eventBus = new EventBus(new ConsoleLogger());
 
-            Resolver.SetResolvers(type => null, LocateAllEventHandlers);
+            Resolver.Configure(type => null, LocateAllEventHandlers, o => { });
             Conventions.SetRetryableEventHandlingExceptionFilter(null);
         }
 
@@ -38,7 +38,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [TearDown]
         public void TearDown()
         {
-            Resolver.ClearResolvers();
+            Resolver.Reset();
         }
 
         [Test]
@@ -47,22 +47,27 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var expected = new[]
             {
                 typeof(IEventHandler<object>),
+                typeof(IEventHandler<Message>),
+                typeof(IEventHandler<Event>),
                 typeof(IEventHandler<SimpleEventBase>),
                 typeof(IEventHandler<SimpleEvent>),
                 typeof(IEventHandler<IEventHandlingSucceededEvent<object>>),
+                typeof(IEventHandler<IEventHandlingSucceededEvent<Message>>),
+                typeof(IEventHandler<IEventHandlingSucceededEvent<Event>>),
                 typeof(IEventHandler<IEventHandlingSucceededEvent<SimpleEventBase>>),
                 typeof(IEventHandler<IEventHandlingSucceededEvent<SimpleEvent>>)
             };
 
             var result = new List<Type>();
-            Resolver.ClearResolvers();
-            Resolver.SetResolvers(
+            Resolver.Reset();
+            Resolver.Configure(
                 type => null,
                 type =>
                 {
                     result.Add(type);
                     return LocateAllEventHandlers(type);
-                });
+                }, 
+                o => { });
 
             _eventBus.Publish(new SimpleEvent());
 
@@ -102,10 +107,11 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenAMessageThatWillFailHandling_WhenAskedToPublish_ShouldGenerateFailedHandlingMessage()
         {
             var failingEventHandler = new FailingEventHandler();
-            Resolver.ClearResolvers();
-            Resolver.SetResolvers(
+            Resolver.Reset();
+            Resolver.Configure(
                 type => null,
-                type => new object[] { failingEventHandler }.Where(x => type.IsAssignableFrom(x.GetType())));
+                type => new object[] { failingEventHandler }.Where(x => type.IsAssignableFrom(x.GetType())),
+                o => { });
 
             var eventThatWillFailToBeHandled = new SimpleEvent();
             _eventBus.Publish(eventThatWillFailToBeHandled);
@@ -124,10 +130,11 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         {
             Conventions.SetRetryableEventHandlingExceptionFilter((o, e) => true);
             var failingEventHandler = new FailingEventHandler();
-            Resolver.ClearResolvers();
-            Resolver.SetResolvers(
+            Resolver.Reset();
+            Resolver.Configure(
                 type => null,
-                type => new object[] { failingEventHandler }.Where(x => type.IsAssignableFrom(x.GetType())));
+                type => new object[] { failingEventHandler }.Where(x => type.IsAssignableFrom(x.GetType())),
+                o => { });
 
             var eventThatWillFailToBeHandled = new SimpleEvent();
             var exception = Assert.Throws<TargetInvocationException>(() => _eventBus.Publish(eventThatWillFailToBeHandled));
@@ -141,7 +148,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         }
     }
 
-    public class EventHandledByMultipleHandlers
+    public class EventHandledByMultipleHandlers : Event
     {
     }
 
@@ -169,7 +176,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
     {
     }
 
-    public class SimpleEventBase // Remember this inherits from object...
+    public class SimpleEventBase : Event // Remember this inherits from object...
     {
     }
 

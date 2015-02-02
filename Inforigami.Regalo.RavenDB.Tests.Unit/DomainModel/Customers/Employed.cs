@@ -1,8 +1,9 @@
 using System;
+using Inforigami.Regalo.Core;
 
 namespace Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers
 {
-    public class Employed
+    public class Employed : Event
     {
         public Guid AggregateId { get; private set; }
         public DateTime StartDate { get; private set; }

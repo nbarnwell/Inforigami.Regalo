@@ -27,16 +27,16 @@ namespace Inforigami.Regalo.Testing
             /*
              * Plan is to invoke the command on the handler and retrieve the actual
              * events from the repository and eventbus, and compare both with the
-             * expected events list passed-in using Inforigami.Regalo.Object compare.
+             * expected events list passed-in using Inforigami.Regalo.ObjectCompare.
              */
 
             InvokeHandler();
 
             var eventsStoredToEventStore = _context.GetGeneratedEvents();
 
-            var comparer = new ObjectComparer().Ignore<Event, Guid?>(x => x.ParentVersion)
-                                               .Ignore<Event, Guid>(x => x.Version)
-                                               .Ignore<Event, Guid>(x => x.Id);
+            var comparer = new ObjectComparer().Ignore<Event, Guid>(x => x.Id)
+                                               .Ignore<Event, Guid>(x => x.CausationId)
+                                               .Ignore<Event, Guid>(x => x.CorrelationId);
 
             ObjectComparisonResult result = comparer.AreEqual(_expected, eventsStoredToEventStore);
             if (!result.AreEqual)

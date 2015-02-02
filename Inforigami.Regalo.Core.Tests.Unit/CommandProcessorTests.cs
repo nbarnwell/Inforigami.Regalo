@@ -19,7 +19,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             _objectCommandHandler = new ObjectCommandHandler();
             _commandHandlerA = new CommandHandlerA();
             _commandHandlerB = new CommandHandlerB();
-            Resolver.SetResolvers(type => null, LocateAllCommandHandlers);
+            Resolver.Configure(type => null, LocateAllCommandHandlers, o => { });
         }
 
         private IEnumerable<object> LocateAllCommandHandlers(Type type)
@@ -31,7 +31,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [TearDown]
         public void TearDown()
         {
-            Resolver.ClearResolvers();
+            Resolver.Reset();
         }
 
         [Test]
@@ -45,14 +45,15 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             };
 
             var result = new List<Type>();
-            Resolver.ClearResolvers();
-            Resolver.SetResolvers(
+            Resolver.Reset();
+            Resolver.Configure(
                 type => null,
                 type =>
                 {
                     result.Add(type);
                     return LocateAllCommandHandlers(type);
-                });
+                },
+                o => { });
 
             var processor = new CommandProcessor(new NullLogger());
 

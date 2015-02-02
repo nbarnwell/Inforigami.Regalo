@@ -25,6 +25,11 @@ namespace Inforigami.Regalo.Testing
             return _repository.Get(id);
         }
 
+        public TEntity Get(Guid id, int version)
+        {
+            return _repository.Get(id, version);
+        }
+
         public void SaveAndPublishEvents(TEntity entity)
         {
             var uncommittedEvents = entity.GetUncommittedEvents();

@@ -2,8 +2,7 @@ using System;
 
 namespace Inforigami.Regalo.Core
 {
-    public abstract class EventHandlingResultEvent
+    public abstract class EventHandlingResultEvent : Event
     {
-        public Guid CorrelationId { get; set; }
     }
 }

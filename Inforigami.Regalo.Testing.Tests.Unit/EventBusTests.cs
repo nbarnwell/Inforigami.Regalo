@@ -30,14 +30,15 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
             var eventBus = new FakeEventBus();
 
             // Act
-            eventBus.Publish((IEnumerable<object>)(new object[] { new SomethingHappened(), new SomethingElseHappened() }));
+            eventBus.Publish((IEnumerable<Event>)(new Event[] { new SomethingHappened(), new SomethingElseHappened() }));
 
             // Assert
             CollectionAssert.AreEqual(new object[] { new SomethingHappened(), new SomethingElseHappened() }, eventBus.Events.ToArray());
         }
     }
 
-    public class SomethingHappened {
+    public class SomethingHappened : Event
+    {
         public bool Equals(SomethingHappened other)
         {
             return !ReferenceEquals(null, other);
@@ -67,7 +68,8 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
         }
     }
 
-    public class SomethingElseHappened {
+    public class SomethingElseHappened : Event
+    {
         public bool Equals(SomethingElseHappened other)
         {
             return !ReferenceEquals(null, other);

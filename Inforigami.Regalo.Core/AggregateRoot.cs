@@ -10,12 +10,21 @@ namespace Inforigami.Regalo.Core
         private static readonly ILogger __logger = Resolver.Resolve<ILogger>();
         
         private readonly IDictionary<RuntimeTypeHandle, MethodInfo> _applyMethodCache = new Dictionary<RuntimeTypeHandle, MethodInfo>();
-        private readonly IList<object> _uncommittedEvents = new List<object>();
+        private readonly IList<Event> _uncommittedEvents = new List<Event>();
 
         public Guid Id { get; protected set; }
-        public Guid? BaseVersion { get; private set; }
 
-        public IEnumerable<object> GetUncommittedEvents()
+        /// <summary>
+        /// The version of the aggregate when loaded from the store.
+        /// </summary>
+        public int BaseVersion { get; private set; }
+
+        /// <summary>
+        /// The current version of the aggregate taking into account any uncommitted events it has generated.
+        /// </summary>
+        public int Version { get; private set; }
+
+        public IEnumerable<Event> GetUncommittedEvents()
         {
             return _uncommittedEvents.ToList();
         }
@@ -24,39 +33,29 @@ namespace Inforigami.Regalo.Core
         {
             if (_uncommittedEvents.Any() == false) return;
 
-            var version = FindCurrentVersion();
-
-            BaseVersion = version;
+            BaseVersion = Version;
             int eventCount = _uncommittedEvents.Count;
             _uncommittedEvents.Clear();
             __logger.Debug(this, "Accepted {0} uncommitted events. Now at base version {1}", eventCount, BaseVersion);
         }
 
-        public void ApplyAll(IEnumerable<object> events)
+        public void ApplyAll(IEnumerable<Event> events)
         {
-            object lastEvent = null;
-            int i = 0;
-            foreach (var evt in events)
+            var eventList = events as IList<Event> ?? events.ToList();
+
+            foreach (var evt in eventList)
             {
                 ApplyEvent(evt);
-
-                lastEvent = evt;
-                i++;
             }
 
-            if (lastEvent != null)
-            {
-                var versionHandler = Resolver.Resolve<IVersionHandler>();
-                var currentVersion = versionHandler.GetVersion(lastEvent);
-                BaseVersion = currentVersion;
-            }
+            BaseVersion = Version;
 
-            __logger.Debug(this, "Applied {0} events. Now at base version {1}", i, BaseVersion);
+            __logger.Debug(this, "Applied {0} events. Now at base version {1}", eventList.Count, BaseVersion);
         }
 
-        protected void Record(object evt)
+        protected void Record(Event evt)
         {
-            SetParentVersion(evt);
+            evt.Version = Version + 1;
 
             ApplyEvent(evt);
 
@@ -67,14 +66,10 @@ namespace Inforigami.Regalo.Core
             __logger.Debug(this, "Recorded new event: {0}", evt);
         }
 
-        private void SetParentVersion(object evt)
+        private void ApplyEvent(Event evt)
         {
-            var versionHandler = Resolver.Resolve<IVersionHandler>();
-            versionHandler.SetParentVersion(evt, FindCurrentVersion());
-        }
+            Version = evt.Version;
 
-        private void ApplyEvent(object evt)
-        {
             var applyMethods = FindApplyMethods(evt);
 
             foreach (var applyMethod in applyMethods)
@@ -88,19 +83,6 @@ namespace Inforigami.Regalo.Core
             if (Id == default(Guid))
             {
                 throw new IdNotSetException();
-            }
-        }
-
-        private Guid? FindCurrentVersion()
-        {
-            if (_uncommittedEvents.Any())
-            {
-                var versionHandler = Resolver.Resolve<IVersionHandler>();
-                return versionHandler.GetVersion(_uncommittedEvents.Last());
-            }
-            else
-            {
-                return BaseVersion;
             }
         }
 

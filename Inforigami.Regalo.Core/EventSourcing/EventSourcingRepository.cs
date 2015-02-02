@@ -21,17 +21,17 @@ namespace Inforigami.Regalo.Core.EventSourcing
             return Get(id, null);
         }
 
-        public TAggregateRoot Get(Guid id, Guid version)
+        public TAggregateRoot Get(Guid id, int version)
         {
-            return Get(id, (Guid?)version);
+            return Get(id, (int?)version);
         }
 
-        private TAggregateRoot Get(Guid id, Guid? version)
+        private TAggregateRoot Get(Guid id, int? version)
         {
-            var events = version == null
-                ? _eventStore.Load(id)
-                : _eventStore.Load(id, version.Value)
-                ;
+            var events =
+                version == null
+                    ? _eventStore.Load(id)
+                    : _eventStore.Load(id, version.Value);
 
             events = events.ToList();
 
@@ -54,7 +54,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
             if (_loaded.Contains(item.Id))
             {
-                object[] baseAndUnseenEvents = _eventStore.Load(item.Id).ToArray();
+                Event[] baseAndUnseenEvents = _eventStore.Load(item.Id).ToArray();
 
                 if (baseAndUnseenEvents.Length > 0)
                 {
@@ -79,29 +79,9 @@ namespace Inforigami.Regalo.Core.EventSourcing
             item.AcceptUncommittedEvents();
         }
 
-        private static IEnumerable<object> GetUnseenEvents(TAggregateRoot item, IList<object> baseAndUnseenEvents)
+        private static IEnumerable<Event> GetUnseenEvents(TAggregateRoot item, IEnumerable<Event> baseAndUnseenEvents)
         {
-            var versionHandler = Resolver.Resolve<IVersionHandler>();
-            var unseenEvents = new Stack<object>();
-
-            // Reverse through the list, adding items to the "unseen" events list
-            // until we find the "base" event, put all previous events into the base
-            // events list in one go.
-            for (int i = baseAndUnseenEvents.Count - 1; i >= 0; i--)
-            {
-                var evt = baseAndUnseenEvents[i];
-
-                if (versionHandler.GetVersion(evt) != item.BaseVersion)
-                {
-                    unseenEvents.Push(evt);
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return unseenEvents;
+            return baseAndUnseenEvents.Where(x => x.Version > item.BaseVersion);
         }
     }
 }

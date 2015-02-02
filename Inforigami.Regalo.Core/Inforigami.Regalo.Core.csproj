@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -45,7 +45,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="Conventions.cs" />
-    <Compile Include="DefaultVersionHandler.cs" />
+    <Compile Include="DateTimeOffsetProvider.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="EventBus.cs" />
@@ -61,8 +61,8 @@
     <Compile Include="EventSourcing\IEventStoreWithPreloading.cs" />
     <Compile Include="EventSourcing\InMemoryEventStore.cs" />
     <Compile Include="EventSourcing\StrictConcurrencyMonitor.cs" />
+    <Compile Include="GuidProvider.cs" />
     <Compile Include="ICommandHandler.cs" />
-    <Compile Include="ICommandBus.cs" />
     <Compile Include="ICommandProcessor.cs" />
     <Compile Include="IdNotSetException.cs" />
     <Compile Include="IEventBus.cs" />
@@ -72,13 +72,11 @@
     <Compile Include="ILogger.cs" />
     <Compile Include="IMessageHandlerContext.cs" />
     <Compile Include="IRepository.cs" />
-    <Compile Include="IVersionHandler.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="MessageHandlerContext.cs" />
     <Compile Include="MessageProcessorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.Version.cs" />
-    <Compile Include="RuntimeConfiguredVersionHandler.cs" />
     <Compile Include="Resolver.cs" />
     <Compile Include="TypeInspector.cs" />
   </ItemGroup>

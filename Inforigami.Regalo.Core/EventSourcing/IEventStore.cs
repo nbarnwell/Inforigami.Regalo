@@ -5,9 +5,9 @@ namespace Inforigami.Regalo.Core.EventSourcing
 {
     public interface IEventStore
     {
-        void Add(Guid aggregateId, IEnumerable<object> events);
-        void Update(Guid aggregateId, IEnumerable<object> events);
-        IEnumerable<object> Load(Guid aggregateId);
-        IEnumerable<object> Load(Guid aggregateId, Guid maxVersion);
+        void Add(Guid aggregateId, IEnumerable<Event> events);
+        void Update(Guid aggregateId, IEnumerable<Event> events);
+        IEnumerable<Event> Load(Guid aggregateId);
+        IEnumerable<Event> Load(Guid aggregateId, int version);
     }
 }

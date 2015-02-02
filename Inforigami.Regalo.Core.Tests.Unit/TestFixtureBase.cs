@@ -14,20 +14,11 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [SetUp]
         public void SetUp()
         {
-            var _versionHandler = new RuntimeConfiguredVersionHandler();
-            _versionHandler.AddConfiguration<UserChangedPassword>(e => e.Version, (e, v) => e.ParentVersion = v);
-            _versionHandler.AddConfiguration<UserRegistered>(e => e.Version, (e, v) => e.ParentVersion = v);
-
             var _nullLogger = new NullLogger();
 
-            Resolver.SetResolvers(
+            Resolver.Configure(
                 type =>
                 {
-                    if (type == typeof(IVersionHandler))
-                    {
-                        return _versionHandler;
-                    }
-
                     if (type == typeof(ILogger))
                     {
                         return _nullLogger;
@@ -35,13 +26,14 @@ namespace Inforigami.Regalo.Core.Tests.Unit
 
                     throw new NotSupportedException(string.Format("TestFixtureBase::SetUp - Nothing registered for {0}", type));
                 },
-                type => null);
+                type => null,
+                o => { });
         }
 
         [TearDown]
         public void TearDown()
         {
-            Resolver.ClearResolvers();
+            Resolver.Reset();
         }
 
         protected void CollectionAssertAreJsonEqual(IEnumerable<object> expected, IEnumerable<object> actual)
@@ -78,14 +70,26 @@ namespace Inforigami.Regalo.Core.Tests.Unit
 
             result = Regex.Replace(
                     result,
-                    @"""Version""\s*:\s*""(?i:[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})""",
-                    @"""Version"" : ""00000000-0000-0000-0000-000000000000""");
+                    @"""BaseVersion""\s*:\s*""(?i:[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})""",
+                    @"""BaseVersion"" : ""00000000-0000-0000-0000-000000000000""");
 
             result =
                 Regex.Replace(
                     result,
                     @"""ParentVersion""\s*:\s*""(?i:[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})""",
                     @"""ParentVersion"" : ""00000000-0000-0000-0000-000000000000""");
+
+            result =
+                Regex.Replace(
+                    result,
+                    @"""CausationId""\s*:\s*""(?i:[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})""",
+                    @"""CausationId"" : ""00000000-0000-0000-0000-000000000000""");
+
+            result =
+                Regex.Replace(
+                    result,
+                    @"""CorrelationId""\s*:\s*""(?i:[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})""",
+                    @"""CorrelationId"" : ""00000000-0000-0000-0000-000000000000""");
 
             return result;
         }

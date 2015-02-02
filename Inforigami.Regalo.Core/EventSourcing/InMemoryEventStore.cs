@@ -6,47 +6,58 @@ namespace Inforigami.Regalo.Core.EventSourcing
 {
     public class InMemoryEventStore : IEventStore
     {
-        private readonly IDictionary<Guid, IList<object>> _aggregates = new Dictionary<Guid, IList<object>>();
+        private readonly IDictionary<Guid, IList<Event>> _aggregates = new Dictionary<Guid, IList<Event>>();
 
-        public IEnumerable<object> Load(Guid aggregateId)
+        public IEnumerable<Event> Load(Guid aggregateId)
         {
             return GetAggregateEventList(aggregateId);
         }
 
-        public IEnumerable<object> Load(Guid aggregateId, Guid maxVersion)
+        public IEnumerable<Event> Load(Guid aggregateId, int maxVersion)
         {
-            var versionHandler = Resolver.Resolve<IVersionHandler>();
-            IList<object> events = GetAggregateEventList(aggregateId);
-            foreach (var evt in events)
-            {
-                yield return evt;
-                if (versionHandler.GetVersion(evt) == maxVersion) break;
-            }
+            IList<Event> events = GetAggregateEventList(aggregateId);
+            return events.Where(x => x.Version <= maxVersion);
         }
 
-        public void Add(Guid aggregateId, IEnumerable<object> events)
+        public void Add(Guid aggregateId, IEnumerable<Event> events)
         {
             Update(aggregateId, events);
         }
 
-        public void Update(Guid aggregateId, object evt)
+        public void Update(Guid aggregateId, Event evt)
         {
-            IList<object> aggregateEventList = GetAggregateEventList(aggregateId);
+            IList<Event> aggregateEventList = GetAggregateEventList(aggregateId);
+            var lastEvent = aggregateEventList.LastOrDefault();
+
+            if (lastEvent != null)
+            {
+                evt.Follows(lastEvent);
+            }
+
             aggregateEventList.Add(evt);
         }
 
-        public void Update(Guid aggregateId, IEnumerable<object> events)
+        public void Update(Guid aggregateId, IEnumerable<Event> events)
         {
-            IList<object> aggregateEventList = GetAggregateEventList(aggregateId);
+            IList<Event> aggregateEventList = GetAggregateEventList(aggregateId);
+            var lastEvent = aggregateEventList.LastOrDefault();
+
             foreach (var evt in events)
             {
+                if (lastEvent != null)
+                {
+                    evt.Follows(lastEvent);
+                }
+
+                lastEvent = evt;
+
                 aggregateEventList.Add(evt);
             }
         }
 
-        private IList<object> FindAggregateEventList(Guid aggregateId)
+        private IList<Event> FindAggregateEventList(Guid aggregateId)
         {
-            IList<object> aggregateEventList;
+            IList<Event> aggregateEventList;
             if (!_aggregates.TryGetValue(aggregateId, out aggregateEventList))
             {
                 return null;
@@ -54,18 +65,18 @@ namespace Inforigami.Regalo.Core.EventSourcing
             return aggregateEventList;
         }
 
-        private IList<object> GetAggregateEventList(Guid aggregateId)
+        private IList<Event> GetAggregateEventList(Guid aggregateId)
         {
-            IList<object> aggregateEventList = FindAggregateEventList(aggregateId);
+            IList<Event> aggregateEventList = FindAggregateEventList(aggregateId);
             if (aggregateEventList == null)
             {
-                aggregateEventList = new List<object>();
+                aggregateEventList = new List<Event>();
                 _aggregates.Add(aggregateId, aggregateEventList);
             }
             return aggregateEventList;
         }
 
-        public IEnumerable<object> Events
+        public IEnumerable<Event> Events
         {
             get { return _aggregates.Values.SelectMany(list => list).ToArray(); }
         }

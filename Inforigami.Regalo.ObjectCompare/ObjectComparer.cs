@@ -88,12 +88,15 @@ namespace Inforigami.Regalo.ObjectCompare
                     {
                         var value1 = property.GetValue(object1, null);
 
-                        if (_circularReferenceChecklist.Contains(value1))
+                        if (property.PropertyType.IsPrimitive == false)
                         {
-                            return ObjectComparisonResult.Success();
-                        }
+                            if (_circularReferenceChecklist.Contains(value1))
+                            {
+                                return ObjectComparisonResult.Success();
+                            }
 
-                        _circularReferenceChecklist.Add(value1);
+                            _circularReferenceChecklist.Add(value1);
+                        }
 
                         var value2 = property.GetValue(object2, null);
 
