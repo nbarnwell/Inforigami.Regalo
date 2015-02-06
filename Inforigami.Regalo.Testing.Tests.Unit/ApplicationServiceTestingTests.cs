@@ -43,7 +43,7 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
                     .HandledBy<PlaceSalesOrderCommandHandler>(CreateHandler())
                     .Given(SalesOrderTestDataBuilder.NewOrder().WithSingleLineItem())
                     .When(c => new PlaceSalesOrder(c.Id))
-                    .Then((a, c) => new[] { new SalesOrderPlaced(a.Id) { Version = a.BaseVersion + 1 } })
+                    .Then((a, c) => new EventChain(a.BaseVersion) { new SalesOrderPlaced(a.Id) })
                     .Assert();
         }
 

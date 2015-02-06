@@ -14,7 +14,7 @@ namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 
         public void Handle(PlaceSalesOrder command)
         {
-            var order = _context.Get(command.Id);
+            var order = _context.Get(command.SalesOrderId);
             order.PlaceOrder();
             _context.SaveAndPublishEvents(order);
         }

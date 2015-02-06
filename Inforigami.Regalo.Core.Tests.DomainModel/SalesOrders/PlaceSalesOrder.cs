@@ -3,11 +3,13 @@ using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 {
-    public class PlaceSalesOrder : Command
+    public class PlaceSalesOrder : ICommand
     {
-        public PlaceSalesOrder(Guid id)
+        public Guid SalesOrderId { get; private set; }
+
+        public PlaceSalesOrder(Guid salesOrderId)
         {
-            Id = id;
+            SalesOrderId = salesOrderId;
         }
     }
 }

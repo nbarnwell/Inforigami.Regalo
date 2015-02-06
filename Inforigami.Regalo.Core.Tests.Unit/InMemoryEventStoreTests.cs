@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Inforigami.Regalo.Interfaces;
+using Inforigami.Regalo.Testing;
 using NUnit.Framework;
 using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
@@ -111,7 +112,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             store.Update(id, allEvents);
 
             // Act
-            IEnumerable<IEvent> version3 = store.Load(id, allEvents[2].Version).ToArray();
+            IEnumerable<IEvent> version3 = store.Load(id, allEvents[2].Headers.Version).ToArray();
 
             // Assert
             CollectionAssert.AreEqual(allEvents.Take(3).ToArray(), version3);

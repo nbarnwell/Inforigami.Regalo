@@ -17,7 +17,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
         public IEnumerable<IEvent> Load(Guid aggregateId, int maxVersion)
         {
             IList<IEvent> events = GetAggregateEventList(aggregateId);
-            return events.Where(x => x.Version <= maxVersion);
+            return events.Where(x => x.Headers.Version <= maxVersion);
         }
 
         public void Add(Guid aggregateId, IEnumerable<IEvent> events)
@@ -32,7 +32,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
             if (lastEvent != null)
             {
-                evt.Version = lastEvent.Version + 1;
+                evt.Headers.Version = lastEvent.Headers.Version + 1;
             }
 
             aggregateEventList.Add(evt);
@@ -47,7 +47,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
             {
                 if (lastEvent != null)
                 {
-                    evt.Version = lastEvent.Version + 1;
+                    evt.Headers.Version = lastEvent.Headers.Version + 1;
                 }
 
                 lastEvent = evt;

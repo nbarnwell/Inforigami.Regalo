@@ -26,7 +26,7 @@ namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 
         private void Apply(SalesOrderCreated evt)
         {
-            Id = evt.AggregateId;
+            Id = evt.SalesOrderId;
         }
 
         private void Apply(ItemsAddedToOrder evt)

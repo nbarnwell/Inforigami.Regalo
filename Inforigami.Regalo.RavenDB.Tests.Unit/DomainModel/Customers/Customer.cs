@@ -48,25 +48,5 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers
         {
             AccountManagerId = accountManagerId;
         }
-
-        public bool Equals(AssignedAccountManager other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return other.AccountManagerId.Equals(AccountManagerId);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(AssignedAccountManager)) return false;
-            return Equals((AssignedAccountManager)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return AccountManagerId.GetHashCode();
-        }
     }
 }

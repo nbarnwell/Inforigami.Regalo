@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using Inforigami.Regalo.Interfaces;
 using NUnit.Framework;
-using Inforigami.Regalo.Core;
 
 namespace Inforigami.Regalo.Testing.Tests.Unit
 {
@@ -18,10 +15,10 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
             var eventBus = new FakeEventBus();
 
             // Act
-            eventBus.Publish(new SomethingHappened());
+            eventBus.Publish(new SomethingHappened(1));
 
             // Assert
-            CollectionAssert.AreEqual(new object[] {new SomethingHappened()}, eventBus.Events);
+            CollectionAssert.AreEqual(new object[] {new SomethingHappened(1)}, eventBus.Events);
         }
 
         [Test]
@@ -31,72 +28,66 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
             var eventBus = new FakeEventBus();
 
             // Act
-            eventBus.Publish((IEnumerable<IEvent>)(new IEvent[] { new SomethingHappened(), new SomethingElseHappened() }));
+            eventBus.Publish((IEnumerable<IEvent>)(new IEvent[] { new SomethingHappened(1), new SomethingElseHappened(2) }));
 
             // Assert
-            CollectionAssert.AreEqual(new object[] { new SomethingHappened(), new SomethingElseHappened() }, eventBus.Events.ToArray());
+            CollectionAssert.AreEqual(new object[] { new SomethingHappened(1), new SomethingElseHappened(2) }, eventBus.Events.ToArray());
         }
     }
 
     public class SomethingHappened : Event
     {
-        public bool Equals(SomethingHappened other)
+        public int Id { get; private set; }
+
+        public SomethingHappened(int id)
         {
-            return !ReferenceEquals(null, other);
+            Id = id;
+        }
+
+        protected bool Equals(SomethingHappened other)
+        {
+            return Id == other.Id;
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(SomethingHappened)) return false;
+            if (obj.GetType() != this.GetType()) return false;
             return Equals((SomethingHappened)obj);
         }
 
         public override int GetHashCode()
         {
-            return 0;
-        }
-
-        public static bool operator ==(SomethingHappened left, SomethingHappened right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(SomethingHappened left, SomethingHappened right)
-        {
-            return !Equals(left, right);
+            return Id;
         }
     }
 
     public class SomethingElseHappened : Event
-    {
-        public bool Equals(SomethingElseHappened other)
+    {   
+        public int Id { get; private set; }
+
+        public SomethingElseHappened(int id)
         {
-            return !ReferenceEquals(null, other);
+            Id = id;
+        }
+
+        protected bool Equals(SomethingElseHappened other)
+        {
+            return Id == other.Id;
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(SomethingElseHappened)) return false;
+            if (obj.GetType() != this.GetType()) return false;
             return Equals((SomethingElseHappened)obj);
         }
 
         public override int GetHashCode()
         {
-            return 0;
-        }
-
-        public static bool operator ==(SomethingElseHappened left, SomethingElseHappened right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(SomethingElseHappened left, SomethingElseHappened right)
-        {
-            return !Equals(left, right);
+            return Id;
         }
     }
 }

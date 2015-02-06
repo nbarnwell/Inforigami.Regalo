@@ -49,20 +49,23 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         [Test]
         public void Disposing_a_delayedwriteeventstore_with_pending_changes_should_throw_exception()
         {
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                using (var eventStore = new DelayedWriteRavenEventStore(_documentStore))
+            Assert.Throws<InvalidOperationException>(
+                () =>
                 {
-                    var customerId = Guid.NewGuid();
+                    using (var eventStore = new DelayedWriteRavenEventStore(_documentStore))
+                    {
+                        var customerId = Guid.NewGuid();
 
-                    var storedEvents = new EventChain();
-                    storedEvents.Add(new CustomerSignedUp(customerId));
-                    storedEvents.Add(new SubscribedToNewsletter("latest"));
-                    storedEvents.Add(new SubscribedToNewsletter("top"));
+                        var storedEvents = new EventChain
+                                           {
+                                               new CustomerSignedUp(customerId),
+                                               new SubscribedToNewsletter("latest"),
+                                               new SubscribedToNewsletter("top")
+                                           };
 
-                    eventStore.Add(customerId, storedEvents);
-                }
-            });
+                        eventStore.Add(customerId, storedEvents);
+                    }
+                });
         }
     }
 }

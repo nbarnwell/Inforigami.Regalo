@@ -33,7 +33,7 @@ namespace Inforigami.Regalo.ObjectCompare.Tests.Unit
         public void IgnoreSamePropertyThroughoutTypeHierarchyParents()
         {
             var ignoreList = new PropertyComparisonIgnoreList();
-            ignoreList.Add<SalesOrderCreated, int>(x => x.Version);
+            ignoreList.Add<SalesOrderCreated, int>(x => x.Headers.Version);
 
             Assert.That(ignoreList.Contains(typeof(SalesOrderCreated), "Version"), Is.True);
             Assert.That(ignoreList.Contains(typeof(IEvent), "Version"), Is.True);
@@ -43,7 +43,7 @@ namespace Inforigami.Regalo.ObjectCompare.Tests.Unit
         public void IgnoreSamePropertyThroughoutTypeHierarchyChildren()
         {
             var ignoreList = new PropertyComparisonIgnoreList();
-            ignoreList.Add<IEvent, int>(x => x.Version);
+            ignoreList.Add<IEvent, int>(x => x.Headers.Version);
 
             Assert.That(ignoreList.Contains(typeof(SalesOrderCreated), "Version"), Is.True);
             Assert.That(ignoreList.Contains(typeof(IEvent), "Version"), Is.True);

@@ -52,6 +52,7 @@
     <Compile Include="AggregateRootTestDataBuilderBase.cs" />
     <Compile Include="ApplicationServiceTestBase.cs" />
     <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="EventChain.cs" />
     <Compile Include="FakeEventBus.cs" />
     <Compile Include="IGivenSetter.cs" />
     <Compile Include="IHandlerSetter.cs" />

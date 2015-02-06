@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Inforigami.Regalo.Interfaces;
+using Inforigami.Regalo.Testing;
 using Moq;
 using NUnit.Framework;
 using Inforigami.Regalo.Core.EventSourcing;
@@ -86,10 +87,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
 
             // Act
-            User user = repository.Get(userId, ((IEvent)events[1]).Version);
+            User user = repository.Get(userId, events[1].Headers.Version);
 
             // Assert
-            Assert.AreEqual(((IEvent)events[1]).Version, user.BaseVersion);
+            Assert.AreEqual(events[1].Headers.Version, user.BaseVersion);
         }
 
         [Test]
@@ -115,11 +116,11 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var userId = Guid.NewGuid();
             eventStore.Update(
                 userId,
-                new IEvent[]
+                new EventChain
                 {
-                    new UserRegistered(userId) { Version = 1 },
-                    new UserChangedPassword("newpassword"){Version = 2},
-                    new UserChangedPassword("newnewpassword") { Version = 3 }
+                    new UserRegistered(userId),
+                    new UserChangedPassword("newpassword"),
+                    new UserChangedPassword("newnewpassword")
                 });
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
 
@@ -194,7 +195,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var user = repository.Get(userId);
             user.ChangePassword("newpassword");
 
-            var currentVersion = user.GetUncommittedEvents().Cast<IEvent>().Last().Version;
+            var currentVersion = user.GetUncommittedEvents().Last().Headers.Version;
 
             // Act
             repository.Save(user);

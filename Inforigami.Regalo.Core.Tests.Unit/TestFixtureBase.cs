@@ -82,6 +82,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             result =
                 Regex.Replace(
                     result,
+                    @"""MessageId""\s*:\s*""(?i:[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})""",
+                    @"""MessageId"" : ""00000000-0000-0000-0000-000000000000""");
+
+            result =
+                Regex.Replace(
+                    result,
                     @"""CausationId""\s*:\s*""(?i:[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})""",
                     @"""CausationId"" : ""00000000-0000-0000-0000-000000000000""");
 

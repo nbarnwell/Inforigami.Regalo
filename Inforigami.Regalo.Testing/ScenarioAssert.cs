@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Inforigami.Regalo.Interfaces;
 using NUnit.Framework;
 using Inforigami.Regalo.Core;
@@ -11,9 +12,9 @@ namespace Inforigami.Regalo.Testing
     {
         private readonly TEntity _entity;
         private readonly TestingMessageHandlerContext<TEntity> _context;
-        private readonly object[] _expected;
+        private readonly IEnumerable<IEvent> _expected;
 
-        public ScenarioAssert(TEntity entity, THandler handler, TCommand command, TestingMessageHandlerContext<TEntity> context, object[] expected) 
+        public ScenarioAssert(TEntity entity, THandler handler, TCommand command, TestingMessageHandlerContext<TEntity> context, IEnumerable<IEvent> expected) 
             : base(handler, command)
         {
             if (context == null) throw new ArgumentNullException("context");
@@ -35,9 +36,9 @@ namespace Inforigami.Regalo.Testing
 
             var eventsStoredToEventStore = _context.GetGeneratedEvents();
 
-            var comparer = new ObjectComparer().Ignore<IEvent, Guid>(x => x.Id)
-                                               .Ignore<IEvent, Guid>(x => x.CausationId)
-                                               .Ignore<IEvent, Guid>(x => x.CorrelationId);
+            var comparer = new ObjectComparer().Ignore<IEventHeaders, Guid>(x => x.MessageId)
+                                               .Ignore<IEventHeaders, Guid>(x => x.CausationId)
+                                               .Ignore<IEventHeaders, Guid>(x => x.CorrelationId);
 
             ObjectComparisonResult result = comparer.AreEqual(_expected, eventsStoredToEventStore);
             if (!result.AreEqual)

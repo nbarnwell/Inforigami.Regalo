@@ -1,17 +1,16 @@
 using System;
-using Inforigami.Regalo.Core;
 using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers
 {
     public class Employed : Event
     {
-        public Guid AggregateId { get; private set; }
+        public Guid EmployeeId { get; private set; }
         public DateTime StartDate { get; private set; }
 
-        public Employed(Guid aggregateId, DateTime startDate)
+        public Employed(Guid employeeId, DateTime startDate)
         {
-            AggregateId = aggregateId;
+            EmployeeId = employeeId;
             StartDate = startDate;
         }
 
@@ -19,7 +18,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return other.AggregateId.Equals(AggregateId) && other.StartDate.Equals(StartDate);
+            return other.EmployeeId.Equals(EmployeeId) && other.StartDate.Equals(StartDate);
         }
 
         public override bool Equals(object obj)
@@ -34,7 +33,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers
         {
             unchecked
             {
-                return (AggregateId.GetHashCode()*397) ^ StartDate.GetHashCode();
+                return (EmployeeId.GetHashCode()*397) ^ StartDate.GetHashCode();
             }
         }
     }

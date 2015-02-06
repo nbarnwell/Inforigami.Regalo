@@ -5,11 +5,11 @@ namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 {
     public class SalesOrderCreated : Event
     {
-        public Guid AggregateId { get; private set; }
+        public Guid SalesOrderId { get; private set; }
 
-        public SalesOrderCreated(Guid id)
+        public SalesOrderCreated(Guid salesOrderId)
         {
-            AggregateId = id;
+            SalesOrderId = salesOrderId;
         }
     }
 }

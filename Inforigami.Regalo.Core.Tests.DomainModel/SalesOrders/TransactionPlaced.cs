@@ -4,17 +4,15 @@ namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 {
     public class TransactionPlaced : Event
     {
+        public string AccountId { get; private set; }
+        public decimal Amount { get; private set; }
+        public string[] Categories { get; private set; }
+
         public TransactionPlaced(string accountId, decimal amount, string[] categories)
         {
-            AggregateId = accountId;
+            AccountId = accountId;
             Amount = amount;
             Categories = categories;
         }
-
-        public string AggregateId { get; private set; }
-
-        public decimal Amount { get; private set; }
-
-        public string[] Categories { get; private set; }
     }
 }

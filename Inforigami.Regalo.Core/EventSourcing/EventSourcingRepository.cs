@@ -82,7 +82,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
         private static IEnumerable<IEvent> GetUnseenEvents(TAggregateRoot item, IEnumerable<IEvent> baseAndUnseenEvents)
         {
-            return baseAndUnseenEvents.Where(x => x.Version > item.BaseVersion);
+            return baseAndUnseenEvents.Where(x => x.Headers.Version > item.BaseVersion);
         }
     }
 }

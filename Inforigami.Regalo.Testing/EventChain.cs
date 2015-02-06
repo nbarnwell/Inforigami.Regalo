@@ -2,22 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using Inforigami.Regalo.Interfaces;
 
-namespace Inforigami.Regalo.Core.Tests.Unit
+namespace Inforigami.Regalo.Testing
 {
     public class EventChain : IEnumerable<IEvent>
     {
         private readonly IList<IEvent> _events = new List<IEvent>();
 
-        private IEvent _lastEvent;
+        private int _version;
+
+        public EventChain()
+        {
+        }
+
+        public EventChain(int startVersion)
+        {
+            _version = startVersion;
+        }
 
         public EventChain Add(IEvent evt)
         {
-            if (_lastEvent != null)
-            {
-                evt.Version = _lastEvent.Version + 1;
-            }
-
-            _lastEvent = evt;
+            evt.Headers.Version = ++_version;
 
             _events.Add(evt);
 

@@ -155,7 +155,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             store.Add(customerId, storedEvents);
             
             // Act
-            var events = store.Load(customerId, storedEvents[1].Version);
+            var events = store.Load(customerId, storedEvents[1].Headers.Version);
 
             // Assert
             CollectionAssert.AreEqual(storedEvents.Take(2), events, "Events loaded from store do not match version requested.");

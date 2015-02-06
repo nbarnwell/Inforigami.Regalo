@@ -16,7 +16,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers
 
         private void Apply(Employed evt)
         {
-            Id = evt.AggregateId;
+            Id = evt.EmployeeId;
             _startDate = evt.StartDate;
         }
     }

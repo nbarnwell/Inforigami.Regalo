@@ -31,9 +31,19 @@ namespace Inforigami.Regalo.Core
             // will actually be returned *after* the implementation (less abstract)
             stack.Push(type);
 
-            // Always return the interfaces in the order they are implemented
-            var interfaces = type.GetInterfaces();
-            for (int i = interfaces.Length - 1; i >= 0; i--)
+            var interfaces = type.GetInterfaces().ToList();
+            interfaces.Sort(
+                (type1, type2) =>
+                {
+                    if (type1 == type2)
+                    {
+                        return string.Compare(type1.FullName, type2.FullName, StringComparison.Ordinal);
+                    }
+
+                    return type2.IsAssignableFrom(type1) ? 1 : -1;
+                });
+
+            for (int i = interfaces.Count - 1; i >= 0; i--)
             {
                 stack.Push(interfaces[i]);
             }

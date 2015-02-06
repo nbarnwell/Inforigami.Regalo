@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.ObjectCompare;
+using Inforigami.Regalo.Testing;
 using NUnit.Framework;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
 
@@ -16,9 +17,9 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [SetUp]
         public void SetUp()
         {
-            comparer = new ObjectComparer().Ignore<IEvent, Guid>(x => x.Id)
-                                                 .Ignore<IEvent, Guid>(x => x.CausationId)
-                                                 .Ignore<IEvent, Guid>(x => x.CorrelationId);
+            comparer = new ObjectComparer().Ignore<IMessageHeaders, Guid>(x => x.MessageId)
+                                                 .Ignore<IEventHeaders, Guid>(x => x.CausationId)
+                                                 .Ignore<IEventHeaders, Guid>(x => x.CorrelationId);
 
             ObjectComparisonResult.ThrowOnFail = true;
         }
@@ -34,10 +35,11 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             user.ChangePassword("newpassword");
             IEnumerable<IEvent> actual = user.GetUncommittedEvents();
 
-            var userRegisteredEvent = new UserRegistered(user.Id);
-            var userChangedPasswordEvent = new UserChangedPassword("newpassword").Follows(userRegisteredEvent);
-
-            IEnumerable<IEvent> expected = new[] { userRegisteredEvent, userChangedPasswordEvent };
+            var expected = new EventChain
+                           {
+                               new UserRegistered(user.Id),
+                               new UserChangedPassword("newpassword")
+                           };
             
             ObjectComparisonResult result = comparer.AreEqual(expected, actual);
             if (!result.AreEqual)
@@ -55,9 +57,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             user.ChangePassword("newpassword");
 
             // Act
-            var userRegisteredEvent = new UserRegistered(user.Id);
-            var userChangedPasswordEvent = new UserChangedPassword("newpassword").Follows(userRegisteredEvent);
-            IEnumerable<IEvent> expectedBefore = new IEvent[] { userRegisteredEvent, userChangedPasswordEvent };
+            IEnumerable<IEvent> expectedBefore = new EventChain { new UserRegistered(user.Id), new UserChangedPassword("newpassword") };
             IEnumerable<IEvent> expectedAfter = new IEvent[0];
 
             IEnumerable<IEvent> before = user.GetUncommittedEvents();

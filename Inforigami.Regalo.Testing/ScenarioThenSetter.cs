@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Inforigami.Regalo.Core;
+using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Testing
 {
@@ -21,7 +23,7 @@ namespace Inforigami.Regalo.Testing
             _command = command;
         }
 
-        public IScenarioAssert<TEntity, THandler, TCommand> Then(Func<TEntity, TCommand, object[]> func)
+        public IScenarioAssert<TEntity, THandler, TCommand> Then(Func<TEntity, TCommand, IEnumerable<IEvent>> func)
         {
             var expected = func.Invoke(_entity, _command);
             return new ScenarioAssert<TEntity, THandler, TCommand>(_entity, _handler, _command, _context, expected);
