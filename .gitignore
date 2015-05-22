@@ -57,3 +57,4 @@ svnignore[.-]
 UpgradeLog*.*
 BuildOutput
 [Nn]u[Gg]et.exe
+*.ncrunch*

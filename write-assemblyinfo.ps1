@@ -8,6 +8,8 @@ $gitVersion -match "^v(\d+)\.(\d+)\.(\d+)\-(\d+)-(g[a-f0-9]{40})`$"
 ($major, $minor, $build, $revision) = $Matches[1..4]
 
 $assemblyVersion = "$major.$minor.$build.$revision"
+$assemblyFileVersion = "$major.$minor.$build.$revision"
+$assemblyInformationalVersion = "$major.$minor.$build-alpha$revision"
 
 write-host "Building output as $assemblyVersion to $assemblyInfoFilename..."
 
