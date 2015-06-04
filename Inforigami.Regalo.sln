@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Core", "Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj", "{80473978-8D0F-4AD4-983E-600E516D49AB}"
 EndProject
@@ -21,6 +21,17 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.ObjectCompare", "Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj", "{BDC34219-6E54-4580-958E-DCC93B1676E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Interfaces", "Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj", "{890D6FBB-4264-4A33-AAA5-302CB201B090}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CAC1BEFE-0B22-4057-82BE-9775166544C8}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		BuildPackage.ps1 = BuildPackage.ps1
+		Get-Version.ps1 = Get-Version.ps1
+		Packaging Regalo.txt = Packaging Regalo.txt
+		PushPackage.ps1 = PushPackage.ps1
+		README.md = README.md
+		write-assemblyinfo.ps1 = write-assemblyinfo.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
