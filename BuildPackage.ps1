@@ -4,12 +4,36 @@ $outputDir = "$scriptDir\BuildOutput"
 . (Join-Path $scriptDir 'Get-Version.ps1')
 
 $v = Get-GitVersion
-$semanticVersion = "$($v.Major).$($v.Minor).$($v.Build)-$($v.Revision)"
 
 md $outputDir -f | out-null
 del $outputDir\*
 
-gci $scriptDir -include Inforigami.Regalo.Core.csproj,Inforigami.Regalo.RavenDB.csproj,Inforigami.Regalo.Testing.csproj,Inforigami.Regalo.ObjectCompare.csproj -recurse | %{ 
-    Write-Host -ForegroundColor Green "$_"
-    nuget.exe pack $_ -Build -Symbols -outputdirectory $outputDir -Properties Configuration=Release -version $semanticVersion
-}
+gci $scriptDir -include Inforigami.Regalo.Core.csproj,Inforigami.Regalo.RavenDB.csproj,Inforigami.Regalo.Testing.csproj,Inforigami.Regalo.ObjectCompare.csproj -recurse | 
+	%{ 
+		Write-Host -ForegroundColor Green "Building and packaging $_..."
+		$_
+	} |
+	%{
+		$nuspec = $_ -replace '.csproj$', '.nuspec'
+
+		if (Test-Path $nuspec) {
+            $nuspecTemp = $nuspec + '.tmp'
+            
+            if (Test-Path $nuspecTemp) {
+                del $nuspec
+            } else {
+                ren $nuspec $nuspecTemp
+            }
+
+            (get-content $nuspecTemp) |
+			    %{ $_ -replace '\$version\$', $v.SemanticVersion } |
+			    add-content $nuspec
+
+            nuget.exe pack $_ -build -Symbols -outputdirectory $outputDir -Properties Configuration=Release
+
+			del $nuspec
+            ren $nuspecTemp $nuspec 
+		} else {
+            nuget.exe pack $_ -build -Symbols -outputdirectory $outputDir -Properties Configuration=Release
+        }
+	}

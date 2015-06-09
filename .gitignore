@@ -27,6 +27,7 @@
 *.sqlsuo
 *.suo
 *.svclog
+*.swp
 *.tlh
 *.tli
 *.tmp

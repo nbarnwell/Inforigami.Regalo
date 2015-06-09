@@ -9,8 +9,9 @@ $scriptDir = $MyInvocation.MyCommand.Path | split-path
 
 $v = Get-GitVersion
 
-$AssemblyVersion = "$($v.Major).$($v.Minor).$($v.Build).$($v.Revision)"
-$AssemblyFileVersion = "$($v.Major).$($v.Minor).$($v.Build).$($v.Revision)"
+$assemblyVersion = '{0}.{1}.{2}.{4}' -f $v.Major, $v.Minor, $v.Build, $v.Revision
+$AssemblyFileVersion = $assemblyVersion
+$semanticVersion = $v.SemanticVersion
 
 write-host "Building output as $assemblyVersion to $assemblyInfoFilename..."
 
@@ -20,6 +21,7 @@ using System.Reflection;
 [assembly: AssemblyDescription("A basic implementation of Greg Young's CQRS/ES pattern. Built from version $assemblyVersion.")]
 [assembly: AssemblyVersion("$assemblyVersion")]
 [assembly: AssemblyFileVersion("$assemblyVersion")]
+[assembly: AssemblyInformationalVersion("$semanticVersion")]
 "@
 
 $assemblyInfo > $assemblyInfoFilename
