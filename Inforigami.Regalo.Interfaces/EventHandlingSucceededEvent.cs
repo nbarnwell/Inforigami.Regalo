@@ -1,3 +1,5 @@
+using System;
+
 namespace Inforigami.Regalo.Interfaces
 {
     public class EventHandlingSucceededEvent<TEvent> : IEventHandlingSucceededEvent<TEvent>
@@ -9,6 +11,13 @@ namespace Inforigami.Regalo.Interfaces
         {
             Evt = evt;
             Headers = new EventHeaders();
+        }
+
+        public void OverwriteHeaders(IEventHeaders headers)
+        {
+            if (headers == null) throw new ArgumentNullException("headers");
+
+            Headers = headers;
         }
     }
 }

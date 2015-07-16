@@ -14,5 +14,12 @@ namespace Inforigami.Regalo.Interfaces
             Evt = evt;
             Exception = exception;
         }
+
+        public void OverwriteHeaders(IEventHeaders headers)
+        {
+            if (headers == null) throw new ArgumentNullException("headers");
+
+            Headers = headers;
+        }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+
 namespace Inforigami.Regalo.Interfaces
 {
     public abstract class Event : IEvent
@@ -7,6 +9,13 @@ namespace Inforigami.Regalo.Interfaces
         protected Event()
         {
             Headers = new EventHeaders();
+        }
+
+        public void OverwriteHeaders(IEventHeaders headers)
+        {
+            if (headers == null) throw new ArgumentNullException("headers");
+
+            Headers = headers;
         }
     }
 }
