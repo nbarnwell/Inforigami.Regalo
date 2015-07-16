@@ -12,12 +12,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
     [TestFixture]
     public class AggregateTests : TestFixtureBase
     {
-        private IObjectComparer comparer;
+        private IObjectComparer _comparer;
 
         [SetUp]
         public void SetUp()
         {
-            comparer = new ObjectComparer().Ignore<IMessageHeaders, Guid>(x => x.MessageId)
+            _comparer = new ObjectComparer().Ignore<IMessageHeaders, Guid>(x => x.MessageId)
                                                  .Ignore<IEventHeaders, Guid>(x => x.CausationId)
                                                  .Ignore<IEventHeaders, Guid>(x => x.CorrelationId);
 
@@ -41,7 +41,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                                new UserChangedPassword("newpassword")
                            };
             
-            ObjectComparisonResult result = comparer.AreEqual(expected, actual);
+            ObjectComparisonResult result = _comparer.AreEqual(expected, actual);
             if (!result.AreEqual)
             {
                 throw new AssertionException(string.Format("Actual events did not match expected events. {0}", result.InequalityReason));
@@ -65,12 +65,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             IEnumerable<IEvent> after = user.GetUncommittedEvents();
             
             // Assert
-            var result = comparer.AreEqual(expectedBefore, before);
+            var result = _comparer.AreEqual(expectedBefore, before);
             if (!result.AreEqual)
             {
                 throw new AssertionException(string.Format("Actual events did not match expected events. {0}", result.InequalityReason));
             }
-            comparer.AreEqual(expectedAfter, after);
+            _comparer.AreEqual(expectedAfter, after);
         }
 
         [Test]

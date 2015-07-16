@@ -55,12 +55,15 @@
     <Compile Include="EventSourcing\ConcurrencyConflict.cs" />
     <Compile Include="EventSourcing\ConcurrencyConflictsDetectedException.cs" />
     <Compile Include="EventSourcing\EventSourcingRepository.cs" />
+    <Compile Include="EventSourcing\EventStoreConcurrencyException.cs" />
+    <Compile Include="EventSourcing\EventStream.cs" />
     <Compile Include="EventSourcing\IConcurrencyMonitor.cs" />
     <Compile Include="EventSourcing\IDelayedWriteEventStore.cs" />
     <Compile Include="EventSourcing\IEventStore.cs" />
     <Compile Include="EventSourcing\IEventStoreWithPreloading.cs" />
     <Compile Include="EventSourcing\InMemoryEventStore.cs" />
     <Compile Include="EventSourcing\StrictConcurrencyMonitor.cs" />
+    <Compile Include="EventStreamIdFormatter.cs" />
     <Compile Include="GuidProvider.cs" />
     <Compile Include="ICommandHandler.cs" />
     <Compile Include="ICommandProcessor.cs" />

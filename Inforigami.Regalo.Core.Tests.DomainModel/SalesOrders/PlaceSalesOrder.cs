@@ -6,10 +6,12 @@ namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
     public class PlaceSalesOrder : ICommand
     {
         public Guid SalesOrderId { get; private set; }
+        public int SalesOrderVersion { get; private set; }
 
-        public PlaceSalesOrder(Guid salesOrderId)
+        public PlaceSalesOrder(Guid salesOrderId, int salesOrderVersion)
         {
             SalesOrderId = salesOrderId;
+            SalesOrderVersion = salesOrderVersion;
         }
     }
 }

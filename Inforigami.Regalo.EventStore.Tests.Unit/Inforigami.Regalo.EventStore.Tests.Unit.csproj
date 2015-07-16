@@ -31,6 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EventStore.ClientAPI, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EventStore.Client.3.0.2\lib\net40\EventStore.ClientAPI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,7 +48,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainModel\Customers\AccountManager.cs" />
+    <Compile Include="DomainModel\Customers\Customer.cs" />
+    <Compile Include="DomainModel\Customers\CustomerSignedUp.cs" />
+    <Compile Include="DomainModel\Customers\Employed.cs" />
+    <Compile Include="DomainModel\Customers\SubscribedToNewsletter.cs" />
+    <Compile Include="DomainModel\InvariantNotSatisfiedException.cs" />
+    <Compile Include="PersistenceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj">
+      <Project>{80473978-8D0F-4AD4-983E-600E516D49AB}</Project>
+      <Name>Inforigami.Regalo.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Inforigami.Regalo.EventStore\Inforigami.Regalo.EventStore.csproj">
+      <Project>{86437787-9D5B-4489-A410-4AED6268B20D}</Project>
+      <Name>Inforigami.Regalo.EventStore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj">
+      <Project>{890D6FBB-4264-4A33-AAA5-302CB201B090}</Project>
+      <Name>Inforigami.Regalo.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj">
+      <Project>{50425006-B901-4461-99D5-7BAE8FFAFA54}</Project>
+      <Name>Inforigami.Regalo.Testing</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

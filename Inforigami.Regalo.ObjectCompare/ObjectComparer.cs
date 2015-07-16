@@ -13,44 +13,44 @@ namespace Inforigami.Regalo.ObjectCompare
         private readonly IList<object> _circularReferenceChecklist = new List<object>();
         private readonly PropertyComparisonIgnoreList _ignores = new PropertyComparisonIgnoreList();
 
-        public ObjectComparisonResult AreEqual(object object1, object object2)
+        public ObjectComparisonResult AreEqual(object expected, object actual)
         {
-            if (object1 == null && object2 == null)
+            if (expected == null && actual == null)
             {
                 return ObjectComparisonResult.Success();
             }
 
-            var type = (object1 ?? object2).GetType();
+            var type = (expected ?? actual).GetType();
             if (_propertyComparisonStack.Count == 0) _propertyComparisonStack.Push(type.Name);
 
-            if ((object1 == null) != (object2 == null))
+            if ((expected == null) != (actual == null))
             {
-                return ObjectComparisonResult.Fail(_propertyComparisonStack, "Nullity differs. Object1 is {0} while Object2 is {1}.", object1 ?? "null", object2 ?? "null");
+                return ObjectComparisonResult.Fail(_propertyComparisonStack, "Nullity differs. expected is {0} while actual is {1}.", expected ?? "null", actual ?? "null");
             }
 
-            var object1Type = object1.GetType();
-            var object2Type = object2.GetType();
+            var expectedType = expected.GetType();
+            var actualType = actual.GetType();
 
-            if (object1Type != object2Type)
+            if (expectedType != actualType)
             {
                 // Let the type check go if they're both at least enumerable
-                if (false == (object1.GetType().IsEnumerable() && object2.GetType().IsEnumerable()))
+                if (false == (expected.GetType().IsEnumerable() && actual.GetType().IsEnumerable()))
                 {
-                    return ObjectComparisonResult.Fail(_propertyComparisonStack, "Objects are of different type. Object1 is {0} while Object2 is {1}.", object1Type, object2Type);
+                    return ObjectComparisonResult.Fail(_propertyComparisonStack, "Objects are of different type. expected is {0} while actual is {1}.", expectedType, actualType);
                 }
             }
 
-            if (object1Type.IsPrimitive())
+            if (expectedType.IsPrimitive())
             {
-                return ArePrimitivesEqual(object1, object2);
+                return ArePrimitivesEqual(expected, actual);
             }
 
-            if (object1Type.IsEnumerable())
+            if (expectedType.IsEnumerable())
             {
-                return AreObjectsInEnumerablesEqual(object1, object2);
+                return AreObjectsInEnumerablesEqual(expected, actual);
             }
 
-            return AreComplexObjectsEqual(object1, object2);
+            return AreComplexObjectsEqual(expected, actual);
         }
 
         public IObjectComparer Ignore<T, TProperty>(Expression<Func<T, TProperty>> ignore)
@@ -59,19 +59,19 @@ namespace Inforigami.Regalo.ObjectCompare
             return this;
         }
 
-        private ObjectComparisonResult ArePrimitivesEqual(object value2, object value1)
+        private ObjectComparisonResult ArePrimitivesEqual(object expected, object actual)
         {
-            if (!value2.Equals(value1))
+            if (!actual.Equals(expected))
             {
-                return ObjectComparisonResult.Fail(_propertyComparisonStack, "Primitive values differ. Value1: {0}, Value2: {1}.", value1, value2);
+                return ObjectComparisonResult.Fail(_propertyComparisonStack, "Primitive values differ. expected: {0}, actual: {1}.", expected, actual);
             }
 
             return ObjectComparisonResult.Success();
         }
 
-        private ObjectComparisonResult AreComplexObjectsEqual(object object1, object object2)
+        private ObjectComparisonResult AreComplexObjectsEqual(object expected, object actual)
         {
-            var typeBeingCompared = object1.GetType();
+            var typeBeingCompared = expected.GetType();
             var properties = typeBeingCompared.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             if (false == properties.Any())
@@ -86,7 +86,7 @@ namespace Inforigami.Regalo.ObjectCompare
                     _propertyComparisonStack.Push(property.Name);
                     try
                     {
-                        var value1 = property.GetValue(object1, null);
+                        var value1 = property.GetValue(expected, null);
 
                         if (property.PropertyType.IsPrimitive == false)
                         {
@@ -98,7 +98,7 @@ namespace Inforigami.Regalo.ObjectCompare
                             _circularReferenceChecklist.Add(value1);
                         }
 
-                        var value2 = property.GetValue(object2, null);
+                        var value2 = property.GetValue(actual, null);
 
                         // NOTE: Recursion
                         var result = AreEqual(value1, value2);

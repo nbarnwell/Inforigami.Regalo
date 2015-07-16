@@ -23,18 +23,7 @@ namespace Inforigami.Regalo.RavenDB
             _documentSession.Advanced.UseOptimisticConcurrency = true;
         }
 
-        public void Add(Guid aggregateId, IEnumerable<IEvent> events)
-        {
-            var stream = new EventStream(aggregateId.ToString());
-            stream.Append(events);
-            _documentSession.Store(stream);
-
-            SetRavenCollectionName(events, _documentSession, stream);
-
-            _hasChanges = true;
-        }
-
-        public void Update(Guid aggregateId, IEnumerable<IEvent> events)
+        public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> events)
         {
             var aggregateIdAsString = aggregateId.ToString();
 
@@ -42,10 +31,16 @@ namespace Inforigami.Regalo.RavenDB
 
             if (stream == null)
             {
-                throw new InvalidOperationException("You cannot update an aggregate that has not been saved.");
-            }
+                stream = new EventStream(aggregateId.ToString());
+                stream.Append(events);
+                _documentSession.Store(stream);
 
-            stream.Append(events);
+                SetRavenCollectionName(events, _documentSession, stream);
+            }
+            else
+            {
+                stream.Append(events);
+            }
 
             _hasChanges = true;
         }
@@ -72,25 +67,25 @@ namespace Inforigami.Regalo.RavenDB
             _documentSession.Load<EventStream>(idValues);
         }
 
-        public IEnumerable<IEvent> Load(Guid aggregateId)
+        public EventStream<T> Load<T>(string aggregateId)
         {
             var aggregateIdAsString = aggregateId.ToString();
 
             var stream = _documentSession.Load<EventStream>(aggregateIdAsString);
 
+            var result = new EventStream<T>(aggregateIdAsString);
+
             if (stream != null)
             {
-                var events = stream.Events;
-
-                return events.Any() ? events : Enumerable.Empty<IEvent>();
+                result.Append(stream.Events);
             }
 
-            return Enumerable.Empty<IEvent>();
+            return result;
         }
 
-        public IEnumerable<IEvent> Load(Guid aggregateId, int maxVersion)
+        public EventStream<T> Load<T>(string aggregateId, int maxVersion)
         {
-            var events = Load(aggregateId).ToList();
+            var events = Load<T>(aggregateId).Events.ToList();
 
             if (events.All(x => x.Headers.Version != maxVersion))
             {
@@ -100,7 +95,9 @@ namespace Inforigami.Regalo.RavenDB
                     string.Format("BaseVersion {0} not found for aggregate {1}", maxVersion, aggregateId));
             }
 
-            return GetEventsForVersion(events, maxVersion).ToList();
+            var result = new EventStream<T>(aggregateId);
+            result.Append(GetEventsForVersion(events, maxVersion));
+            return result;
         }
 
         private static IEnumerable<IEvent> GetEventsForVersion(IEnumerable<IEvent> events, int maxVersion)

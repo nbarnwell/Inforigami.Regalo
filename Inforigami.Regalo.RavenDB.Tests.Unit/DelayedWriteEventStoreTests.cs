@@ -1,5 +1,4 @@
 using System;
-using Inforigami.Regalo.Core.Tests.Unit;
 using Inforigami.Regalo.Interfaces;
 using Moq;
 using NUnit.Framework;
@@ -63,7 +62,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
                                                new SubscribedToNewsletter("top")
                                            };
 
-                        eventStore.Add(customerId, storedEvents);
+                        eventStore.Save<Customer>(customerId.ToString(), 0, storedEvents);
                     }
                 });
         }

@@ -9,17 +9,11 @@ namespace Inforigami.Regalo.Core.EventSourcing
     {
         private readonly IEventStore _eventStore;
         private readonly IConcurrencyMonitor _concurrencyMonitor;
-        private readonly ISet<Guid> _loaded = new HashSet<Guid>();
 
         public EventSourcingRepository(IEventStore eventStore, IConcurrencyMonitor concurrencyMonitor)
         {
             _eventStore = eventStore;
             _concurrencyMonitor = concurrencyMonitor;
-        }
-
-        public TAggregateRoot Get(Guid id)
-        {
-            return Get(id, null);
         }
 
         public TAggregateRoot Get(Guid id, int version)
@@ -29,20 +23,18 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
         private TAggregateRoot Get(Guid id, int? version)
         {
-            var events =
+            var aggregateId = EventStreamIdFormatter.GetStreamId<TAggregateRoot>(id.ToString());
+
+            var stream =
                 version == null
-                    ? _eventStore.Load(id)
-                    : _eventStore.Load(id, version.Value);
+                    ? _eventStore.Load<TAggregateRoot>(aggregateId)
+                    : _eventStore.Load<TAggregateRoot>(aggregateId, version.Value);
 
-            events = events.ToList();
-
-            if (!events.Any()) return null;
+            if (stream == null) return null;
 
             var aggregateRoot = new TAggregateRoot();
 
-            aggregateRoot.ApplyAll(events);
-
-            _loaded.Add(aggregateRoot.Id);
+            aggregateRoot.ApplyAll(stream.Events);
 
             return aggregateRoot;
         }
@@ -53,28 +45,46 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
             if (uncommittedEvents.Length == 0) return;
 
-            if (_loaded.Contains(item.Id))
+            var streamId = EventStreamIdFormatter.GetStreamId<TAggregateRoot>(item.Id.ToString());
+
+            try
             {
-                IEvent[] baseAndUnseenEvents = _eventStore.Load(item.Id).ToArray();
-
-                if (baseAndUnseenEvents.Length > 0)
-                {
-                    var unseenEvents = GetUnseenEvents(item, baseAndUnseenEvents);
-                    var conflicts = _concurrencyMonitor.CheckForConflicts(unseenEvents, uncommittedEvents);
-                    if (conflicts.Any())
-                    {
-                        var exception = new ConcurrencyConflictsDetectedException(conflicts);
-                        exception.Data.Add("AggregateId", item.Id);
-                        throw exception;
-                    }
-                }
-
-                _eventStore.Update(item.Id, uncommittedEvents);
+                _eventStore.Save<TAggregateRoot>(streamId, item.BaseVersion, uncommittedEvents);
             }
-            else
+            catch (EventStoreConcurrencyException e)
             {
-                _eventStore.Add(item.Id, uncommittedEvents);
-                _loaded.Add(item.Id);
+                EventStream<TAggregateRoot> stream = _eventStore.Load<TAggregateRoot>(streamId);
+
+                if (stream != null)
+                {
+                    IEvent[] baseAndUnseenEvents = stream.Events.ToArray();
+
+                    if (baseAndUnseenEvents.Length > 0)
+                    {
+                        var unseenEvents = GetUnseenEvents(item, baseAndUnseenEvents);
+                        var conflicts = _concurrencyMonitor.CheckForConflicts(unseenEvents, uncommittedEvents);
+                        if (!conflicts.Any())
+                        {
+                            // Re-version our uncommitted events on top of those already saved to the db.
+                            int unseenVersion = unseenEvents.Last().Headers.Version;
+                            int newVersion = unseenVersion;
+
+                            foreach (var evt in uncommittedEvents)
+                            {
+                                evt.Headers.Version = ++newVersion;
+                            }
+
+                            _eventStore.Save<TAggregateRoot>(streamId, unseenVersion, uncommittedEvents);
+                        }
+                        else
+                        {
+                            var exception = new ConcurrencyConflictsDetectedException(conflicts);
+                            exception.Data.Add("AggregateId", item.Id);
+                            throw exception;
+                        }
+                    }
+
+                }
             }
 
             item.AcceptUncommittedEvents();

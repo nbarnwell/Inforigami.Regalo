@@ -20,10 +20,10 @@ namespace Inforigami.Regalo.Testing
             _eventBus   = eventBus;
         }
 
-        public TEntity Get(Guid id)
-        {
-            return _repository.Get(id);
-        }
+        //public TEntity Get(Guid id)
+        //{
+        //    return _repository.Get(id.ToString());
+        //}
 
         public TEntity Get(Guid id, int version)
         {

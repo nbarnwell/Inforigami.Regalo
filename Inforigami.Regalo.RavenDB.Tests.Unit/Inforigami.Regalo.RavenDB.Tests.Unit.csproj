@@ -108,10 +108,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Inforigami.Regalo.Core.Tests.Unit\Inforigami.Regalo.Core.Tests.Unit.csproj">
-      <Project>{09055902-1429-4A6F-B3A7-01C3C2715FF1}</Project>
-      <Name>Inforigami.Regalo.Core.Tests.Unit</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj">
       <Project>{80473978-8D0F-4AD4-983E-600E516D49AB}</Project>
       <Name>Inforigami.Regalo.Core</Name>

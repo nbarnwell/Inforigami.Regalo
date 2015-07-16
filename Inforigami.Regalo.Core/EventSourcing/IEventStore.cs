@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Inforigami.Regalo.Interfaces;
 
@@ -6,9 +5,8 @@ namespace Inforigami.Regalo.Core.EventSourcing
 {
     public interface IEventStore
     {
-        void Add(Guid aggregateId, IEnumerable<IEvent> events);
-        void Update(Guid aggregateId, IEnumerable<IEvent> events);
-        IEnumerable<IEvent> Load(Guid aggregateId);
-        IEnumerable<IEvent> Load(Guid aggregateId, int version);
+        void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents);
+        EventStream<T> Load<T>(string aggregateId);
+        EventStream<T> Load<T>(string aggregateId, int version);
     }
 }

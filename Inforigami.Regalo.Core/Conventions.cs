@@ -13,6 +13,8 @@ namespace Inforigami.Regalo.Core
         public static bool AggregatesMustImplementApplyMethods { get { return _aggregatesMustImplementApplyMethods; } }
         public static Func<Type, Type> FindAggregateTypeForEventType { get { return _findAggregateTypeForEventType; } }
 
+        public static string StreamIdFormat = "$aggregateTypeName-$aggregateId";
+
         /// <summary>
         /// If returns true, exception will be "bubbled" to the caller. If false, the framework will attempt to 
         /// publish an EventHandlingFailedEvent that should be handled by an appropriate handler.

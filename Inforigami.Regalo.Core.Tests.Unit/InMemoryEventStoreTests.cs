@@ -5,6 +5,7 @@ using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.Testing;
 using NUnit.Framework;
 using Inforigami.Regalo.Core.EventSourcing;
+using Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
 
 namespace Inforigami.Regalo.Core.Tests.Unit
@@ -19,10 +20,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             IEventStore store = new InMemoryEventStore();
             
             // Act
-            IEnumerable<object> events = store.Load(Guid.NewGuid());
+            EventStream<SalesOrder> stream = store.Load<SalesOrder>(Guid.NewGuid().ToString());
 
             // Assert
-            CollectionAssert.IsEmpty(events);
+            Assert.That(stream, Is.Null);
         }
 
         [Test]
@@ -32,10 +33,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             IEventStore store = new InMemoryEventStore();
 
             // Act
-            IEnumerable<object> events = store.Load(Guid.NewGuid(), 1);
+            EventStream<SalesOrder> stream = store.Load<SalesOrder>(Guid.NewGuid().ToString(), 1);
 
             // Assert
-            CollectionAssert.IsEmpty(events);
+            Assert.That(stream, Is.Null);
         }
 
         [Test]
@@ -47,11 +48,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var userRegistered = new UserRegistered(userId);
 
             // Act
-            store.Update(userId, new[] { userRegistered });
+            store.Save<User>(userId.ToString(), 0, new[] { userRegistered });
 
             // Assert
-            CollectionAssert.IsNotEmpty(((InMemoryEventStore)store).Events);
-            Assert.AreSame(userRegistered, ((InMemoryEventStore)store).Events.First());
+            var allEvents = ((InMemoryEventStore)store).GetAllEvents();
+            CollectionAssert.IsNotEmpty(allEvents);
+            Assert.AreSame(userRegistered, allEvents.First());
         }
 
         [Test]
@@ -64,11 +66,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             user.ChangePassword("newpassword");
 
             // Act
-            store.Update(user.Id, user.GetUncommittedEvents());
+            store.Save<User>(user.Id.ToString(), 0, user.GetUncommittedEvents());
 
             // Assert
-            CollectionAssert.IsNotEmpty(((InMemoryEventStore)store).Events);
-            CollectionAssert.AreEqual(user.GetUncommittedEvents(), ((InMemoryEventStore)store).Events);
+            var allEvents = ((InMemoryEventStore)store).GetAllEvents();
+            CollectionAssert.IsNotEmpty(allEvents);
+            CollectionAssert.AreEqual(user.GetUncommittedEvents(), allEvents);
         }
 
         [Test]
@@ -87,14 +90,14 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             user2.ChangePassword("user2pwd1");
             user2.ChangePassword("user2pwd2");
 
-            store.Update(user1.Id, user1.GetUncommittedEvents());
-            store.Update(user2.Id, user2.GetUncommittedEvents());
+            store.Save<User>(user1.Id.ToString(), 0, user1.GetUncommittedEvents());
+            store.Save<User>(user2.Id.ToString(), 0, user2.GetUncommittedEvents());
 
             // Act
-            IEnumerable<object> eventsForUser1 = store.Load(user1.Id);
+            EventStream<User> eventsForUser1 = store.Load<User>(user1.Id.ToString());
 
             // Assert
-            CollectionAssert.AreEqual(user1.GetUncommittedEvents(), eventsForUser1, "Store didn't return user1's events properly.");
+            CollectionAssert.AreEqual(user1.GetUncommittedEvents(), eventsForUser1.Events, "Store didn't return user1's events properly.");
         }
 
         [Test]
@@ -109,10 +112,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                                             .Add(new UserChangedPassword("pwd3"))
                                             .Add(new UserChangedPassword("pwd4"));
 
-            store.Update(id, allEvents);
+            store.Save<User>(id.ToString(), 0, allEvents);
 
             // Act
-            IEnumerable<IEvent> version3 = store.Load(id, allEvents[2].Headers.Version).ToArray();
+            IEnumerable<IEvent> version3 = store.Load<User>(id.ToString(), allEvents[2].Headers.Version).Events;
 
             // Assert
             CollectionAssert.AreEqual(allEvents.Take(3).ToArray(), version3);

@@ -7,12 +7,25 @@ using Moq;
 using NUnit.Framework;
 using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
+using Inforigami.Regalo.ObjectCompare;
 
 namespace Inforigami.Regalo.Core.Tests.Unit
 {
     [TestFixture]
     public class RepositoryTests : TestFixtureBase
     {
+        private IObjectComparer _comparer;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _comparer = new ObjectComparer().Ignore<IMessageHeaders, Guid>(x => x.MessageId)
+                                            .Ignore<IEventHeaders, Guid>(x => x.CausationId)
+                                            .Ignore<IEventHeaders, Guid>(x => x.CorrelationId);
+
+            ObjectComparisonResult.ThrowOnFail = true;
+        }
+
         [Test]
         public void GivenAggregateWithNoUncommittedEvents_WhenSaved_ThenEventStoreShouldContainNoAdditionalEvents()
         {
@@ -27,7 +40,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             repository.Save(user);
 
             // Assert
-            CollectionAssertAreJsonEqual(expectedEvents, eventStore.Events);
+            CollectionAssertAreJsonEqual(expectedEvents, eventStore.GetAllEvents());
         }
 
         [Test]
@@ -45,7 +58,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             repository.Save(user);
 
             // Assert
-            CollectionAssertAreJsonEqual(expectedEvents, eventStore.Events);
+            var comparisonResult = _comparer.AreEqual(expectedEvents, eventStore.GetAllEvents());
+            Assert.That(comparisonResult.AreEqual, comparisonResult.InequalityReason);
         }
 
         [Test]
@@ -54,8 +68,9 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var eventStore = new InMemoryEventStore();
             var userId = Guid.NewGuid();
-            eventStore.Update(
-                userId,
+            eventStore.Save<User>(
+                EventStreamIdFormatter.GetStreamId<User>(userId.ToString()),
+                0,
                 new EventChain()
                 {
                     new UserRegistered(userId),
@@ -65,7 +80,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
 
             // Act
-            User user = repository.Get(userId);
+            User user = repository.Get(userId, 3);
 
             // Assert
             Assert.Throws<InvalidOperationException>(() => user.ChangePassword("newnewpassword")); // Should fail if the user's events were correctly applied
@@ -83,7 +98,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                 new UserChangedPassword("newpassword"), 
                 new UserChangedPassword("newnewpassword")
             };
-            eventStore.Update(userId, events);
+            eventStore.Save<User>(EventStreamIdFormatter.GetStreamId<User>(userId.ToString()), 0, events);
+
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
 
             // Act
@@ -114,8 +130,9 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var eventStore = new InMemoryEventStore();
             var userId = Guid.NewGuid();
-            eventStore.Update(
-                userId,
+            eventStore.Save<User>(
+                EventStreamIdFormatter.GetStreamId<User>(userId.ToString()),
+                0,
                 new EventChain
                 {
                     new UserRegistered(userId),
@@ -125,7 +142,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
 
             // Act
-            User user = repository.Get(userId);
+            User user = repository.Get(userId, 3);
 
             // Assert
             Assert.AreEqual(3, user.BaseVersion);
@@ -166,42 +183,49 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenExistingAggregateWithUnseenChanges_WhenSaving_ThenShouldCheckConcurrencyWithCorrectEvents()
         {
             // Arrange
-            var userId = Guid.NewGuid();
             var eventStore = new InMemoryEventStore();
-            eventStore.Update(userId, new UserRegistered(userId));
 
+            // Register and save a new user
+            var user = new User();
+            user.Register();
             var concurrencyMonitor = new StrictConcurrencyMonitor();
             var repository = new EventSourcingRepository<User>(eventStore, concurrencyMonitor);
-            var user = repository.Get(userId);
+            repository.Save(user);
 
-            // Now another user changes the password before we get chance to save our changes:
-            eventStore.Update(userId, new UserChangedPassword("adifferentpassword"));
+            // We change password...
+            var repository1 = new EventSourcingRepository<User>(eventStore, concurrencyMonitor);
+            var user1 = repository1.Get(user.Id, user.Version);
+            user1.ChangePassword("newpassword");
 
-            user.ChangePassword("newpassword");
+            // ...but so does someone else, who saves their changes before we have a chance to save ours...
+            var repository2 = new EventSourcingRepository<User>(eventStore, concurrencyMonitor);
+            var user2 = repository.Get(user.Id, user.Version);
+            user2.ChangePassword("newpassword");
+            repository2.Save(user2);
 
-            Assert.Throws<ConcurrencyConflictsDetectedException>(() => repository.Save(user));
+            // ...so we should get a concurrency exception when we try to save
+            Assert.Throws<ConcurrencyConflictsDetectedException>(() => repository1.Save(user1));
         }
 
         [Test]
         public void GivenAggregateWithUncommittedEvents_WhenSaved_ThenBaseVersionShouldMatchCurrentVersion()
         {
             // Arrange
-            var userId = Guid.NewGuid();
             var eventStore = new InMemoryEventStore();
-            var userRegistered = new UserRegistered(userId);
-            eventStore.Update(userId, userRegistered);
-
+            var user = new User();
+            user.Register();
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
-            var user = repository.Get(userId);
+            repository.Save(user);
+
             user.ChangePassword("newpassword");
 
-            var currentVersion = user.GetUncommittedEvents().Last().Headers.Version;
+            var versionAfterChange = user.GetUncommittedEvents().Last().Headers.Version;
 
             // Act
             repository.Save(user);
 
             // Assert
-            Assert.AreEqual(currentVersion, user.BaseVersion, "User's base version has not been updated to match current version on successful save.");
+            Assert.AreEqual(versionAfterChange, user.BaseVersion, "User's base version has not been updated to match current version on successful save.");
         }
 
         [Test]

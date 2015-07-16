@@ -17,10 +17,10 @@ namespace Inforigami.Regalo.Core
             _eventBus = eventBus;
         }
 
-        public TEntity Get(Guid id)
-        {
-            return _repository.Get(id);
-        }
+        //public TEntity Get(Guid id)
+        //{
+        //    return _repository.Get(id);
+        //}
 
         public TEntity Get(Guid id, int version)
         {
