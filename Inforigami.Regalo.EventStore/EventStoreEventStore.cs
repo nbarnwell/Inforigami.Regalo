@@ -23,11 +23,13 @@ namespace Inforigami.Regalo.EventStore
 
         public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
+            var eventStoreExpectedVersion = expectedVersion == -1 ? ExpectedVersion.NoStream : expectedVersion;
+
             try
             {
                 string streamId = EventStreamIdFormatter.GetStreamId<T>(aggregateId);
 
-                _eventStoreConnection.AppendToStreamAsync(streamId, expectedVersion, GetEventData(newEvents)).Wait();
+                _eventStoreConnection.AppendToStreamAsync(streamId, eventStoreExpectedVersion, GetEventData(newEvents)).Wait();
             }
             catch (WrongExpectedVersionException ex)
             {
@@ -39,11 +41,14 @@ namespace Inforigami.Regalo.EventStore
 
         public EventStream<T> Load<T>(string aggregateId)
         {
-            throw new NotImplementedException();
+            return Load<T>(aggregateId, EventStreamVersion.Max);
         }
 
         public EventStream<T> Load<T>(string aggregateId, int version)
         {
+            if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentException("An aggregate ID is required", "aggregateId");
+            if (version < 0) throw new ArgumentOutOfRangeException("version", version, "Version must me 0 or greater, where 0 represents the first event in the stream.");
+
             string streamId = EventStreamIdFormatter.GetStreamId<T>(aggregateId);
 
             var streamEvents = new List<ResolvedEvent>();
@@ -67,9 +72,16 @@ namespace Inforigami.Regalo.EventStore
 
             } while (!currentSlice.IsEndOfStream);
 
-            var domainEvents = streamEvents.Select(x => BuildDomainEvent(x.OriginalEvent.Data, x.OriginalEvent.Metadata));
+            var domainEvents = streamEvents.Select(x => BuildDomainEvent(x.OriginalEvent.Data, x.OriginalEvent.Metadata)).ToList();
             var result = new EventStream<T>(aggregateId);
             result.Append(domainEvents);
+
+            if (version != EventStreamVersion.Max && result.GetVersion() != version)
+            {
+                var exception = new ArgumentOutOfRangeException("version", version, string.Format("Event for version {0} could not be found for stream {1}", version, streamId));
+                exception.Data.Add("Existing stream", domainEvents);
+                throw exception;
+            }
 
             return result;
         }
@@ -79,8 +91,8 @@ namespace Inforigami.Regalo.EventStore
             var dataJson = Encoding.UTF8.GetString(data);
             var headerJson = Encoding.UTF8.GetString(metadata);
 
-            var evt = (IEvent)JsonConvert.DeserializeObject(dataJson);
-            evt.OverwriteHeaders((IEventHeaders)JsonConvert.DeserializeObject(headerJson));
+            var evt = (IEvent)JsonConvert.DeserializeObject(dataJson, GetDefaultJsonSerializerSettings());
+            evt.OverwriteHeaders((IEventHeaders)JsonConvert.DeserializeObject(headerJson, GetDefaultJsonSerializerSettings()));
 
             return evt;
         }

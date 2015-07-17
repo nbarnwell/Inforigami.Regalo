@@ -66,7 +66,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
             // Act
             var id = Guid.NewGuid();
             var evt = new CustomerSignedUp(id);
-            store.Save<Customer>(id.ToString(), 0,  new[] { evt });
+            store.Save<Customer>(id.ToString(), EventStreamVersion.NoStream, new[] { evt });
             var stream = store.Load<Customer>(id.ToString());
 
             // Assert
@@ -92,7 +92,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
 
             customer.AssignAccountManager(accountManager.Id, startDate);
 
-            store.Save<Customer>(customer.Id.ToString(), 0, customer.GetUncommittedEvents());
+            store.Save<Customer>(customer.Id.ToString(), EventStreamVersion.NoStream, customer.GetUncommittedEvents());
 
             // Act
             var acctMgrAssignedEvent = (AccountManagerAssigned)store.Load<Customer>(customer.Id.ToString())
@@ -113,7 +113,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
             // Act
             var customer = new Customer();
             customer.Signup();
-            store.Save<Customer>(customer.Id.ToString(), 0, customer.GetUncommittedEvents());
+            store.Save<Customer>(customer.Id.ToString(), EventStreamVersion.NoStream, customer.GetUncommittedEvents());
             var stream = store.Load<Customer>(customer.Id.ToString());
 
             // Assert
@@ -130,7 +130,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
 
             // Act
             var id = Guid.NewGuid();
-            store.Save<Customer>(id.ToString(), 0, Enumerable.Empty<IEvent>());
+            store.Save<Customer>(id.ToString(), EventStreamVersion.NoStream, Enumerable.Empty<IEvent>());
             var stream = store.Load<Customer>(id.ToString());
 
             // Assert
@@ -146,7 +146,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
                                                .Add(new SubscribedToNewsletter("top"));
-            store.Save<Customer>(customerId.ToString(), 0, storedEvents);
+            store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
 
             // Act
             var stream = store.Load<Customer>(customerId.ToString(), storedEvents[1].Headers.Version);
@@ -167,7 +167,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
                                   new SubscribedToNewsletter("latest"), 
                                   new SubscribedToNewsletter("top")
                               };
-            store.Save<Customer>(customerId.ToString(), 0, storedEvents);
+            store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
 
             // Act / Assert
             Assert.Throws<ArgumentOutOfRangeException>(() => store.Load<Customer>(customerId.ToString(), 4));

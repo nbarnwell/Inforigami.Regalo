@@ -14,7 +14,7 @@ namespace Inforigami.Regalo.Interfaces
         {
             CausationId = MessageId;
             CorrelationId = MessageId;
-            Version = 1;
+            Version = 0;
             Topics = new Dictionary<string, string>();
         }
     }

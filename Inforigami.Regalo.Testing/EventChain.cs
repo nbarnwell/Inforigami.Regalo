@@ -8,7 +8,7 @@ namespace Inforigami.Regalo.Testing
     {
         private readonly IList<IEvent> _events = new List<IEvent>();
 
-        private int _version;
+        private int _version = -1;
 
         public EventChain()
         {

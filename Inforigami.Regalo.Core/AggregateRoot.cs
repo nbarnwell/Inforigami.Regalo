@@ -25,6 +25,12 @@ namespace Inforigami.Regalo.Core
         /// </summary>
         public int Version { get; private set; }
 
+        protected AggregateRoot()
+        {
+            BaseVersion = -1;
+            Version = -1;
+        }
+
         public IEnumerable<IEvent> GetUncommittedEvents()
         {
             return _uncommittedEvents.ToList();

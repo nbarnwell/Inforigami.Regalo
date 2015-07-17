@@ -132,7 +132,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var userId = Guid.NewGuid();
             eventStore.Save<User>(
                 EventStreamIdFormatter.GetStreamId<User>(userId.ToString()),
-                0,
+                EventStreamVersion.NoStream,
                 new EventChain
                 {
                     new UserRegistered(userId),
@@ -142,10 +142,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
 
             // Act
-            User user = repository.Get(userId, 3);
+            User user = repository.Get(userId, 2);
 
             // Assert
-            Assert.AreEqual(3, user.BaseVersion);
+            Assert.AreEqual(2, user.BaseVersion);
         }
 
         [Test]

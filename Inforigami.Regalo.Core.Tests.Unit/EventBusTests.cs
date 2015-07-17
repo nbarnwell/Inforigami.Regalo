@@ -26,7 +26,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             _eventBus = new EventBus(new ConsoleLogger());
 
             Resolver.Configure(type => null, LocateAllEventHandlers, o => { });
-            Conventions.SetRetryableEventHandlingExceptionFilter(null);
+            Conventions.SetRetryableEventHandlingExceptionFilter((o, exception) => false);
         }
 
         private IEnumerable<object> LocateAllEventHandlers(Type type)

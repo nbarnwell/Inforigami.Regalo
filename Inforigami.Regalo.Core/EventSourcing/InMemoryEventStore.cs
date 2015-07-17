@@ -17,7 +17,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
         public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
             if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentNullException("aggregateId");
-            if (expectedVersion < 0)                    throw new ArgumentOutOfRangeException("expectedVersion", "Expected version should be greater than or equal to 0.");
+            if (expectedVersion < -1)                   throw new ArgumentOutOfRangeException("expectedVersion", "Expected version should be greater than or equal to -1.");
             if (newEvents == null)                      throw new ArgumentNullException("newEvents");
 
             var newEventsList = newEvents.ToList();
@@ -40,7 +40,15 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
         private static void CheckConcurrency(int expectedVersion, ICollection<IEvent> existingStream)
         {
-            if (existingStream != null && existingStream.Count != expectedVersion)
+            if (existingStream != null && expectedVersion == -1)
+            {
+                var exception = new EventStoreConcurrencyException(
+                    string.Format("Expected to create a new stream but one already exists."));
+                exception.Data.Add("Existing stream", existingStream);
+                throw exception;
+            }
+
+            if (existingStream != null && existingStream.Last().Headers.Version != expectedVersion)
             {
                 var exception = new EventStoreConcurrencyException(
                     string.Format("Expected version {0} does not match actual version {1}", expectedVersion, existingStream.Count));

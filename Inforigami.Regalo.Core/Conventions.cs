@@ -33,13 +33,11 @@ namespace Inforigami.Regalo.Core
 
         public static void SetFindAggregateTypeForEventType(Func<Type, Type> findAggregateTypeForEventType)
         {
-            if (findAggregateTypeForEventType == null) throw new ArgumentNullException("findAggregateTypeForEventType");
             _findAggregateTypeForEventType = findAggregateTypeForEventType;
         }
 
         public static void SetRetryableEventHandlingExceptionFilter(Func<object, Exception, bool> retryableEventHandlingExceptionFilter)
         {
-            if (retryableEventHandlingExceptionFilter == null) throw new ArgumentNullException("retryableEventHandlingExceptionFilter");
             _eventHandlingExceptionFilter = retryableEventHandlingExceptionFilter;
         }
     }

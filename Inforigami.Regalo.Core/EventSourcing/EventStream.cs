@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Core.EventSourcing
@@ -7,18 +8,25 @@ namespace Inforigami.Regalo.Core.EventSourcing
     {
         private List<IEvent> _events;
 
-        public EventStream(string id)
-        {
-            Id = id;
-            _events = new List<IEvent>();
-        }
-
         public string Id { get; private set; }
 
         public IEnumerable<IEvent> Events
         {
             get { return _events.ToArray(); }
             private set { _events = new List<IEvent>(value); }
+        }
+
+        public bool HasEvents { get { return _events != null && _events.Any(); } }
+
+        public EventStream(string id)
+        {
+            Id = id;
+            _events = new List<IEvent>();
+        }
+
+        public int GetVersion()
+        {
+            return _events.Last().Headers.Version;
         }
 
         public void Append(IEnumerable<IEvent> events)

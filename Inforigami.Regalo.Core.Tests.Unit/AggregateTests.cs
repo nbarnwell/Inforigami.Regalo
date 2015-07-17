@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.ObjectCompare;
 using Inforigami.Regalo.Testing;
@@ -95,7 +96,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             user.ApplyAll(Enumerable.Empty<IEvent>());
 
             // Assert
-            Assert.That(user.BaseVersion, Is.EqualTo(0));
+            Assert.That(user.BaseVersion, Is.EqualTo(EventStreamVersion.NoStream));
         }
         
         [Test]

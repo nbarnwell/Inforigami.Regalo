@@ -57,6 +57,7 @@
     <Compile Include="EventSourcing\EventSourcingRepository.cs" />
     <Compile Include="EventSourcing\EventStoreConcurrencyException.cs" />
     <Compile Include="EventSourcing\EventStream.cs" />
+    <Compile Include="EventSourcing\EventStreamVersion.cs" />
     <Compile Include="EventSourcing\IConcurrencyMonitor.cs" />
     <Compile Include="EventSourcing\IDelayedWriteEventStore.cs" />
     <Compile Include="EventSourcing\IEventStore.cs" />
