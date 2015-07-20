@@ -8,7 +8,15 @@ $v = Get-GitVersion
 md $outputDir -f | out-null
 del $outputDir\*
 
-gci $scriptDir -include Inforigami.Regalo.Core.csproj,Inforigami.Regalo.RavenDB.csproj,Inforigami.Regalo.Testing.csproj,Inforigami.Regalo.ObjectCompare.csproj -recurse | 
+$projectsToPackage = @(
+    'Inforigami.Regalo.Core.csproj',
+    'Inforigami.Regalo.RavenDB.csproj',
+    'Inforigami.Regalo.EventStore.csproj',
+    'Inforigami.Regalo.Testing.csproj',
+    'Inforigami.Regalo.ObjectCompare.csproj'
+)
+
+gci $scriptDir -include $projectsToPackage -recurse | 
 	%{ 
 		Write-Host -ForegroundColor Green "Building and packaging $_..."
 		$_
