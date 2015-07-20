@@ -9,6 +9,7 @@ md $outputDir -f | out-null
 del $outputDir\*
 
 $projectsToPackage = @(
+    'Inforigami.Regalo.Interfaces.csproj',
     'Inforigami.Regalo.Core.csproj',
     'Inforigami.Regalo.RavenDB.csproj',
     'Inforigami.Regalo.EventStore.csproj',
