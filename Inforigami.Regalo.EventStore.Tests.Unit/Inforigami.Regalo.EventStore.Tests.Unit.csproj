@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConnectionTests.cs" />
     <Compile Include="DomainModel\Customers\AccountManager.cs" />
     <Compile Include="DomainModel\Customers\Customer.cs" />
     <Compile Include="DomainModel\Customers\CustomerSignedUp.cs" />
