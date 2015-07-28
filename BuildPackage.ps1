@@ -18,14 +18,14 @@ $projectsToPackage = @(
 )
 
 gci $scriptDir -include $projectsToPackage -recurse | 
-	%{ 
-		Write-Host -ForegroundColor Green "Building and packaging $_..."
-		$_
-	} |
-	%{
-		$nuspec = $_ -replace '.csproj$', '.nuspec'
+    %{ 
+        Write-Host -ForegroundColor Green "Building and packaging $_..."
+        $_
+    } |
+    %{
+        $nuspec = $_ -replace '.csproj$', '.nuspec'
 
-		if (Test-Path $nuspec) {
+        if (Test-Path $nuspec) {
             $nuspecTemp = $nuspec + '.tmp'
             
             if (Test-Path $nuspecTemp) {
@@ -35,14 +35,14 @@ gci $scriptDir -include $projectsToPackage -recurse |
             }
 
             (get-content $nuspecTemp) |
-			    %{ $_ -replace '\$version\$', $v.SemanticVersion } |
-			    add-content $nuspec
+                %{ $_ -replace '\$version\$', $v.SemanticVersion } |
+                add-content $nuspec
 
             nuget.exe pack $_ -build -Symbols -outputdirectory $outputDir -Properties Configuration=Release
 
-			del $nuspec
+            del $nuspec
             ren $nuspecTemp $nuspec 
-		} else {
+        } else {
             nuget.exe pack $_ -build -Symbols -outputdirectory $outputDir -Properties Configuration=Release
         }
-	}
+    }

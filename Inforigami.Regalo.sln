@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Core", "Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj", "{80473978-8D0F-4AD4-983E-600E516D49AB}"
 EndProject
@@ -36,6 +36,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.EventStore", "Inforigami.Regalo.EventStore\Inforigami.Regalo.EventStore.csproj", "{86437787-9D5B-4489-A410-4AED6268B20D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.EventStore.Tests.Unit", "Inforigami.Regalo.EventStore.Tests.Unit\Inforigami.Regalo.EventStore.Tests.Unit.csproj", "{2B896F6E-11DD-479F-A23E-6CDBF1AF48AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.SqlServer", "Inforigami.Regalo.SqlServer\Inforigami.Regalo.SqlServer.csproj", "{A33527A2-4FFE-429F-93A8-3A8DD5C9AE76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.SqlServer.Tests.Unit", "Inforigami.Regalo.SqlServer.Tests.Unit\Inforigami.Regalo.SqlServer.Tests.Unit.csproj", "{C8909090-16E1-4E60-B702-3A50FC8F5E54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,14 @@ Global
 		{2B896F6E-11DD-479F-A23E-6CDBF1AF48AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B896F6E-11DD-479F-A23E-6CDBF1AF48AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B896F6E-11DD-479F-A23E-6CDBF1AF48AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A33527A2-4FFE-429F-93A8-3A8DD5C9AE76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A33527A2-4FFE-429F-93A8-3A8DD5C9AE76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A33527A2-4FFE-429F-93A8-3A8DD5C9AE76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A33527A2-4FFE-429F-93A8-3A8DD5C9AE76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8909090-16E1-4E60-B702-3A50FC8F5E54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8909090-16E1-4E60-B702-3A50FC8F5E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8909090-16E1-4E60-B702-3A50FC8F5E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8909090-16E1-4E60-B702-3A50FC8F5E54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
