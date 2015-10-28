@@ -9,7 +9,7 @@ $scriptDir = $MyInvocation.MyCommand.Path | split-path
 
 $v = Get-GitVersion
 
-$assemblyVersion = '{0}.{1}.{2}.{4}' -f $v.Major, $v.Minor, $v.Build, $v.Revision
+$assemblyVersion = '{0}.{1}.{2}.{3}' -f $v.Major, $v.Minor, $v.Build, $v.Revision
 $AssemblyFileVersion = $assemblyVersion
 $semanticVersion = $v.SemanticVersion
 
