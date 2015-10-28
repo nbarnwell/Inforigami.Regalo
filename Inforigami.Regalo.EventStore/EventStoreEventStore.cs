@@ -20,7 +20,7 @@ namespace Inforigami.Regalo.EventStore
         public EventStoreEventStore(IEventStoreConnection eventStoreConnection, ILogger logger)
         {
             if (eventStoreConnection == null) throw new ArgumentNullException("eventStoreConnection");
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (logger == null) throw new ArgumentNullException("logger");
 
             _eventStoreConnection = eventStoreConnection;
             _logger = logger;
