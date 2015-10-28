@@ -8,17 +8,22 @@ using Inforigami.Regalo.Core;
 using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using Newtonsoft.Json;
+using ILogger = Inforigami.Regalo.Core.ILogger;
 
 namespace Inforigami.Regalo.EventStore
 {
     public class EventStoreEventStore : IEventStore, IDisposable
     {
         private readonly IEventStoreConnection _eventStoreConnection;
+        private readonly ILogger _logger;
 
-        public EventStoreEventStore(IEventStoreConnection eventStoreConnection)
+        public EventStoreEventStore(IEventStoreConnection eventStoreConnection, ILogger logger)
         {
             if (eventStoreConnection == null) throw new ArgumentNullException("eventStoreConnection");
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+
             _eventStoreConnection = eventStoreConnection;
+            _logger = logger;
         }
 
         public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
@@ -28,6 +33,7 @@ namespace Inforigami.Regalo.EventStore
             try
             {
                 string streamId = EventStreamIdFormatter.GetStreamId<T>(aggregateId);
+                _logger.Debug(this, "Saving " + typeof(T) + " to stream " + streamId);
 
                 _eventStoreConnection.AppendToStreamAsync(streamId, eventStoreExpectedVersion, GetEventData(newEvents)).Wait();
             }
@@ -50,6 +56,8 @@ namespace Inforigami.Regalo.EventStore
             if (version < 0) throw new ArgumentOutOfRangeException("version", version, "Version must me 0 or greater, where 0 represents the first event in the stream.");
 
             string streamId = EventStreamIdFormatter.GetStreamId<T>(aggregateId);
+            _logger.Debug(this, "Loading " + typeof(T) + " from stream " + streamId);
+
 
             var streamEvents = new List<ResolvedEvent>();
 

@@ -3,7 +3,7 @@ using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 {
-    public class PlaceSalesOrder : ICommand
+    public class PlaceSalesOrder : Command
     {
         public Guid SalesOrderId { get; private set; }
         public int SalesOrderVersion { get; private set; }

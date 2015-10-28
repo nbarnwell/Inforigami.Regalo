@@ -48,7 +48,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Loading_GivenEmptyStore_ShouldReturnNull()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection);
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
 
             // Act
             EventStream<Customer> events = store.Load<Customer>(Guid.NewGuid().ToString());
@@ -61,7 +61,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Saving_GivenSingleEvent_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection);
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
 
             // Act
             var id = Guid.NewGuid();
@@ -81,7 +81,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Saving_GivenEventWithGuidProperty_ShouldAllowReloadingToGuidType()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection);
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
 
             var customer = new Customer();
             customer.Signup();
@@ -108,7 +108,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Saving_GivenEvents_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection);
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
 
             // Act
             var customer = new Customer();
@@ -126,7 +126,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Saving_GivenNoEvents_ShouldDoNothing()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection);
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
 
             // Act
             var id = Guid.NewGuid();
@@ -141,7 +141,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersion_ThenShouldOnlyReturnRequestedEvents()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection);
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
             var customerId = Guid.NewGuid();
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
@@ -159,7 +159,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersionThatNoEventHas_ThenShouldFail()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection);
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
             var customerId = Guid.NewGuid();
             var storedEvents = new IEvent[]
                               {
