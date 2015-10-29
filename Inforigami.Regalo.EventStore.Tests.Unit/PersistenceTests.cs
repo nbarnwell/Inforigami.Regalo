@@ -156,6 +156,24 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         }
 
         [Test]
+        public void GivenAggregateWithMultipleEvents_WhenLoadingMaxVersion_ThenShouldReturnAllEvents()
+        {
+            // Arrange
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            var customerId = Guid.NewGuid();
+            var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
+                                               .Add(new SubscribedToNewsletter("latest"))
+                                               .Add(new SubscribedToNewsletter("top"));
+            store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
+
+            // Act
+            var stream = store.Load<Customer>(customerId.ToString(), EventStreamVersion.Max);
+
+            // Assert
+            CollectionAssert.AreEqual(storedEvents, stream.Events, "Events loaded from store do not match version requested.");
+        }
+
+        [Test]
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersionThatNoEventHas_ThenShouldFail()
         {
             // Arrange

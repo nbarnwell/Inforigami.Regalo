@@ -3,6 +3,6 @@
     public static class EventStreamVersion
     {
         public const int NoStream = -1;
-        public const int Max = 2;
+        public const int Max = -2;
     }
 }
