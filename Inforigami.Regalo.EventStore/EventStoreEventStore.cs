@@ -83,6 +83,11 @@ namespace Inforigami.Regalo.EventStore
 
             } while (!currentSlice.IsEndOfStream);
 
+            if (streamEvents.Count == 0)
+            {
+                return null;
+            }
+
             var domainEvents = streamEvents.Select(x => BuildDomainEvent(x.OriginalEvent.Data, x.OriginalEvent.Metadata)).ToList();
             var result = new EventStream<T>(aggregateId);
             result.Append(domainEvents);

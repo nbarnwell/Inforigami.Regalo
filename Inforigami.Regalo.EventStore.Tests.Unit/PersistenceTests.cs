@@ -54,7 +54,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
             EventStream<Customer> events = store.Load<Customer>(Guid.NewGuid().ToString());
 
             // Assert
-            CollectionAssert.IsEmpty(events.Events);
+            Assert.That(events, Is.Null);
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
             var stream = store.Load<Customer>(id.ToString());
 
             // Assert
-            CollectionAssert.IsEmpty(stream.Events);
+            Assert.That(stream, Is.Null);
         }
 
         [Test]
