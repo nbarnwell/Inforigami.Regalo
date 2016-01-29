@@ -32,10 +32,9 @@ namespace Inforigami.Regalo.EventStore
 
             try
             {
-                string streamId = EventStreamIdFormatter.GetStreamId<T>(aggregateId);
-                _logger.Debug(this, "Saving " + typeof(T) + " to stream " + streamId);
+                _logger.Debug(this, "Saving " + typeof(T) + " to stream " + aggregateId);
 
-                _eventStoreConnection.AppendToStreamAsync(streamId, eventStoreExpectedVersion, GetEventData(newEvents)).Wait();
+                _eventStoreConnection.AppendToStreamAsync(aggregateId, eventStoreExpectedVersion, GetEventData(newEvents)).Wait();
             }
             catch (WrongExpectedVersionException ex)
             {
@@ -59,8 +58,7 @@ namespace Inforigami.Regalo.EventStore
                 if (version <= 0) throw new ArgumentOutOfRangeException("version", version, "Version must be 0 or greater, where 0 represents the first event in the stream, or the special value EventStreamVersion.Max to load the latest version of the stream.");
             }
 
-            string streamId = EventStreamIdFormatter.GetStreamId<T>(aggregateId);
-            _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from stream " + streamId);
+            _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from stream " + aggregateId);
 
             var streamEvents = new List<ResolvedEvent>();
 
@@ -68,7 +66,7 @@ namespace Inforigami.Regalo.EventStore
             var nextSliceStart = StreamPosition.Start;
             do
             {
-                currentSlice = _eventStoreConnection.ReadStreamEventsForwardAsync(streamId, nextSliceStart, 200, false).Result;
+                currentSlice = _eventStoreConnection.ReadStreamEventsForwardAsync(aggregateId, nextSliceStart, 200, false).Result;
 
                 nextSliceStart = currentSlice.NextEventNumber;
 
@@ -94,7 +92,7 @@ namespace Inforigami.Regalo.EventStore
 
             if (version != EventStreamVersion.Max && result.GetVersion() != version)
             {
-                var exception = new ArgumentOutOfRangeException("version", version, string.Format("Event for version {0} could not be found for stream {1}", version, streamId));
+                var exception = new ArgumentOutOfRangeException("version", version, string.Format("Event for version {0} could not be found for stream {1}", version, aggregateId));
                 exception.Data.Add("Existing stream", domainEvents);
                 throw exception;
             }

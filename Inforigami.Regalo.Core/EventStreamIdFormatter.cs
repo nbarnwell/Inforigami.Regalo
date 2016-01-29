@@ -6,9 +6,9 @@ namespace Inforigami.Regalo.Core
     {
         private static readonly Func<Type, string, string> __default =
             (type, id) => Conventions.StreamIdFormat
-                                     .Replace("$aggregateTypeNamespace", type.Namespace)
-                                     .Replace("$aggregateTypeName", type.Name)
-                                     .Replace("$aggregateId", id);
+                                     .Replace("${aggregateTypeNamespace}", type.Namespace)
+                                     .Replace("${aggregateTypeName}", type.Name)
+                                     .Replace("${aggregateId}", id);
 
         private static Func<Type, string, string> _provider = __default;
 
