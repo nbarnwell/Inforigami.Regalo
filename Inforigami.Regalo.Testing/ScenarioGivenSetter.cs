@@ -17,9 +17,15 @@ namespace Inforigami.Regalo.Testing
             _context = context;
         }
 
+        [Obsolete("Use the overload that takes an entity instead.")]
         public IWhenSetter<TEntity, THandler> Given(ITestDataBuilder<TEntity> testDataBuilder)
         {
             var entity = testDataBuilder.Build();
+            return Given(entity);
+        }
+
+        public IWhenSetter<TEntity, THandler> Given(TEntity entity)
+        {
             _context.SaveAndPublishEvents(entity);
             _context.ClearGeneratedEvents();
             return new ScenarioWhenSetter<TEntity, THandler>(entity, _handler, _context);

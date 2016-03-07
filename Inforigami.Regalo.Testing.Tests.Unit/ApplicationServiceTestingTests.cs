@@ -41,7 +41,7 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
         {
             Scenario.For<SalesOrder>(Context)
                     .HandledBy<PlaceSalesOrderCommandHandler>(CreateHandler())
-                    .Given(SalesOrderTestDataBuilder.NewOrder().WithSingleLineItem())
+                    .Given(SalesOrderTestDataBuilder.NewOrder().WithSingleLineItem().Build())
                     .When(order => new PlaceSalesOrder(order.Id, order.Version))
                     .Then((a, c) => new EventChain(a.BaseVersion) { new SalesOrderPlaced(a.Id) })
                     .Assert();
@@ -52,7 +52,7 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
         {
             Scenario.For(Context)
                     .HandledBy(CreateHandler())
-                    .Given(SalesOrderTestDataBuilder.NewOrder())
+                    .Given(SalesOrderTestDataBuilder.NewOrder().Build())
                     .When(order => new PlaceSalesOrder(order.Id, order.Version))
                     .Throws<InvalidOperationException>()
                     .Assert();
