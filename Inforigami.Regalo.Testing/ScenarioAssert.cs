@@ -26,6 +26,11 @@ namespace Inforigami.Regalo.Testing
 
         public void Assert()
         {
+            Assert(null);
+        }
+
+        public void Assert(Action<IObjectComparer> configureComparer)
+        {
             /*
              * Plan is to invoke the command on the handler and retrieve the actual
              * events from the repository and eventbus, and compare both with the
@@ -38,7 +43,10 @@ namespace Inforigami.Regalo.Testing
 
             var comparer = new ObjectComparer().Ignore<IEventHeaders, Guid>(x => x.MessageId)
                                                .Ignore<IEventHeaders, Guid>(x => x.CausationId)
-                                               .Ignore<IEventHeaders, Guid>(x => x.CorrelationId);
+                                               .Ignore<IEventHeaders, Guid>(x => x.CorrelationId)
+                                               .Ignore<IEventHeaders, DateTimeOffset>(x => x.Timestamp);
+
+            configureComparer?.Invoke(comparer);
 
             ObjectComparisonResult result = comparer.AreEqual(_expected, eventsStoredToEventStore);
             if (!result.AreEqual)
