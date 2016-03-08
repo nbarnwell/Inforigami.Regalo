@@ -46,7 +46,10 @@ namespace Inforigami.Regalo.Testing
                                                .Ignore<IEventHeaders, Guid>(x => x.CorrelationId)
                                                .Ignore<IEventHeaders, DateTimeOffset>(x => x.Timestamp);
 
-            configureComparer?.Invoke(comparer);
+            if (configureComparer != null)
+            {
+                configureComparer.Invoke(comparer);
+            }
 
             ObjectComparisonResult result = comparer.AreEqual(_expected, eventsStoredToEventStore);
             if (!result.AreEqual)
