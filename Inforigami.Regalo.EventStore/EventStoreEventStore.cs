@@ -53,9 +53,9 @@ namespace Inforigami.Regalo.EventStore
         {
             if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentException("An aggregate ID is required", "aggregateId");
 
-            if (version != EventStreamVersion.Max)
+            if (version == EventStreamVersion.NoStream)
             {
-                if (version <= 0) throw new ArgumentOutOfRangeException("version", version, "Version must be 0 or greater, where 0 represents the first event in the stream, or the special value EventStreamVersion.Max to load the latest version of the stream.");
+                throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EventStreamVersion.NoStream (-1) value.");
             }
 
             _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from stream " + aggregateId);

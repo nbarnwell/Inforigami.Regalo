@@ -138,7 +138,10 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         }
 
         [Test]
-        public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersion_ThenShouldOnlyReturnRequestedEvents()
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersion_ThenShouldOnlyReturnRequestedEvents(int version)
         {
             // Arrange
             IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
@@ -149,10 +152,10 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
             store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
 
             // Act
-            var stream = store.Load<Customer>(customerId.ToString(), storedEvents[1].Headers.Version);
+            var stream = store.Load<Customer>(customerId.ToString(), version);
 
             // Assert
-            CollectionAssert.AreEqual(storedEvents.Take(2), stream.Events, "Events loaded from store do not match version requested.");
+            CollectionAssert.AreEqual(storedEvents.Take(version + 1), stream.Events, "Events loaded from store do not match version requested.");
         }
 
         [Test]
@@ -188,7 +191,25 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
             store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
 
             // Act / Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => store.Load<Customer>(customerId.ToString(), 4));
+            Assert.Throws<ArgumentOutOfRangeException>(() => store.Load<Customer>(customerId.ToString(), 10));
+        }
+
+        [Test]
+        public void GivenAggregateWithMultipleEvents_WhenLoadingSpecialNoStreamVersion_ThenShouldFail()
+        {
+            // Arrange
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            var customerId = Guid.NewGuid();
+            var storedEvents = new IEvent[]
+                              {
+                                  new CustomerSignedUp(customerId), 
+                                  new SubscribedToNewsletter("latest"), 
+                                  new SubscribedToNewsletter("top")
+                              };
+            store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
+
+            // Act / Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => store.Load<Customer>(customerId.ToString(), EventStreamVersion.NoStream));
         }
     }
 }
