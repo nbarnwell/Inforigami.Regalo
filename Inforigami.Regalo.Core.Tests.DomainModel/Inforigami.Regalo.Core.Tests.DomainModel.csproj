@@ -48,6 +48,7 @@
     <Compile Include="SalesOrders\SalesOrderCreated.cs" />
     <Compile Include="SalesOrders\SalesOrderPlaced.cs" />
     <Compile Include="SalesOrders\TransactionPlaced.cs" />
+    <Compile Include="Users\SuperUser.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Users\UserChangedPassword.cs" />
     <Compile Include="Users\UserRegistered.cs" />

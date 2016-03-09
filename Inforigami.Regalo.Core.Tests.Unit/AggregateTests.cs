@@ -51,6 +51,30 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         }
 
         [Test]
+        public void InvokingBehaviour_GivenSimpleAggregateRootThatInheritsAnother_ShouldRecordEvents()
+        {
+            // Arrange
+            var user = new SuperUser();
+            user.Register();
+
+            // Act
+            user.ChangePassword("newpassword");
+            IEnumerable<IEvent> actual = user.GetUncommittedEvents();
+
+            var expected = new EventChain
+                           {
+                               new UserRegistered(user.Id),
+                               new UserChangedPassword("newpassword")
+                           };
+            
+            ObjectComparisonResult result = _comparer.AreEqual(expected, actual);
+            if (!result.AreEqual)
+            {
+                throw new AssertionException(string.Format("Actual events did not match expected events. {0}", result.InequalityReason));
+            }
+        }
+
+        [Test]
         public void AcceptingEvents_GivenAggregateWithUncommittedEvents_ShouldClearUncommittedEvents()
         {
             // Arrange

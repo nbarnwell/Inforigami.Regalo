@@ -116,17 +116,21 @@ namespace Inforigami.Regalo.Core
 
         private MethodInfo FindApplyMethod(Type eventType)
         {
+            var typeInspector = new TypeInspector();
+
             MethodInfo applyMethod;
             if (false == _applyMethodCache.TryGetValue(eventType.TypeHandle, out applyMethod))
             {
-                applyMethod = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-                    .Where(m => m.Name == "Apply")
-                    .Where(
-                        m =>
-                        {
-                            var parameters = m.GetParameters();
-                            return parameters.Length == 1 && parameters[0].ParameterType == eventType;
-                        }).SingleOrDefault();
+                applyMethod =
+                    typeInspector.GetTypeHierarchy(GetType())
+                                 .SelectMany(x => x.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic))
+                                 .Where(m => m.Name == "Apply")
+                                 .Where(
+                                     m =>
+                                     {
+                                         var parameters = m.GetParameters();
+                                         return parameters.Length == 1 && parameters[0].ParameterType == eventType;
+                                     }).SingleOrDefault();
 
                 _applyMethodCache.Add(eventType.TypeHandle, applyMethod);
             }
