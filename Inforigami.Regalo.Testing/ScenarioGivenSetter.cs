@@ -26,7 +26,11 @@ namespace Inforigami.Regalo.Testing
 
         public IWhenSetter<TEntity, THandler> Given(TEntity entity)
         {
-            _context.SaveAndPublishEvents(entity);
+            if (entity != null)
+            {
+                _context.SaveAndPublishEvents(entity);
+            }
+
             _context.ClearGeneratedEvents();
             return new ScenarioWhenSetter<TEntity, THandler>(entity, _handler, _context);
         }

@@ -48,6 +48,19 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
         }
 
         [Test]
+        public void GivenNoSalesOrder_WhenCreatingOrder_ThenShouldNotThrow()
+        {
+            var id = Guid.NewGuid();
+
+            Scenario.For(Context)
+                    .HandledBy(new CreateSalesOrderHandler(Context, id))
+                    .Given((SalesOrder)null)
+                    .When(order => new CreateSalesOrder())
+                    .Then((order, cmd) => new EventChain(-1) { new SalesOrderCreated(id) })
+                    .Assert();
+        }
+
+        [Test]
         public void GivenSalesOrderWithNoLines_WhenPlacingOrder_ThenShouldThrow()
         {
             Scenario.For(Context)
@@ -61,6 +74,25 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
         private PlaceSalesOrderCommandHandler CreateHandler()
         {
             return new PlaceSalesOrderCommandHandler(Context);
+        }
+    }
+
+    public class CreateSalesOrderHandler : ICommandHandler<CreateSalesOrder>
+    {
+        private readonly TestingMessageHandlerContext<SalesOrder> _context;
+        private readonly Guid _id;
+
+        public CreateSalesOrderHandler(TestingMessageHandlerContext<SalesOrder> context, Guid id)
+        {
+            _context = context;
+            _id = id;
+        }
+
+        public void Handle(CreateSalesOrder command)
+        {
+            var so = new SalesOrder();
+            so.Create(_id);
+            _context.SaveAndPublishEvents(so);
         }
     }
 }
