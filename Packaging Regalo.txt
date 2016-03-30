@@ -7,7 +7,7 @@ DON'T COPY AND PASTE, JUST TYPE IT IN...
     git commit -m "[message]"
     
 3. Tag as v[Major].[Minor].[Revision]
-    git tag v3.3.0
+    New-SemverTag.ps1 [args]
 
 4. Run BuildPackage.ps1
     . .\BuildPackage.ps1
