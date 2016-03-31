@@ -38,7 +38,13 @@ namespace Inforigami.Regalo.Core
 
         public void AcceptUncommittedEvents()
         {
-            if (_uncommittedEvents.Any() == false) return;
+            if (_uncommittedEvents.Any() == false)
+            {
+                __logger.Debug(this, "No uncommitted events to accept for ID {0}.", Id);
+                return;
+            }
+
+            __logger.Debug(this, "Accepting events for ID {0}", Id);
 
             BaseVersion = Version;
             int eventCount = _uncommittedEvents.Count;
@@ -82,10 +88,13 @@ namespace Inforigami.Regalo.Core
         {
             Version = evt.Headers.Version;
 
+            __logger.Debug(this, "Applying {0}", evt.GetType());
+
             var applyMethods = FindApplyMethods(evt);
 
             foreach (var applyMethod in applyMethods)
             {
+                __logger.Debug(this, "Applying {0} via {1}", evt.GetType(), applyMethod);
                 applyMethod.Invoke(this, new[] { evt });
             }
         }
@@ -106,10 +115,20 @@ namespace Inforigami.Regalo.Core
         {
             var typeInspector = new TypeInspector();
 
-            var applyMethods = typeInspector.GetTypeHierarchy(evt.GetType())
-                                            .Select(FindApplyMethod)
+            var typeHierarchy = typeInspector.GetTypeHierarchy(evt.GetType());
+
+            var applyMethods = typeHierarchy.Select(FindApplyMethod)
                                             .Where(x => x != null)
                                             .ToList();
+
+            if (Conventions.AggregatesMustImplementApplyMethods && applyMethods.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        "Class {0} does not implement an Apply() method for {1} or any of it's superclasses. Either implement the method or set Conventions.AggregatesMustImplementApplyMethods to false.",
+                        GetType().Name,
+                        evt.GetType()));
+            }
 
             return applyMethods;
         }
@@ -133,15 +152,6 @@ namespace Inforigami.Regalo.Core
                                      }).SingleOrDefault();
 
                 _applyMethodCache.Add(eventType.TypeHandle, applyMethod);
-            }
-
-            if (Conventions.AggregatesMustImplementApplyMethods && applyMethod == null)
-            {
-                throw new InvalidOperationException(
-                    string.Format(
-                        "Class {0} does not implement Apply({1} evt). Either implement the method or set Conventions.AggregatesMustImplementApplyMethods to false.",
-                        GetType().Name,
-                        eventType.Name));
             }
 
             return applyMethod;

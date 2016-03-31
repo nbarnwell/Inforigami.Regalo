@@ -12,8 +12,8 @@ namespace Inforigami.Regalo.Testing
         [SetUp]
         public void SetUp()
         {
-            var eventStore = new InMemoryEventStore();
-            var repository = new EventSourcingRepository<TEntity>(eventStore, new StrictConcurrencyMonitor());
+            var eventStore = new InMemoryEventStore(new ConsoleLogger());
+            var repository = new EventSourcingRepository<TEntity>(eventStore, new StrictConcurrencyMonitor(), new ConsoleLogger());
             var eventBus = new FakeEventBus();
             Context = new TestingMessageHandlerContext<TEntity>(repository, eventBus);
         }

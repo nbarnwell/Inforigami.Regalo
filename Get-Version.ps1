@@ -1,5 +1,3 @@
-param([bool]$IsPrerelease = $true)
-
 Set-StrictMode -Version Latest
 
 function Get-GitVersion {
@@ -9,7 +7,7 @@ function Get-GitVersion {
 
     $semanticVersion = "$major.$minor.$build"
 
-    if (($revision -gt 0) -or $IsPrerelease) {
+    if ($revision -gt 0) {
         $semanticVersion = "$major.$minor.$build-alpha$revision"
     }
 

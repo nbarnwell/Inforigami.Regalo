@@ -17,7 +17,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenEmptyEventStore_WhenLoadingEvents_ThenNothingShouldBeReturned()
         {
             // Arrange
-            IEventStore store = new InMemoryEventStore();
+            IEventStore store = new InMemoryEventStore(new ConsoleLogger());
             
             // Act
             EventStream<SalesOrder> stream = store.Load<SalesOrder>(Guid.NewGuid().ToString());
@@ -30,7 +30,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenEmptyEventStore_WhenLoadingEventsForSpecificVersion_ThenNothingShouldBeReturned()
         {
             // Arrange
-            IEventStore store = new InMemoryEventStore();
+            IEventStore store = new InMemoryEventStore(new ConsoleLogger());
 
             // Act
             EventStream<SalesOrder> stream = store.Load<SalesOrder>(Guid.NewGuid().ToString(), 1);
@@ -43,7 +43,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenEmptyEventStore_WhenAddingEventsOneAtATime_ThenStoreShouldContainThoseEvents()
         {
             // Arrange
-            IEventStore store = new InMemoryEventStore();
+            IEventStore store = new InMemoryEventStore(new ConsoleLogger());
             var userId = Guid.NewGuid();
             var userRegistered = new UserRegistered(userId);
 
@@ -60,7 +60,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenEmptyEventStore_WhenAddingEventsInBulk_ThenStoreShouldContainThoseEvents()
         {
             // Arrange
-            IEventStore store = new InMemoryEventStore();
+            IEventStore store = new InMemoryEventStore(new ConsoleLogger());
             var user = new User();
             user.Register();
             user.ChangePassword("newpassword");
@@ -78,7 +78,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenEventStorePopulatedWithEventsForMultipleAggregates_WhenLoadingEventsForAnAggregate_ThenShouldReturnEventsForThatAggregate()
         {
             // Arrange
-            IEventStore store = new InMemoryEventStore();
+            IEventStore store = new InMemoryEventStore(new ConsoleLogger());
 
             var user1 = new User();
             user1.Register();
@@ -101,10 +101,36 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         }
 
         [Test]
+        public void GivenEventStorePopulatedWithEventsForMultipleAggregates_WhenLoadingEventsForAnAggregate_AndSpecifyingLatestVersion_ThenShouldReturnEventsForThatAggregate()
+        {
+            // Arrange
+            IEventStore store = new InMemoryEventStore(new ConsoleLogger());
+
+            var user1 = new User();
+            user1.Register();
+            user1.ChangePassword("user1pwd1");
+            user1.ChangePassword("user1pwd2");
+
+            var user2 = new User();
+            user2.Register();
+            user2.ChangePassword("user2pwd1");
+            user2.ChangePassword("user2pwd2");
+
+            store.Save<User>(user1.Id.ToString(), 0, user1.GetUncommittedEvents());
+            store.Save<User>(user2.Id.ToString(), 0, user2.GetUncommittedEvents());
+
+            // Act
+            EventStream<User> eventsForUser1 = store.Load<User>(user1.Id.ToString(), EventStreamVersion.Max);
+
+            // Assert
+            CollectionAssert.AreEqual(user1.GetUncommittedEvents(), eventsForUser1.Events, "Store didn't return user1's events properly.");
+        }
+
+        [Test]
         public void GivenEventStorePopulatedWithManyEventsForAnAggregate_WhenLoadingForSpecificVersion_ThenShouldOnlyLoadEventsUpToAndIncludingThatVersion()
         {
             // Arrange
-            IEventStore store = new InMemoryEventStore();
+            IEventStore store = new InMemoryEventStore(new ConsoleLogger());
             var id = Guid.NewGuid();
             var allEvents = new EventChain().Add(new UserRegistered(id))
                                             .Add(new UserChangedPassword("pwd1"))

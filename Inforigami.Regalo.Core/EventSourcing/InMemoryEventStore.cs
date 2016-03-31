@@ -1,13 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Core.EventSourcing
 {
     public class InMemoryEventStore : IEventStore
     {
+        private readonly ILogger _logger;
         private readonly IDictionary<string, IList<IEvent>> _eventStreams = new Dictionary<string, IList<IEvent>>();
+
+        public InMemoryEventStore(ILogger logger)
+        {
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
+        }
 
         public IEnumerable<IEvent> GetAllEvents()
         {
@@ -19,6 +27,8 @@ namespace Inforigami.Regalo.Core.EventSourcing
             if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentNullException("aggregateId");
             if (expectedVersion < -1)                   throw new ArgumentOutOfRangeException("expectedVersion", "Expected version should be greater than or equal to -1.");
             if (newEvents == null)                      throw new ArgumentNullException("newEvents");
+
+            LogSavingNewEventsList(aggregateId, expectedVersion, newEvents);
 
             var newEventsList = newEvents.ToList();
             var existingStream = FindEvents(aggregateId);
@@ -36,6 +46,18 @@ namespace Inforigami.Regalo.Core.EventSourcing
                     existingStream.Add(evt);
                 }
             }
+        }
+
+        private void LogSavingNewEventsList(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
+        {
+            var eventsList = string.Join(Environment.NewLine, newEvents.Select(x => string.Format("{0}: {1}", x.GetType(), x.Headers.MessageId)));
+            var message = string.Format(
+                "Saving events for {0}@{1}{2}{3}",
+                aggregateId,
+                expectedVersion,
+                Environment.NewLine,
+                eventsList);
+            _logger.Debug(this, message);
         }
 
         private static void CheckConcurrency(int expectedVersion, ICollection<IEvent> existingStream)
@@ -91,7 +113,12 @@ namespace Inforigami.Regalo.Core.EventSourcing
                 return null;
             }
 
-            if (version.HasValue)
+            if (version == EventStreamVersion.NoStream)
+            {
+                throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EventStreamVersion.NoStream (-1) value.");
+            }
+
+            if (version.HasValue && version != EventStreamVersion.Max)
             {
                 events = events.Where(x => x.Headers.Version <= version.Value).ToList();
             }

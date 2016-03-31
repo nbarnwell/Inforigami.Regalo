@@ -15,6 +15,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
     public class RepositoryTests : TestFixtureBase
     {
         private IObjectComparer _comparer;
+        private ILogger _logger;
 
         [SetUp]
         public void SetUp()
@@ -22,6 +23,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             _comparer = new ObjectComparer().Ignore<IMessageHeaders, Guid>(x => x.MessageId)
                                             .Ignore<IEventHeaders, Guid>(x => x.CausationId)
                                             .Ignore<IEventHeaders, Guid>(x => x.CorrelationId);
+            _logger = new ConsoleLogger();
 
             ObjectComparisonResult.ThrowOnFail = true;
         }
@@ -30,8 +32,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenAggregateWithNoUncommittedEvents_WhenSaved_ThenEventStoreShouldContainNoAdditionalEvents()
         {
             // Arrange
-            var eventStore = new InMemoryEventStore();
-            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
+            var eventStore = new InMemoryEventStore(new ConsoleLogger());
+            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object, _logger);
             var user = new User();
 
             var expectedEvents = Enumerable.Empty<object>();
@@ -47,8 +49,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenAggregateWithUncommittedEvents_WhenSaved_ThenEventStoreShouldContainThoseEvents()
         {
             // Arrange
-            var eventStore = new InMemoryEventStore();
-            IRepository<User> repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
+            var eventStore = new InMemoryEventStore(new ConsoleLogger());
+            IRepository<User> repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object, _logger);
             var user = new User();
             user.Register();
 
@@ -66,7 +68,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenPopulatedEventStore_WhenLoadingAggregate_ThenRepositoryShouldRebuildThatAggregate()
         {
             // Arrange
-            var eventStore = new InMemoryEventStore();
+            var eventStore = new InMemoryEventStore(new ConsoleLogger());
             var userId = Guid.NewGuid();
             eventStore.Save<User>(
                 EventStreamIdFormatter.GetStreamId<User>(userId.ToString()),
@@ -77,7 +79,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                     new UserChangedPassword("newpassword"),
                     new UserChangedPassword("newnewpassword")
                 });
-            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
+            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object, _logger);
 
             // Act
             User user = repository.Get(userId, 3);
@@ -90,7 +92,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenPopulatedEventStore_WhenLoadingSpecificVersionOfAggregate_ThenRepositoryShouldRebuildThatAggregateToThatVersion()
         {
             // Arrange
-            var eventStore = new InMemoryEventStore();
+            var eventStore = new InMemoryEventStore(new ConsoleLogger());
             var userId = Guid.NewGuid();
             var events = new EventChain
             {
@@ -100,7 +102,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             };
             eventStore.Save<User>(EventStreamIdFormatter.GetStreamId<User>(userId.ToString()), 0, events);
 
-            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
+            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object, _logger);
 
             // Act
             User user = repository.Get(userId, events[1].Headers.Version);
@@ -128,7 +130,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenPopulatedEventStore_WhenLoadingAggregate_ThenAggregateVersionShouldReflectStoredEvents()
         {
             // Arrange
-            var eventStore = new InMemoryEventStore();
+            var eventStore = new InMemoryEventStore(new ConsoleLogger());
             var userId = Guid.NewGuid();
             eventStore.Save<User>(
                 EventStreamIdFormatter.GetStreamId<User>(userId.ToString()),
@@ -139,7 +141,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                     new UserChangedPassword("newpassword"),
                     new UserChangedPassword("newnewpassword")
                 });
-            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
+            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object, _logger);
 
             // Act
             User user = repository.Get(userId, 2);
@@ -154,7 +156,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var user = new User();
             var concurrencyMonitor = new Mock<IConcurrencyMonitor>();
-            var repository = new EventSourcingRepository<User>(new InMemoryEventStore(), concurrencyMonitor.Object);
+            var repository = new EventSourcingRepository<User>(new InMemoryEventStore(new ConsoleLogger()), concurrencyMonitor.Object, _logger);
 
             // Act
             repository.Save(user);
@@ -170,7 +172,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var user = new User();
             user.Register();
             var concurrencyMonitor = new Mock<IConcurrencyMonitor>();
-            var repository = new EventSourcingRepository<User>(new InMemoryEventStore(), concurrencyMonitor.Object);
+            var repository = new EventSourcingRepository<User>(new InMemoryEventStore(new ConsoleLogger()), concurrencyMonitor.Object, _logger);
 
             // Act
             repository.Save(user);
@@ -183,23 +185,24 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenExistingAggregateWithUnseenChanges_WhenSaving_ThenShouldCheckConcurrencyWithCorrectEvents()
         {
             // Arrange
-            var eventStore = new InMemoryEventStore();
+            var eventStore = new InMemoryEventStore(new ConsoleLogger());
 
             // Register and save a new user
             var user = new User();
             user.Register();
             var concurrencyMonitor = new StrictConcurrencyMonitor();
-            var repository = new EventSourcingRepository<User>(eventStore, concurrencyMonitor);
+            var repository = new EventSourcingRepository<User>(eventStore, concurrencyMonitor, _logger);
             repository.Save(user);
+            var userVersion = user.Version;
 
             // We change password...
-            var repository1 = new EventSourcingRepository<User>(eventStore, concurrencyMonitor);
-            var user1 = repository1.Get(user.Id, user.Version);
+            var repository1 = new EventSourcingRepository<User>(eventStore, concurrencyMonitor, _logger);
+            var user1 = repository1.Get(user.Id, userVersion);
             user1.ChangePassword("newpassword");
 
             // ...but so does someone else, who saves their changes before we have a chance to save ours...
-            var repository2 = new EventSourcingRepository<User>(eventStore, concurrencyMonitor);
-            var user2 = repository.Get(user.Id, user.Version);
+            var repository2 = new EventSourcingRepository<User>(eventStore, concurrencyMonitor, _logger);
+            var user2 = repository.Get(user.Id, userVersion);
             user2.ChangePassword("newpassword");
             repository2.Save(user2);
 
@@ -211,10 +214,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void GivenAggregateWithUncommittedEvents_WhenSaved_ThenBaseVersionShouldMatchCurrentVersion()
         {
             // Arrange
-            var eventStore = new InMemoryEventStore();
+            var eventStore = new InMemoryEventStore(new ConsoleLogger());
             var user = new User();
             user.Register();
-            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object);
+            var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object, _logger);
             repository.Save(user);
 
             user.ChangePassword("newpassword");
@@ -234,7 +237,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             // Arrange
             var user = new User();
             user.Register();
-            var repository = new EventSourcingRepository<User>(new InMemoryEventStore(), new Mock<IConcurrencyMonitor>().Object);
+            var repository = new EventSourcingRepository<User>(new InMemoryEventStore(new ConsoleLogger()), new Mock<IConcurrencyMonitor>().Object, _logger);
 
             // Act
             repository.Save(user);

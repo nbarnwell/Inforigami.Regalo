@@ -7,13 +7,19 @@ namespace Inforigami.Regalo.Core.EventSourcing
 {
     public class EventSourcingRepository<TAggregateRoot> : IRepository<TAggregateRoot> where TAggregateRoot : AggregateRoot, new()
     {
+        private readonly ILogger _logger;
         private readonly IEventStore _eventStore;
         private readonly IConcurrencyMonitor _concurrencyMonitor;
 
-        public EventSourcingRepository(IEventStore eventStore, IConcurrencyMonitor concurrencyMonitor)
+        public EventSourcingRepository(IEventStore eventStore, IConcurrencyMonitor concurrencyMonitor, ILogger logger)
         {
-            _eventStore = eventStore;
+            if (eventStore == null)         throw new ArgumentNullException(nameof(eventStore));
+            if (concurrencyMonitor == null) throw new ArgumentNullException(nameof(concurrencyMonitor));
+            if (logger == null)             throw new ArgumentNullException(nameof(logger));
+
+            _eventStore         = eventStore;
             _concurrencyMonitor = concurrencyMonitor;
+            _logger             = logger;
         }
 
         public TAggregateRoot Get(Guid id, int version)
@@ -24,13 +30,23 @@ namespace Inforigami.Regalo.Core.EventSourcing
         private TAggregateRoot Get(Guid id, int? version)
         {
             var aggregateId = EventStreamIdFormatter.GetStreamId<TAggregateRoot>(id.ToString());
+            _logger.Debug(this, "Loading stream with ID {0} at version {1}", aggregateId, version);
 
             var stream =
                 version == null
                     ? _eventStore.Load<TAggregateRoot>(aggregateId)
                     : _eventStore.Load<TAggregateRoot>(aggregateId, version.Value);
 
-            if (stream == null) return null;
+            if (stream == null)
+            {
+                _logger.Warn(this, "No stream found for ID {0}", aggregateId);
+                return null;
+            }
+
+            if (!stream.HasEvents)
+            {
+                _logger.Warn(this, "Stream for ID {0} has no events for version {1}", aggregateId, version);
+            }
 
             var aggregateRoot = new TAggregateRoot();
 
