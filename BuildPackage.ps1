@@ -38,11 +38,11 @@ gci $scriptDir -include $projectsToPackage -recurse |
                 %{ $_ -replace '\$version\$', $v.SemanticVersion } |
                 add-content $nuspec
 
-            nuget.exe pack $_ -build -Symbols -outputdirectory $outputDir -Properties Configuration=Release
+            nuget.exe pack $_ -build -Symbols -outputdirectory $outputDir -Properties Configuration=Release -MSBuildVersion 14
 
             del $nuspec
             ren $nuspecTemp $nuspec 
         } else {
-            nuget.exe pack $_ -build -Symbols -outputdirectory $outputDir -Properties Configuration=Release
+            nuget.exe pack $_ -build -Symbols -outputdirectory $outputDir -Properties Configuration=Release -MSBuildVersion 14
         }
     }
