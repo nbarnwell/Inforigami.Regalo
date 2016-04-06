@@ -43,6 +43,7 @@
     <Compile Include="..\Inforigami.Regalo.Interfaces\Properties\AssemblyInfo.Version.cs">
       <Link>Properties\AssemblyInfo.Version.cs</Link>
     </Compile>
+    <Compile Include="EnumerableComparisonReport.cs" />
     <Compile Include="ObjectComparisonException.cs" />
     <Compile Include="ObjectComparisonResult.cs" />
     <Compile Include="IObjectComparer.cs" />

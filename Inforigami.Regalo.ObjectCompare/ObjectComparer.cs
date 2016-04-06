@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Inforigami.Regalo.ObjectCompare
 {
@@ -140,10 +142,13 @@ namespace Inforigami.Regalo.ObjectCompare
 
             if (hasNext1 != hasNext2)
             {
-                return ObjectComparisonResult.Fail(_propertyComparisonStack, "Enumerable properties have different lengths.");
+                var r = new EnumerableComparisonReport();
+                var report = r.Generate("Expected", value1, "Actual", value2);
+                return ObjectComparisonResult.Fail(_propertyComparisonStack, "Enumerable properties have different lengths:\r\n" + report);
             }
 
             return ObjectComparisonResult.Success();
         }
+
     }
 }
