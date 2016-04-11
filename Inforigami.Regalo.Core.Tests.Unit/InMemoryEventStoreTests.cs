@@ -141,7 +141,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             store.Save<User>(id.ToString(), 0, allEvents);
 
             // Act
-            IEnumerable<IEvent> version3 = store.Load<User>(id.ToString(), allEvents[2].Headers.Version).Events;
+            IEnumerable<IEvent> version3 = store.Load<User>(id.ToString(), allEvents[2].Version).Events;
 
             // Assert
             CollectionAssert.AreEqual(allEvents.Take(3).ToArray(), version3);

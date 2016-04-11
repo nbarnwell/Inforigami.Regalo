@@ -20,9 +20,9 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [SetUp]
         public void SetUp()
         {
-            _comparer = new ObjectComparer().Ignore<IMessageHeaders, Guid>(x => x.MessageId)
-                                            .Ignore<IEventHeaders, Guid>(x => x.CausationId)
-                                            .Ignore<IEventHeaders, Guid>(x => x.CorrelationId);
+            _comparer = new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
+                                            .Ignore<IEvent, Guid>(x => x.CausationId)
+                                            .Ignore<IEvent, Guid>(x => x.CorrelationId);
             _logger = new ConsoleLogger();
 
             ObjectComparisonResult.ThrowOnFail = true;
@@ -105,10 +105,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object, _logger);
 
             // Act
-            User user = repository.Get(userId, events[1].Headers.Version);
+            User user = repository.Get(userId, events[1].Version);
 
             // Assert
-            Assert.AreEqual(events[1].Headers.Version, user.BaseVersion);
+            Assert.AreEqual(events[1].Version, user.BaseVersion);
         }
 
         [Test]
@@ -222,7 +222,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
 
             user.ChangePassword("newpassword");
 
-            var versionAfterChange = user.GetUncommittedEvents().Last().Headers.Version;
+            var versionAfterChange = user.GetUncommittedEvents().Last().Version;
 
             // Act
             repository.Save(user);

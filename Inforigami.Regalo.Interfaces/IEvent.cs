@@ -1,8 +1,11 @@
+using System;
+
 namespace Inforigami.Regalo.Interfaces
 {
     public interface IEvent : IMessage
     {
-        IEventHeaders Headers { get; }
-        void OverwriteHeaders(IEventHeaders headers);
+        Guid CausationId { get; set; }
+        Guid CorrelationId { get; set; }
+        int Version { get; set; }
     }
 }

@@ -156,7 +156,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             store.Save<Customer>(customerId.ToString(), 0, storedEvents);
            
             // Act
-            var stream = store.Load<Customer>(customerId.ToString(), storedEvents[1].Headers.Version);
+            var stream = store.Load<Customer>(customerId.ToString(), storedEvents[1].Version);
 
             // Assert
             CollectionAssert.AreEqual(storedEvents.Take(2), stream.Events, "Events loaded from store do not match version requested.");

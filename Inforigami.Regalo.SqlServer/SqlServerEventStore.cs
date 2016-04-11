@@ -86,9 +86,9 @@ namespace Inforigami.Regalo.SqlServer
 
             foreach (var evt in newEvents)
             {
-                idParameter.Value          = evt.Headers.MessageId;
+                idParameter.Value          = evt.MessageId;
                 aggregateIdParameter.Value = aggregateId;
-                versionParameter.Value     = evt.Headers.Version;
+                versionParameter.Value     = evt.Version;
                 dataParameter.Value        = GetJson(evt);
 
                 eventCommand.ExecuteNonQuery();
@@ -103,7 +103,7 @@ namespace Inforigami.Regalo.SqlServer
             aggregateRootCommand.CommandText = @"update AggregateRoot set Version = @Version where Id = @Id and @Version = @ExpectedVersion;";
 
             aggregateRootCommand.Parameters.AddWithValue("@Id", aggregateId);
-            aggregateRootCommand.Parameters.AddWithValue("@Version", newEvents.Last().Headers.Version);
+            aggregateRootCommand.Parameters.AddWithValue("@Version", newEvents.Last().Version);
             aggregateRootCommand.Parameters.AddWithValue("@ExpectedVersion", expectedVersion);
 
             int rowsUpdated = aggregateRootCommand.ExecuteNonQuery();
@@ -122,7 +122,7 @@ namespace Inforigami.Regalo.SqlServer
             aggregateRootCommand.CommandText = @"insert into AggregateRoot (Id, [Version]) values (@Id, @Version);";
 
             aggregateRootCommand.Parameters.AddWithValue("@Id", aggregateId);
-            aggregateRootCommand.Parameters.AddWithValue("@Version", newEvents.Last().Headers.Version);
+            aggregateRootCommand.Parameters.AddWithValue("@Version", newEvents.Last().Version);
 
             aggregateRootCommand.ExecuteNonQuery();
         }

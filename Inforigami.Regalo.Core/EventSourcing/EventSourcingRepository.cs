@@ -82,12 +82,12 @@ namespace Inforigami.Regalo.Core.EventSourcing
                         if (!conflicts.Any())
                         {
                             // Re-version our uncommitted events on top of those already saved to the db.
-                            int unseenVersion = unseenEvents.Last().Headers.Version;
+                            int unseenVersion = unseenEvents.Last().Version;
                             int newVersion = unseenVersion;
 
                             foreach (var evt in uncommittedEvents)
                             {
-                                evt.Headers.Version = ++newVersion;
+                                evt.Version = ++newVersion;
                             }
 
                             _eventStore.Save<TAggregateRoot>(streamId, unseenVersion, uncommittedEvents);
@@ -108,7 +108,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
         private static IEnumerable<IEvent> GetUnseenEvents(TAggregateRoot item, IEnumerable<IEvent> baseAndUnseenEvents)
         {
-            return baseAndUnseenEvents.Where(x => x.Headers.Version > item.BaseVersion);
+            return baseAndUnseenEvents.Where(x => x.Version > item.BaseVersion);
         }
     }
 }

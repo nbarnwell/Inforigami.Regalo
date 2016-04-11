@@ -26,7 +26,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
         public int GetVersion()
         {
-            return _events.Last().Headers.Version;
+            return _events.Last().Version;
         }
 
         public void Append(IEnumerable<IEvent> events)

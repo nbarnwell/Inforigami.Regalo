@@ -4,18 +4,16 @@ namespace Inforigami.Regalo.Interfaces
 {
     public abstract class Event : IEvent
     {
-        public IEventHeaders Headers { get; private set; }
+        public Guid           MessageId     { get; set; }
+        public DateTimeOffset Timestamp     { get; set; }
+        public Guid           CausationId   { get; set; }
+        public Guid           CorrelationId { get; set; }
+        public int            Version       { get; set; }
 
-        protected Event()
+        public Event()
         {
-            Headers = new EventHeaders();
-        }
-
-        public void OverwriteHeaders(IEventHeaders headers)
-        {
-            if (headers == null) throw new ArgumentNullException("headers");
-
-            Headers = headers;
+            MessageId = Guid.NewGuid();
+            Timestamp = DateTimeOffset.Now;
         }
     }
 }

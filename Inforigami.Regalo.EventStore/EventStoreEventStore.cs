@@ -103,10 +103,8 @@ namespace Inforigami.Regalo.EventStore
         private static IEvent BuildDomainEvent(byte[] data, byte[] metadata)
         {
             var dataJson = Encoding.UTF8.GetString(data);
-            var headerJson = Encoding.UTF8.GetString(metadata);
 
             var evt = (IEvent)JsonConvert.DeserializeObject(dataJson, GetDefaultJsonSerializerSettings());
-            evt.OverwriteHeaders((IEventHeaders)JsonConvert.DeserializeObject(headerJson, GetDefaultJsonSerializerSettings()));
 
             return evt;
         }
@@ -119,19 +117,11 @@ namespace Inforigami.Regalo.EventStore
         {
             return newEvents.Select(
                 x => new EventData(
-                    x.Headers.MessageId,
+                    x.MessageId,
                     GetEventTypeFriendlyName(x),
                     true,
                     GetEventBytes(x),
-                    GetEventHeadersBytes(x.Headers)));
-        }
-
-        private static byte[] GetEventHeadersBytes(IEventHeaders headers)
-        {
-            if (headers == null) throw new ArgumentNullException("headers");
-
-            return GetBytes(headers);
-        }
+                    null)); }
 
         private static byte[] GetEventBytes(IEvent evt)
         {

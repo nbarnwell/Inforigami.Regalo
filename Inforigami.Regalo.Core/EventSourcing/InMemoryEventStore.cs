@@ -50,7 +50,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
         private void LogSavingNewEventsList(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
-            var eventsList = string.Join(Environment.NewLine, newEvents.Select(x => string.Format("{0}: {1}", x.GetType(), x.Headers.MessageId)));
+            var eventsList = string.Join(Environment.NewLine, newEvents.Select(x => string.Format("{0}: {1}", x.GetType(), x.MessageId)));
             var message = string.Format(
                 "Saving events for {0}@{1}{2}{3}",
                 aggregateId,
@@ -70,7 +70,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
                 throw exception;
             }
 
-            if (existingStream != null && existingStream.Last().Headers.Version != expectedVersion)
+            if (existingStream != null && existingStream.Last().Version != expectedVersion)
             {
                 var exception = new EventStoreConcurrencyException(
                     string.Format("Expected version {0} does not match actual version {1}", expectedVersion, existingStream.Count));
@@ -120,7 +120,7 @@ namespace Inforigami.Regalo.Core.EventSourcing
 
             if (version.HasValue && version != EventStreamVersion.Max)
             {
-                events = events.Where(x => x.Headers.Version <= version.Value).ToList();
+                events = events.Where(x => x.Version <= version.Value).ToList();
             }
 
             return events;

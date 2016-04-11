@@ -87,7 +87,7 @@ namespace Inforigami.Regalo.RavenDB
         {
             var events = Load<T>(aggregateId).Events.ToList();
 
-            if (events.All(x => x.Headers.Version != maxVersion))
+            if (events.All(x => x.Version != maxVersion))
             {
                 throw new ArgumentOutOfRangeException(
                     "maxVersion",
@@ -102,7 +102,7 @@ namespace Inforigami.Regalo.RavenDB
 
         private static IEnumerable<IEvent> GetEventsForVersion(IEnumerable<IEvent> events, int maxVersion)
         {
-            return events.Where(x => x.Headers.Version <= maxVersion);
+            return events.Where(x => x.Version <= maxVersion);
         }
 
         public void Dispose()

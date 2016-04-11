@@ -21,7 +21,7 @@ namespace Inforigami.Regalo.Testing
 
         public EventChain Add(IEvent evt)
         {
-            evt.Headers.Version = ++_version;
+            evt.Version = ++_version;
 
             _events.Add(evt);
 

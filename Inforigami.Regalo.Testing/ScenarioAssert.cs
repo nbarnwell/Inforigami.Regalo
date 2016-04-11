@@ -41,10 +41,10 @@ namespace Inforigami.Regalo.Testing
 
             var eventsStoredToEventStore = _context.GetGeneratedEvents();
 
-            var comparer = new ObjectComparer().Ignore<IEventHeaders, Guid>(x => x.MessageId)
-                                               .Ignore<IEventHeaders, Guid>(x => x.CausationId)
-                                               .Ignore<IEventHeaders, Guid>(x => x.CorrelationId)
-                                               .Ignore<IEventHeaders, DateTimeOffset>(x => x.Timestamp);
+            var comparer = new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
+                                               .Ignore<IEvent, Guid>(x => x.CausationId)
+                                               .Ignore<IEvent, Guid>(x => x.CorrelationId)
+                                               .Ignore<IMessage, DateTimeOffset>(x => x.Timestamp);
 
             if (configureComparer != null)
             {

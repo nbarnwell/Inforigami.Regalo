@@ -68,12 +68,7 @@ namespace Inforigami.Regalo.Core
 
         protected void Record(IEvent evt)
         {
-            if (evt.Headers == null)
-            {
-                throw new ArgumentException(string.Format("The event {0} does not have a headers object.", evt.GetType()));
-            }
-
-            evt.Headers.Version = Version + 1;
+            evt.Version = Version + 1;
 
             ApplyEvent(evt);
 
@@ -86,7 +81,7 @@ namespace Inforigami.Regalo.Core
 
         private void ApplyEvent(IEvent evt)
         {
-            Version = evt.Headers.Version;
+            Version = evt.Version;
 
             __logger.Debug(this, "Applying {0}", evt.GetType());
 
