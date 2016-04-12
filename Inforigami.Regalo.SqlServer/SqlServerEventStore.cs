@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Transactions;
+using Inforigami.Regalo.Core;
 using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using Newtonsoft.Json;
@@ -16,11 +17,15 @@ namespace Inforigami.Regalo.SqlServer
     public class SqlServerEventStore : IEventStore, IDisposable
     {
         private readonly string _connectionName;
+        private readonly ILogger _logger;
 
-        public SqlServerEventStore(string connectionName)
+        public SqlServerEventStore(string connectionName, ILogger logger)
         {
             if (connectionName == null) throw new ArgumentNullException("connectionName");
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+
             _connectionName = connectionName;
+            _logger = logger;
         }
 
         public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
@@ -30,22 +35,20 @@ namespace Inforigami.Regalo.SqlServer
             if (!Guid.TryParse(aggregateId, out aggregateIdGuid)) throw new ArgumentException(string.Format("\"{0}\" is not a valid Guid", aggregateId), "aggregateId");
             
             using (var transaction = GetTransaction())
+            using (var connection = GetConnection())
             {
-                using (var connection = GetConnection())
+                connection.Open();
+
+                if (expectedVersion == EventStreamVersion.NoStream)
                 {
-                    connection.Open();
-
-                    if (expectedVersion == EventStreamVersion.NoStream)
-                    {
-                        InsertAggregateRow(aggregateIdGuid, newEvents, connection);
-                    }
-                    else
-                    {
-                        UpdateAggregateRow(aggregateIdGuid, expectedVersion, newEvents, connection);
-                    }
-
-                    InsertEvents(aggregateIdGuid, newEvents, connection);
+                    InsertAggregateRow(aggregateIdGuid, newEvents, connection);
                 }
+                else
+                {
+                    UpdateAggregateRow(aggregateIdGuid, expectedVersion, newEvents, connection);
+                }
+
+                InsertEvents(aggregateIdGuid, newEvents, connection);
 
                 transaction.Complete();
             }
@@ -53,12 +56,62 @@ namespace Inforigami.Regalo.SqlServer
 
         public EventStream<T> Load<T>(string aggregateId)
         {
-            throw new NotImplementedException();
+            return Load<T>(aggregateId, EventStreamVersion.Max);
         }
 
         public EventStream<T> Load<T>(string aggregateId, int version)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentException("An aggregate ID is required", "aggregateId");
+
+            if (version == EventStreamVersion.NoStream)
+            {
+                throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EventStreamVersion.NoStream (-1) value.");
+            }
+
+            _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from stream " + aggregateId);
+
+            using (var transaction = GetTransaction())
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandType = CommandType.Text;
+                command.CommandText = @"select * from AggregateRootEvent where AggregateId = @aggregateId and Version <= @Version order by Version;";
+
+                var aggregateIdParameter = command.Parameters.Add("@AggregateId", SqlDbType.UniqueIdentifier);
+                var versionParameter     = command.Parameters.Add("@Version", SqlDbType.Int);
+
+                aggregateIdParameter.Value = aggregateId;
+                versionParameter.Value = version;
+
+                var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+
+                var events = new List<IEvent>();
+                while (reader.NextResult())
+                {
+                    events.Add((IEvent)JsonConvert.DeserializeObject(reader.GetString(3)));
+                }
+
+                if (events.Count == 0)
+                {
+                    return null;
+                }
+
+                var result = new EventStream<T>(aggregateId);
+                result.Append(events);
+
+                if (version != EventStreamVersion.Max && result.GetVersion() != version)
+                {
+                    var exception = new ArgumentOutOfRangeException("version", version, string.Format("Event for version {0} could not be found for stream {1}", version, aggregateId));
+                    exception.Data.Add("Existing stream", events);
+                    throw exception;
+                }
+
+                transaction.Complete();
+
+                return result;
+            }
         }
 
         public void Dispose()
