@@ -68,7 +68,7 @@ namespace Inforigami.Regalo.SqlServer
                 throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EventStreamVersion.NoStream (-1) value.");
             }
 
-            _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from stream " + aggregateId);
+            _logger.Debug(this, "Loading " + typeof(T) + " version " + EventStreamVersion.GetName(version) + " from stream " + aggregateId);
 
             using (var transaction = GetTransaction())
             using (var connection = GetConnection())
@@ -82,15 +82,15 @@ namespace Inforigami.Regalo.SqlServer
                 var aggregateIdParameter = command.Parameters.Add("@AggregateId", SqlDbType.UniqueIdentifier);
                 var versionParameter     = command.Parameters.Add("@Version", SqlDbType.Int);
 
-                aggregateIdParameter.Value = aggregateId;
-                versionParameter.Value = version;
+                aggregateIdParameter.Value = Guid.Parse(aggregateId);
+                versionParameter.Value = version == EventStreamVersion.Max ? int.MaxValue : version;
 
                 var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
 
                 var events = new List<IEvent>();
-                while (reader.NextResult())
+                while (reader.Read())
                 {
-                    events.Add((IEvent)JsonConvert.DeserializeObject(reader.GetString(3)));
+                    events.Add((IEvent)JsonConvert.DeserializeObject(reader.GetString(3), GetJsonSerialisationSettings()));
                 }
 
                 if (events.Count == 0)
@@ -169,6 +169,11 @@ namespace Inforigami.Regalo.SqlServer
 
         private static void InsertAggregateRow(Guid aggregateId, IEnumerable<IEvent> newEvents, SqlConnection connection)
         {
+            if (newEvents == null || !newEvents.Any())
+            {
+                return;
+            }
+
             var aggregateRootCommand = connection.CreateCommand();
 
             aggregateRootCommand.CommandType = CommandType.Text;
@@ -208,7 +213,7 @@ namespace Inforigami.Regalo.SqlServer
 
         private JsonSerializerSettings GetJsonSerialisationSettings()
         {
-            return new JsonSerializerSettings { Formatting = Formatting.Indented, TypeNameHandling = TypeNameHandling.Auto };
+            return new JsonSerializerSettings { Formatting = Formatting.Indented, TypeNameHandling = TypeNameHandling.All };
         }
     }
 }
