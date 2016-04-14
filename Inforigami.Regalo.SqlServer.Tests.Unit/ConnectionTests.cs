@@ -11,12 +11,19 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
     [TestFixture]
     public class ConnectionTests
     {
+        private ILogger _logger;
+
         [SetUp]
         public void SetUp()
         {
+            _logger = new ConsoleLogger();
+
             Resolver.Configure(type =>
             {
-                if (type == typeof(ILogger)) return new NullLogger();
+                if (type == typeof(ILogger))
+                {
+                    return _logger;
+                }
                 throw new InvalidOperationException(string.Format("No type of {0} registered.", type));
             },
             type => null,
@@ -32,7 +39,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
         [Test]
         public void Connecting_to_undefined_database_name_throws_exception()
         {
-            var store = new SqlServerEventStore("InvalidConnnectionName");
+            var store = new SqlServerEventStore("InvalidConnnectionName", _logger);
             var user = new User();
             user.Register();
             user.ChangePassword("password");
@@ -43,7 +50,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
         [Test]
         public void Connecting_to_non_SqlClient_throws_exception()
         {
-            var store = new SqlServerEventStore("NonSqlClientConnection");
+            var store = new SqlServerEventStore("NonSqlClientConnection", _logger);
             var user = new User();
             user.Register();
             user.ChangePassword("password");
@@ -54,7 +61,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
         [Test]
         public void Connecting_to_SqlClient_does_not_throw_exception()
         {
-            var store = new SqlServerEventStore("SqlClientConnection");
+            var store = new SqlServerEventStore("SqlClientConnection", _logger);
             var user = new User();
             user.Register();
             user.ChangePassword("password");
