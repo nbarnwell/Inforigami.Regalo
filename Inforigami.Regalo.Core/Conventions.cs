@@ -7,9 +7,11 @@ namespace Inforigami.Regalo.Core
         private static bool _aggregatesMustImplementApplyMethods = false;
         private static Func<Type, Type> _findAggregateTypeForEventType = null;
         private static Func<object, Exception, bool> _eventHandlingExceptionFilter = null;
+        private static NoEventHandlerBehaviour _behaviourWhenNoEventHandlerFound = NoEventHandlerBehaviour.Throw;
 
         public static bool AggregatesMustImplementApplyMethods { get { return _aggregatesMustImplementApplyMethods; } }
         public static Func<Type, Type> FindAggregateTypeForEventType { get { return _findAggregateTypeForEventType; } }
+        public static NoEventHandlerBehaviour BehaviourWhenNoEventHandlerFound { get { return _behaviourWhenNoEventHandlerFound;} }
 
         public static string StreamIdFormat
         {
@@ -36,5 +38,17 @@ namespace Inforigami.Regalo.Core
         {
             _eventHandlingExceptionFilter = retryableEventHandlingExceptionFilter;
         }
+
+        public static void SetBehaviourWhenNoEventHandlerFound(NoEventHandlerBehaviour newBehaviour)
+        {
+            _behaviourWhenNoEventHandlerFound = newBehaviour;
+        }
+    }
+
+    public enum NoEventHandlerBehaviour
+    {
+        Throw,
+        Warn,
+        Ignore
     }
 }

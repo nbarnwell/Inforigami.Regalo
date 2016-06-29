@@ -29,13 +29,29 @@ namespace Inforigami.Regalo.Core
             // event, for which it's not obligatory to have a handler.
             if (!IsEventHandlingSuccessEvent(message) && targets.IsEmpty())
             {
-                throw new InvalidOperationException(string.Format("No handlers registered for: {0}", message));
+                HandleNoHandlerFound(message);
             }
 
             foreach (var target in targets)
             {
                 _logger.Debug(this, "Invoking {0} with {1}", target.Handler, message);
                 target.MethodInfo.Invoke(target.Handler, new object[] { message });
+            }
+        }
+
+        private void HandleNoHandlerFound<TMessage>(TMessage message)
+        {
+            switch (Conventions.BehaviourWhenNoEventHandlerFound)
+            {
+                case NoEventHandlerBehaviour.Ignore:
+                    // Do nothing;
+                    break;
+                case NoEventHandlerBehaviour.Warn:
+                    _logger.Warn(this, "No handler registered for: {0}", message);
+                    break;
+                case NoEventHandlerBehaviour.Throw:
+                default:
+                    throw new InvalidOperationException(string.Format("No handlers registered for: {0}", message));
             }
         }
 
