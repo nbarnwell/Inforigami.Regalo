@@ -55,7 +55,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                 },
                 o => { });
 
-            var processor = new CommandProcessor(new NullLogger());
+            var processor = new CommandProcessor(new ConsoleLogger());
 
             processor.Process(new SimpleCommand());
 
@@ -72,7 +72,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                 typeof(SimpleCommand),
             };
 
-            var processor = new CommandProcessor(new NullLogger());
+            var processor = new CommandProcessor(new ConsoleLogger());
 
             processor.Process(new SimpleCommand());
 
@@ -84,7 +84,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [Test]
         public void GivenAMessageHandledMultipleHandlers_WhenAskedToProcess_ShouldInvokeAllCommandHandlersInCorrectSequence()
         {
-            var processor = new CommandProcessor(new NullLogger());
+            var processor = new CommandProcessor(new ConsoleLogger());
 
             processor.Process(new CommandHandledByMultipleHandlers());
 

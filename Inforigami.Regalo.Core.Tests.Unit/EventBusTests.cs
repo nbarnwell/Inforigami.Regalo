@@ -96,7 +96,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [Test]
         public void GivenAMessageHandledMultipleHandlers_WhenAskedToPublish_ShouldInvokeAllCommandHandlersInCorrectSequence()
         {
-            var processor = new EventBus(new NullLogger());
+            var processor = new EventBus(new ConsoleLogger());
 
             processor.Publish(new EventHandledByMultipleHandlers());
 

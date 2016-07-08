@@ -14,7 +14,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [SetUp]
         public void SetUp()
         {
-            var _nullLogger = new NullLogger();
+            var _nullLogger = new ConsoleLogger();
 
             Resolver.Configure(
                 type =>

@@ -27,7 +27,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             _documentStore.Initialize();
             Resolver.Configure(type =>
                                {
-                                   if (type == typeof(ILogger)) return new NullLogger();
+                                   if (type == typeof(ILogger)) return new ConsoleLogger();
                                    throw new InvalidOperationException(string.Format("No type of {0} registered.", type));
                                },
                 type => null,

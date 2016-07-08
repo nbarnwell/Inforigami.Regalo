@@ -26,7 +26,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
 
             Resolver.Configure(type =>
             {
-                if (type == typeof(ILogger)) return new NullLogger();
+                if (type == typeof(ILogger)) return new ConsoleLogger();
                 throw new InvalidOperationException(string.Format("No type of {0} registered.", type));
             },
             type => null,
@@ -48,7 +48,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Loading_GivenEmptyStore_ShouldReturnNull()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
 
             // Act
             EventStream<Customer> events = store.Load<Customer>(Guid.NewGuid().ToString());
@@ -61,7 +61,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Saving_GivenSingleEvent_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
 
             // Act
             var id = Guid.NewGuid();
@@ -81,7 +81,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Saving_GivenEventWithGuidProperty_ShouldAllowReloadingToGuidType()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
 
             var customer = new Customer();
             customer.Signup();
@@ -108,7 +108,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Saving_GivenEvents_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
 
             // Act
             var customer = new Customer();
@@ -126,7 +126,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void Saving_GivenNoEvents_ShouldDoNothing()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
 
             // Act
             var id = Guid.NewGuid();
@@ -144,7 +144,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersion_ThenShouldOnlyReturnRequestedEvents(int version)
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
             var customerId = Guid.NewGuid();
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
@@ -162,7 +162,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingMaxVersion_ThenShouldReturnAllEvents()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
             var customerId = Guid.NewGuid();
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
@@ -180,7 +180,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersionThatNoEventHas_ThenShouldFail()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
             var customerId = Guid.NewGuid();
             var storedEvents = new IEvent[]
                               {
@@ -198,7 +198,7 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecialNoStreamVersion_ThenShouldFail()
         {
             // Arrange
-            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new NullLogger());
+            IEventStore store = new EventStoreEventStore(_eventStoreConnection, new ConsoleLogger());
             var customerId = Guid.NewGuid();
             var storedEvents = new IEvent[]
                               {

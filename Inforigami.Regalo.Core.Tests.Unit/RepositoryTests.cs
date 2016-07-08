@@ -22,7 +22,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         {
             _comparer = new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
                                             .Ignore<IEvent, Guid>(x => x.CausationId)
-                                            .Ignore<IEvent, Guid>(x => x.CorrelationId);
+                                            .Ignore<IEvent, Guid>(x => x.CorrelationId)
+                                            .Ignore<IMessage, DateTimeOffset>(x => x.Timestamp);
             _logger = new ConsoleLogger();
 
             ObjectComparisonResult.ThrowOnFail = true;

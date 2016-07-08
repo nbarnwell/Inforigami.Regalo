@@ -40,16 +40,16 @@ namespace Inforigami.Regalo.Core
         {
             if (_uncommittedEvents.Any() == false)
             {
-                __logger.Debug(this, "No uncommitted events to accept for ID {0}.", Id);
+                Debug("No uncommitted events to accept");
                 return;
             }
 
-            __logger.Debug(this, "Accepting events for ID {0}", Id);
+            __logger.Debug(this, "Accepting uncommitted events");
 
             BaseVersion = Version;
             int eventCount = _uncommittedEvents.Count;
             _uncommittedEvents.Clear();
-            __logger.Debug(this, "Accepted {0} uncommitted events. Now at base version {1}", eventCount, BaseVersion);
+            Debug("Accepted {0} uncommitted events. Now at base version {1}", eventCount, BaseVersion);
         }
 
         public void ApplyAll(IEnumerable<IEvent> events)
@@ -63,11 +63,13 @@ namespace Inforigami.Regalo.Core
 
             BaseVersion = Version;
 
-            __logger.Debug(this, "Applied {0} events. Now at base version {1}", eventList.Count, BaseVersion);
+            Debug("Applied {0} events. Now at base version {1}", eventList.Count, BaseVersion);
         }
 
         protected void Record(IEvent evt)
         {
+            Debug("Recording new event: {0}", evt);
+
             evt.Version = Version + 1;
 
             ApplyEvent(evt);
@@ -75,21 +77,19 @@ namespace Inforigami.Regalo.Core
             ValidateHasId();
 
             _uncommittedEvents.Add(evt);
-
-            __logger.Debug(this, "Recorded new event: {0}", evt);
         }
 
         private void ApplyEvent(IEvent evt)
         {
             Version = evt.Version;
 
-            __logger.Debug(this, "Applying {0}", evt.GetType());
-
             var applyMethods = FindApplyMethods(evt);
+
+            var applyMethodNames = string.Join(", ", applyMethods.Select(x => x.ToString()));
+            Debug("Applying {0} via {1}...", evt.GetType(), applyMethodNames);
 
             foreach (var applyMethod in applyMethods)
             {
-                __logger.Debug(this, "Applying {0} via {1}", evt.GetType(), applyMethod);
                 applyMethod.Invoke(this, new[] { evt });
             }
         }
@@ -150,6 +150,12 @@ namespace Inforigami.Regalo.Core
             }
 
             return applyMethod;
+        }
+
+        private void Debug(string format, params object[] values)
+        {
+            var message = string.Format(format, values);
+            __logger.Debug(this, "{0}@{1}<{2}: {3}", Id, BaseVersion, Version, message);
         }
     }
 }
