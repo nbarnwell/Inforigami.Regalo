@@ -51,11 +51,14 @@
     <Compile Include="..\Inforigami.Regalo.Interfaces\Properties\AssemblyInfo.Version.cs">
       <Link>Properties\AssemblyInfo.Version.cs</Link>
     </Compile>
+    <Compile Include="AutoCommitEventStoreSession.cs" />
     <Compile Include="EventStoreConnectionBehavior.cs" />
     <Compile Include="EventStoreConnectionProvider.cs" />
     <Compile Include="EventStoreEventStore.cs" />
+    <Compile Include="EventStoreSession.cs" />
     <Compile Include="IEventStoreConfiguration.cs" />
     <Compile Include="IEventStoreConnectionProvider.cs" />
+    <Compile Include="IEventStoreSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

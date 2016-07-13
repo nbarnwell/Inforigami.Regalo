@@ -14,10 +14,10 @@ namespace Inforigami.Regalo.EventStore
 {
     public class EventStoreEventStore : IEventStore, IDisposable
     {
-        private readonly IEventStoreConnection _eventStoreConnection;
+        private readonly IEventStoreSession _eventStoreConnection;
         private readonly ILogger _logger;
 
-        public EventStoreEventStore(IEventStoreConnection eventStoreConnection, ILogger logger)
+        public EventStoreEventStore(IEventStoreSession eventStoreConnection, ILogger logger)
         {
             if (eventStoreConnection == null) throw new ArgumentNullException("eventStoreConnection");
             if (logger == null) throw new ArgumentNullException("logger");
