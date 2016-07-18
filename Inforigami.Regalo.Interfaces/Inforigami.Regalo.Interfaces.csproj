@@ -49,6 +49,7 @@
     <Compile Include="IEventHandlingResultEvent.cs" />
     <Compile Include="IEventHandlingSucceededEvent.cs" />
     <Compile Include="IMessage.cs" />
+    <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.Version.cs">
       <DependentUpon>AssemblyInfo.cs</DependentUpon>
