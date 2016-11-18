@@ -14,6 +14,12 @@ namespace Inforigami.Regalo.Testing
             _context = context;
         }
 
+        public IGivenSetter<TEntity, THandler> HandledBy<THandler>(
+            Func<IMessageHandlerContext<TEntity>, THandler> createHandler)
+        {
+            return HandledBy(createHandler(_context));
+        }
+
         public IGivenSetter<TEntity, THandler> HandledBy<THandler>(THandler handler)
         {
             // TODO: Some sort of IoC style to build the handler with 
