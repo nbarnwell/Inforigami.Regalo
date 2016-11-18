@@ -9,8 +9,11 @@ namespace Inforigami.Regalo.Core
     public abstract class MessageProcessorBase
     {
         private readonly ILogger _logger;
+        private readonly object _handleMethodCacheLock = new object();
         private readonly IDictionary<RuntimeTypeHandle, MethodInfo> _handleMethodCache = new Dictionary<RuntimeTypeHandle, MethodInfo>();
+        private readonly object _eventHandlingSuccessEventTypeCacheLock = new object();
         private readonly IDictionary<RuntimeTypeHandle, bool> _eventHandlingSuccessEventTypeCache = new Dictionary<RuntimeTypeHandle, bool>();
+        private readonly object _eventHandlingResultEventTypeCacheLock = new object();
         private readonly IDictionary<RuntimeTypeHandle, bool> _eventHandlingResultEventTypeCache = new Dictionary<RuntimeTypeHandle, bool>();
 
         protected MessageProcessorBase(ILogger logger)
@@ -57,29 +60,35 @@ namespace Inforigami.Regalo.Core
 
         private bool IsEventHandlingSuccessEvent(object evt)
         {
-            var eventType = evt.GetType();
-
-            bool result;
-            if (!_eventHandlingSuccessEventTypeCache.TryGetValue(eventType.TypeHandle, out result))
+            lock (_eventHandlingSuccessEventTypeCacheLock)
             {
-                result = eventType.GetInterfaces()
-                                  .Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandlingSucceededEvent<>));
-                _eventHandlingSuccessEventTypeCache.Add(eventType.TypeHandle, result);
-            }
+                var eventType = evt.GetType();
 
-            return result;
+                bool result;
+                if (!_eventHandlingSuccessEventTypeCache.TryGetValue(eventType.TypeHandle, out result))
+                {
+                    result = eventType.GetInterfaces()
+                                      .Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandlingSucceededEvent<>));
+                    _eventHandlingSuccessEventTypeCache.Add(eventType.TypeHandle, result);
+                }
+
+                return result;
+            }
         }
 
         private bool IsEventHandlingResultEvent(Type eventType)
         {
-            bool result;
-            if (!_eventHandlingResultEventTypeCache.TryGetValue(eventType.TypeHandle, out result))
+            lock (_eventHandlingResultEventTypeCacheLock)
             {
-                result = typeof(IEventHandlingResultEvent).IsAssignableFrom(eventType);
-                _eventHandlingResultEventTypeCache.Add(eventType.TypeHandle, result);
-            }
+                bool result;
+                if (!_eventHandlingResultEventTypeCache.TryGetValue(eventType.TypeHandle, out result))
+                {
+                    result = typeof(IEventHandlingResultEvent).IsAssignableFrom(eventType);
+                    _eventHandlingResultEventTypeCache.Add(eventType.TypeHandle, result);
+                }
 
-            return result;
+                return result;
+            }
         }
 
         private List<HandlerDescriptor> GetHandlerDescriptors(Type messageHandlerOpenType, Type messageType)
@@ -122,22 +131,26 @@ namespace Inforigami.Regalo.Core
 
         private MethodInfo FindHandleMethod(Type messageType, Type handlerType)
         {
-            MethodInfo handleMethod;
-            if (false == _handleMethodCache.TryGetValue(handlerType.TypeHandle, out handleMethod))
+            lock (_handleMethodCacheLock)
             {
-                handleMethod = handlerType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                                          .Where(m => m.Name == "Handle")
-                                          .Where(
-                                              m =>
-                                              {
-                                                  var parameters = m.GetParameters();
-                                                  return parameters.Length == 1 && parameters[0].ParameterType == messageType;
-                                              }).SingleOrDefault();
+                MethodInfo handleMethod;
+                if (false == _handleMethodCache.TryGetValue(handlerType.TypeHandle, out handleMethod))
+                {
+                    handleMethod = handlerType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                                              .Where(m => m.Name == "Handle")
+                                              .Where(
+                                                  m =>
+                                                  {
+                                                      var parameters = m.GetParameters();
+                                                      return parameters.Length == 1
+                                                             && parameters[0].ParameterType == messageType;
+                                                  }).SingleOrDefault();
 
-                _handleMethodCache.Add(handlerType.TypeHandle, handleMethod);
+                    _handleMethodCache.Add(handlerType.TypeHandle, handleMethod);
+                }
+
+                return handleMethod;
             }
-
-            return handleMethod;
         }
 
         private class HandlerDescriptor
