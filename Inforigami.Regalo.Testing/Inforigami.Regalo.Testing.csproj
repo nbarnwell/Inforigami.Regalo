@@ -61,6 +61,7 @@
     <Compile Include="ITestDataBuilder.cs" />
     <Compile Include="IThenSetter.cs" />
     <Compile Include="IWhenSetter.cs" />
+    <Compile Include="ObjectComparerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="ScenarioAssert.cs" />

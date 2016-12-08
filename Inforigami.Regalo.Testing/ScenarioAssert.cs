@@ -29,6 +29,7 @@ namespace Inforigami.Regalo.Testing
             Assert(null);
         }
 
+        [Obsolete("Use Assert() instead, and configure the ObjectComparerProvider's factory delegate appropriately for your requirements. E.g. ObjectComparerProvider.Configure(() => ObjectComparerProvider.Default().Ignore<MyMessage, string>(m => m.MyPropertyToIgnore))")]
         public void Assert(Action<IObjectComparer> configureComparer)
         {
             /*
@@ -41,10 +42,7 @@ namespace Inforigami.Regalo.Testing
 
             var eventsStoredToEventStore = _context.GetGeneratedEvents();
 
-            var comparer = new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
-                                               .Ignore<IEvent, Guid>(x => x.CausationId)
-                                               .Ignore<IEvent, Guid>(x => x.CorrelationId)
-                                               .Ignore<IMessage, DateTimeOffset>(x => x.Timestamp);
+            var comparer = ObjectComparerProvider.Create();
 
             if (configureComparer != null)
             {
