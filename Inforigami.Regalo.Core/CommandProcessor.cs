@@ -2,8 +2,8 @@ namespace Inforigami.Regalo.Core
 {
     public class CommandProcessor : MessageProcessorBase, ICommandProcessor
     {
-        public CommandProcessor(ILogger logger) 
-            : base(logger)
+        public CommandProcessor(ILogger logger, INoHandlerFoundStrategyFactory noHandlerFoundStrategyFactory) 
+            : base(logger, noHandlerFoundStrategyFactory)
         {
         }
 

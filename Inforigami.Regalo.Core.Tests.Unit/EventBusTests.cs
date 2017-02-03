@@ -23,7 +23,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             _objectEventHandler = new ObjectEventHandler();
             _eventHandlerA = new EventHandlerA();
             _eventHandlerB = new EventHandlerB();
-            _eventBus = new EventBus(new ConsoleLogger());
+            _eventBus = new EventBusTestDataBuilder().Build();
 
             Resolver.Configure(type => null, LocateAllEventHandlers, o => { });
             Conventions.SetRetryableEventHandlingExceptionFilter((o, exception) => false);
@@ -98,7 +98,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [Test]
         public void GivenAMessageHandledMultipleHandlers_WhenAskedToPublish_ShouldInvokeAllCommandHandlersInCorrectSequence()
         {
-            var processor = new EventBus(new ConsoleLogger());
+            var processor = new EventBusTestDataBuilder().Build();
 
             processor.Publish(new EventHandledByMultipleHandlers());
 
@@ -149,85 +149,6 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                     typeof(SimpleEvent)
                 },
                 failingEventHandler.TargetsCalled);
-        }
-    }
-
-    public class EventHandledByMultipleHandlers : Event
-    {
-    }
-
-    public class EventHandlerA : IEventHandler<EventHandledByMultipleHandlers>
-    {
-        public readonly IList<Type> TargetsCalled = new List<Type>();
-
-        public void Handle(EventHandledByMultipleHandlers evt)
-        {
-            TargetsCalled.Add(typeof(EventHandledByMultipleHandlers));
-        }
-    }
-
-    public class EventHandlerB : IEventHandler<EventHandledByMultipleHandlers>
-    {
-        public readonly IList<Type> TargetsCalled = new List<Type>();
-
-        public void Handle(EventHandledByMultipleHandlers evt)
-        {
-            TargetsCalled.Add(typeof(EventHandledByMultipleHandlers));
-        }
-    }
-
-    public class SimpleEvent : SimpleEventBase
-    {
-    }
-
-    public class SimpleEventBase : Event // Remember this inherits from object...
-    {
-    }
-
-    public class ObjectEventHandler
-        : IEventHandler<object>,
-        IEventHandler<SimpleEventBase>,
-        IEventHandler<SimpleEvent>
-    {
-        public readonly IList<Type> TargetsCalled = new List<Type>();
-        public readonly IList<Type> MessageTypes = new List<Type>();
-
-        public void Handle(object evt)
-        {
-            TargetsCalled.Add(typeof(object));
-            MessageTypes.Add(evt.GetType());
-        }
-
-        void IEventHandler<SimpleEventBase>.Handle(SimpleEventBase evt)
-        {
-            TargetsCalled.Add(typeof(SimpleEventBase));
-            MessageTypes.Add(evt.GetType());
-        }
-
-        public void Handle(SimpleEvent evt)
-        {
-            TargetsCalled.Add(typeof(SimpleEvent));
-            MessageTypes.Add(evt.GetType());
-        }
-    }
-
-    public class FailingEventHandler : IEventHandler<SimpleEvent>, IEventHandler<IEventHandlingFailedEvent<SimpleEvent>>
-    {
-        public readonly IList<Type> TargetsCalled = new List<Type>();
-        public readonly IList<Type> MessageTypes = new List<Type>();
-
-        public void Handle(SimpleEvent evt)
-        {
-            TargetsCalled.Add(typeof(SimpleEvent));
-            MessageTypes.Add(evt.GetType());
-
-            throw new Exception("Deliberate failure.");
-        }
-
-        public void Handle(IEventHandlingFailedEvent<SimpleEvent> evt)
-        {
-            TargetsCalled.Add(typeof(IEventHandlingFailedEvent<SimpleEvent>));
-            MessageTypes.Add(evt.GetType());
         }
     }
 }

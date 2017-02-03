@@ -8,8 +8,8 @@ namespace Inforigami.Regalo.Core
     {
         private readonly ILogger _logger;
 
-        public EventBus(ILogger logger) 
-            : base(logger)
+        public EventBus(ILogger logger, INoHandlerFoundStrategyFactory noHandlerFoundStrategyFactory) 
+            : base(logger, noHandlerFoundStrategyFactory)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;

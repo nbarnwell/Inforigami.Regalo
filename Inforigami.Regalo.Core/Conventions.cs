@@ -7,11 +7,15 @@ namespace Inforigami.Regalo.Core
         private static bool _aggregatesMustImplementApplyMethods = false;
         private static Func<Type, Type> _findAggregateTypeForEventType = null;
         private static Func<object, Exception, bool> _eventHandlingExceptionFilter = null;
-        private static NoEventHandlerBehaviour _behaviourWhenNoEventHandlerFound = NoEventHandlerBehaviour.Throw;
+        private static NoMessageHandlerBehaviour _behaviourWhenNoMessageHandlerFound = NoMessageHandlerBehaviour.Throw;
+        private static NoMessageHandlerBehaviour _behaviourWhenNoSuccessMessageHandlerFound = NoMessageHandlerBehaviour.Ignore;
+        private static NoMessageHandlerBehaviour _behaviourWhenNoFailedMessageHandlerFound = NoMessageHandlerBehaviour.Warn;
 
         public static bool AggregatesMustImplementApplyMethods { get { return _aggregatesMustImplementApplyMethods; } }
         public static Func<Type, Type> FindAggregateTypeForEventType { get { return _findAggregateTypeForEventType; } }
-        public static NoEventHandlerBehaviour BehaviourWhenNoEventHandlerFound { get { return _behaviourWhenNoEventHandlerFound;} }
+        public static NoMessageHandlerBehaviour BehaviourWhenNoMessageHandlerFound { get { return _behaviourWhenNoMessageHandlerFound;} }
+        public static NoMessageHandlerBehaviour BehaviourWhenNoSuccessMessageHandlerFound { get { return _behaviourWhenNoSuccessMessageHandlerFound;} }
+        public static NoMessageHandlerBehaviour BehaviourWhenNoFailedMessageHandlerFound { get { return _behaviourWhenNoFailedMessageHandlerFound;} }
 
         public static string StreamIdFormat
         {
@@ -39,13 +43,23 @@ namespace Inforigami.Regalo.Core
             _eventHandlingExceptionFilter = retryableEventHandlingExceptionFilter;
         }
 
-        public static void SetBehaviourWhenNoEventHandlerFound(NoEventHandlerBehaviour newBehaviour)
+        public static void SetBehaviourWhenNoEventHandlerFound(NoMessageHandlerBehaviour newBehaviour)
         {
-            _behaviourWhenNoEventHandlerFound = newBehaviour;
+            _behaviourWhenNoMessageHandlerFound = newBehaviour;
+        }
+
+        public static void SetBehaviourWhenNoSuccessEventHandlerFound(NoMessageHandlerBehaviour newBehaviour)
+        {
+            _behaviourWhenNoSuccessMessageHandlerFound = newBehaviour;
+        }
+
+        public static void SetBehaviourWhenNoFailedEventHandlerFound(NoMessageHandlerBehaviour newBehaviour)
+        {
+            _behaviourWhenNoFailedMessageHandlerFound = newBehaviour;
         }
     }
 
-    public enum NoEventHandlerBehaviour
+    public enum NoMessageHandlerBehaviour
     {
         Throw,
         Warn,

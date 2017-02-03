@@ -9,71 +9,44 @@ namespace Inforigami.Regalo.Core
     public abstract class MessageProcessorBase
     {
         private readonly ILogger _logger;
+        private readonly INoHandlerFoundStrategyFactory _noHandlerFoundStrategyFactory;
+
         private readonly object _handleMethodCacheLock = new object();
         private readonly IDictionary<RuntimeTypeHandle, MethodInfo> _handleMethodCache = new Dictionary<RuntimeTypeHandle, MethodInfo>();
-        private readonly object _eventHandlingSuccessEventTypeCacheLock = new object();
-        private readonly IDictionary<RuntimeTypeHandle, bool> _eventHandlingSuccessEventTypeCache = new Dictionary<RuntimeTypeHandle, bool>();
         private readonly object _eventHandlingResultEventTypeCacheLock = new object();
         private readonly IDictionary<RuntimeTypeHandle, bool> _eventHandlingResultEventTypeCache = new Dictionary<RuntimeTypeHandle, bool>();
 
-        protected MessageProcessorBase(ILogger logger)
+        protected MessageProcessorBase(ILogger logger, INoHandlerFoundStrategyFactory noHandlerFoundStrategyFactory)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (noHandlerFoundStrategyFactory == null) throw new ArgumentNullException(nameof(noHandlerFoundStrategyFactory));
+            
             _logger = logger;
+            _noHandlerFoundStrategyFactory = noHandlerFoundStrategyFactory;
         }
 
         protected void HandleMessage<TMessage>(TMessage message, Type messageHandlerOpenType)
         {
-            var messageType = message.GetType();
+            var targets = GetHandlerDescriptors(messageHandlerOpenType, message.GetType());
 
-            var targets = GetHandlerDescriptors(messageHandlerOpenType, messageType);
-
-            // Throw if there are no handlers. Unless it's a successwrapper
-            // event, for which it's not obligatory to have a handler.
-            if (!IsEventHandlingSuccessEvent(message) && targets.IsEmpty())
+            if (targets.IsEmpty())
             {
                 HandleNoHandlerFound(message);
             }
-
-            foreach (var target in targets)
+            else
             {
-                _logger.Debug(this, "Invoking {0} with {1}", target.Handler, message);
-                target.MethodInfo.Invoke(target.Handler, new object[] { message });
+                foreach (var target in targets)
+                {
+                    _logger.Debug(this, "Invoking {0} with {1}", target.Handler, message);
+                    target.MethodInfo.Invoke(target.Handler, new object[] { message });
+                }
             }
         }
 
         private void HandleNoHandlerFound<TMessage>(TMessage message)
         {
-            switch (Conventions.BehaviourWhenNoEventHandlerFound)
-            {
-                case NoEventHandlerBehaviour.Ignore:
-                    // Do nothing;
-                    break;
-                case NoEventHandlerBehaviour.Warn:
-                    _logger.Warn(this, "No handler registered for: {0}", message);
-                    break;
-                case NoEventHandlerBehaviour.Throw:
-                default:
-                    throw new InvalidOperationException(string.Format("No handlers registered for: {0}", message));
-            }
-        }
-
-        private bool IsEventHandlingSuccessEvent(object evt)
-        {
-            lock (_eventHandlingSuccessEventTypeCacheLock)
-            {
-                var eventType = evt.GetType();
-
-                bool result;
-                if (!_eventHandlingSuccessEventTypeCache.TryGetValue(eventType.TypeHandle, out result))
-                {
-                    result = eventType.GetInterfaces()
-                                      .Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandlingSucceededEvent<>));
-                    _eventHandlingSuccessEventTypeCache.Add(eventType.TypeHandle, result);
-                }
-
-                return result;
-            }
+            var strategy = _noHandlerFoundStrategyFactory.Create(message);
+            strategy.Invoke(message);
         }
 
         private bool IsEventHandlingResultEvent(Type eventType)

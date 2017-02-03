@@ -55,7 +55,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                 },
                 o => { });
 
-            var processor = new CommandProcessor(new ConsoleLogger());
+            var processor = new CommandProcessorTestDataBuilder().Build();
 
             processor.Process(new SimpleCommand());
 
@@ -72,7 +72,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                 typeof(SimpleCommand),
             };
 
-            var processor = new CommandProcessor(new ConsoleLogger());
+            var processor = new CommandProcessorTestDataBuilder().Build();
 
             processor.Process(new SimpleCommand());
 
@@ -84,68 +84,13 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [Test]
         public void GivenAMessageHandledMultipleHandlers_WhenAskedToProcess_ShouldInvokeAllCommandHandlersInCorrectSequence()
         {
-            var processor = new CommandProcessor(new ConsoleLogger());
+            var processor = new CommandProcessorTestDataBuilder().Build();
 
             processor.Process(new CommandHandledByMultipleHandlers());
 
             CollectionAssert.AreEqual(new [] { typeof(object) }, _objectCommandHandler.Messages);
             CollectionAssert.AreEqual(new [] { typeof(CommandHandledByMultipleHandlers) }, _commandHandlerA.Messages);
             CollectionAssert.AreEqual(new [] { typeof(CommandHandledByMultipleHandlers) }, _commandHandlerB.Messages);
-        }
-    }
-
-    public class CommandHandledByMultipleHandlers
-    {
-    }
-
-    public class CommandHandlerA : ICommandHandler<CommandHandledByMultipleHandlers>
-    {
-        public readonly IList<Type> Messages = new List<Type>();
-
-        public void Handle(CommandHandledByMultipleHandlers command)
-        {
-            Messages.Add(typeof(CommandHandledByMultipleHandlers));
-        }
-    }
-
-    public class CommandHandlerB : ICommandHandler<CommandHandledByMultipleHandlers>
-    {
-        public readonly IList<Type> Messages = new List<Type>();
-
-        public void Handle(CommandHandledByMultipleHandlers command)
-        {
-            Messages.Add(typeof(CommandHandledByMultipleHandlers));
-        }
-    }
-
-    public class SimpleCommand : SimpleCommandBase
-    {
-    }
-
-    public class SimpleCommandBase // Remember this inherits from object...
-    {
-    }
-
-    public class ObjectCommandHandler 
-        : ICommandHandler<object>,
-        ICommandHandler<SimpleCommandBase>,
-        ICommandHandler<SimpleCommand>
-    {
-        public readonly IList<Type> Messages = new List<Type>(); 
-
-        public void Handle(object command)
-        {
-            Messages.Add(typeof(object));
-        }
-
-        void ICommandHandler<SimpleCommandBase>.Handle(SimpleCommandBase command)
-        {
-            Messages.Add(typeof(SimpleCommandBase));
-        }
-
-        public void Handle(SimpleCommand command)
-        {
-            Messages.Add(typeof(SimpleCommand));
         }
     }
 }
