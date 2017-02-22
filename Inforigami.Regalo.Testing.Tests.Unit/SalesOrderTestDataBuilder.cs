@@ -3,34 +3,29 @@ using Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders;
 
 namespace Inforigami.Regalo.Testing.Tests.Unit
 {
-    public class SalesOrderTestDataBuilder : AggregateRootTestDataBuilderBase<SalesOrder>
+    public class SalesOrderTestDataBuilder : TestDataBuilderBase<SalesOrder>
     {
-        private SalesOrder _order;
-
-        private SalesOrderTestDataBuilder(SalesOrder order)
+        public static SalesOrderTestDataBuilder WithDefaults()
         {
-            _order = order;
-            CurrentDescription = "New order";
+            var b = new SalesOrderTestDataBuilder();
+            return b.NewOrder();
         }
 
-        protected override SalesOrder BuildAggregate()
+        public SalesOrderTestDataBuilder NewOrder()
         {
-            return _order;
-        }
-
-        public static SalesOrderTestDataBuilder NewOrder()
-        {
-            var salesOrder = new SalesOrder();
-            salesOrder.Create(Guid.NewGuid());
-            var builder = new SalesOrderTestDataBuilder(salesOrder);
-            return builder;
+            AddAction(so => so.Create(Guid.NewGuid()), "New order");
+            return this;
         }
 
         public SalesOrderTestDataBuilder WithSingleLineItem()
         {
-            _order.AddLine("SKU", 10);
-            CurrentDescription = "Order with single line item";
+            AddAction(so => so.AddLine("SKU", 10), "Order with single line item");
             return this;
+        }
+
+        protected override SalesOrder CreateInstance()
+        {
+            return new SalesOrder();
         }
     }
 }
