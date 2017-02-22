@@ -46,6 +46,7 @@
     </Compile>
     <Compile Include="AggregateRoot.cs" />
     <Compile Include="CommandProcessor.cs" />
+    <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Conventions.cs" />
     <Compile Include="DateTimeOffsetProvider.cs" />
     <Compile Include="EnumerableExtensions.cs" />

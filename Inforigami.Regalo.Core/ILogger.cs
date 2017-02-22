@@ -8,5 +8,6 @@ namespace Inforigami.Regalo.Core
         void Info(object sender, string format, params object[] args);
         void Warn(object sender, string format, params object[] args);
         void Error(object sender, Exception exception, string format, params object[] args);
+        void Error(object sender, string format, params object[] args);
     }
 }
