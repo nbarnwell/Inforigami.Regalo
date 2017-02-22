@@ -90,7 +90,7 @@ namespace Inforigami.Regalo.Core
                 WriteDivider();
                 WriteMessage(message);
 
-                Console.WriteLine((char)30);
+                Console.WriteLine();
             }
         }
 
@@ -101,13 +101,13 @@ namespace Inforigami.Regalo.Core
 
         private void WriteSender(object sender)
         {
-            var senderName = sender.GetType().Name;
+            var senderName = $"\"{sender.GetType().Name}\"";
             WriteText(senderName);
         }
 
         private void WriteTimestamp()
         {
-            WriteText($"{DateTimeOffset.Now:s}");
+            WriteText(DateTimeOffset.Now.ToString("s").Replace("T", " "), ConsoleColor.White, null);
         }
 
         private void WriteSeverity(Severity severity)
@@ -145,6 +145,8 @@ namespace Inforigami.Regalo.Core
                     break;
             }
 
+            severityName = severityName.PadRight(5, ' ');
+
             WriteText(severityName, foreground, background);
         }
 
@@ -153,14 +155,15 @@ namespace Inforigami.Regalo.Core
             Console.Write('\t');
         }
 
-        private void WriteText(string text, ConsoleColor foreground, ConsoleColor background)
+        private void WriteText(string text, ConsoleColor? foreground, ConsoleColor? background)
         {
             var prevForeground = Console.ForegroundColor;
             var prevBackground = Console.BackgroundColor;
             try
             {
-                Console.ForegroundColor = foreground;
-                Console.BackgroundColor = background;
+                Console.ForegroundColor = foreground ?? prevForeground;
+                Console.BackgroundColor = background ?? prevBackground;
+
                 WriteText(text);
             }
             finally
