@@ -78,6 +78,7 @@
     <Compile Include="INoHandlerFoundStrategy.cs" />
     <Compile Include="INoHandlerFoundStrategyFactory.cs" />
     <Compile Include="IRepository.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="MessageHandlerContext.cs" />
     <Compile Include="MessageProcessorBase.cs" />
     <Compile Include="NoHandlerFoundStrategyFactory.cs" />

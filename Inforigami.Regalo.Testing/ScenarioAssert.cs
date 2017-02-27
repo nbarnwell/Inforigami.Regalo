@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Inforigami.Regalo.Interfaces;
 using NUnit.Framework;
 using Inforigami.Regalo.Core;
@@ -26,14 +27,8 @@ namespace Inforigami.Regalo.Testing
 
         public void Assert()
         {
-            Assert(null);
-        }
-
-        [Obsolete("Use Assert() instead, and configure the ObjectComparerProvider's factory delegate appropriately for your requirements. E.g. ObjectComparerProvider.Configure(() => ObjectComparerProvider.Default().Ignore<MyMessage, string>(m => m.MyPropertyToIgnore))")]
-        public void Assert(Action<IObjectComparer> configureComparer)
-        {
             /*
-             * Plan is to invoke the command on the handler and retrieve the actual
+             * Invoke the command on the handler and retrieve the actual
              * events from the repository and eventbus, and compare both with the
              * expected events list passed-in using Inforigami.Regalo.ObjectCompare.
              */
@@ -44,15 +39,18 @@ namespace Inforigami.Regalo.Testing
 
             var comparer = ObjectComparerProvider.Create();
 
-            if (configureComparer != null)
-            {
-                configureComparer.Invoke(comparer);
-            }
-
             ObjectComparisonResult result = comparer.AreEqual(_expected, eventsStoredToEventStore);
             if (!result.AreEqual)
             {
-                throw new AssertionException(string.Format("Actual events did not match expected events. {0}", result.InequalityReason));
+                var message = $"Actual events did not match expected events. {result.InequalityReason}";
+
+                if (_expected.Any() && !eventsStoredToEventStore.Any())
+                {
+                    message +=
+                        "\r\nCheck that your Scenario-based test is using the same IMesasageHandlerContext throughout, in case events are written to one assertions are performed against another.";
+                }
+
+                throw new AssertionException(message);
             }
         }
     }

@@ -17,6 +17,7 @@ namespace Inforigami.Regalo.Testing
     /// }
     /// </code></example>
     public abstract class TestDataBuilderBase<T> : ITestDataBuilder<T>
+        where T: class
     {
         private readonly IList<Action<T>> _actions = new List<Action<T>>();
 
@@ -48,5 +49,10 @@ namespace Inforigami.Regalo.Testing
         }
 
         protected abstract T CreateInstance();
+
+        public static T None()
+        {
+            return null;
+        }
     }
 }

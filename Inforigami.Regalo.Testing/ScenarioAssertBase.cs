@@ -25,9 +25,10 @@ namespace Inforigami.Regalo.Testing
             {
                 throw new InvalidOperationException(
                     string.Format(
-                        "Handler is of type {0} and has no public Handle({1}) method. "
-                        + "Since often there may be multiple classes representing a message with the same name, be sure to check the "
-                        + "handler handles the message in the assembly and namespace you are expecting.",
+                        @"Handler is of type {0} and has no public Handle({1}) method. 
+Two suggestions:
+1) Since often there may be multiple classes representing a message with the same name, be sure to check the handler handles the message in the assembly and namespace you are expecting.
+2) Check your Scenario-based test is passing in a command, and not accidentally passing in a Builder object, having forgotten to call .Build().",
                         handlerType,
                         commandType));
             }
