@@ -1,3 +1,4 @@
+using Inforigami.Regalo.Messaging;
 using Inforigami.Regalo.Testing;
 
 namespace Inforigami.Regalo.Core.Tests.Unit

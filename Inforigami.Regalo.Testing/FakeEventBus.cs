@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.Interfaces;
+using Inforigami.Regalo.Messaging;
 
 namespace Inforigami.Regalo.Testing
 {

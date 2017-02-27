@@ -2,6 +2,7 @@ using System;
 using NUnit.Framework;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders;
+using Inforigami.Regalo.Messaging;
 using Inforigami.Regalo.ObjectCompare;
 
 namespace Inforigami.Regalo.Testing.Tests.Unit

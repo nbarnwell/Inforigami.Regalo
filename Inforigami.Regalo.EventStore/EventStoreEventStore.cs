@@ -5,7 +5,7 @@ using System.Text;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using Inforigami.Regalo.Core;
-using Inforigami.Regalo.Core.EventSourcing;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using Newtonsoft.Json;
 using ILogger = Inforigami.Regalo.Core.ILogger;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using EventStore.ClientAPI;
 using Inforigami.Regalo.Core;
-using Inforigami.Regalo.Core.EventSourcing;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.EventStore.Tests.Unit.DomainModel.Customers;
 using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.Testing;

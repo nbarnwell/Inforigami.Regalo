@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using Inforigami.Regalo.Core;
-using Inforigami.Regalo.Core.EventSourcing;
+using Inforigami.Regalo.EventSourcing;
 
 namespace Inforigami.Regalo.Testing
 {

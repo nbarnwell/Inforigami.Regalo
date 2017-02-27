@@ -5,8 +5,8 @@ using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.Testing;
 using Moq;
 using NUnit.Framework;
-using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.ObjectCompare;
 
 namespace Inforigami.Regalo.Core.Tests.Unit

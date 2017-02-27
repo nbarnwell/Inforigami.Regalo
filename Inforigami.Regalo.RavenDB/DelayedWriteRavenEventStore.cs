@@ -6,7 +6,7 @@ using Raven.Abstractions.Data;
 using Raven.Client;
 using Raven.Client.Document;
 using Inforigami.Regalo.Core;
-using Inforigami.Regalo.Core.EventSourcing;
+using Inforigami.Regalo.EventSourcing;
 
 namespace Inforigami.Regalo.RavenDB
 {

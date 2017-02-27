@@ -5,6 +5,7 @@ using System.Reflection;
 using Inforigami.Regalo.Interfaces;
 using NUnit.Framework;
 using Inforigami.Regalo.Core;
+using Inforigami.Regalo.Messaging;
 using Inforigami.Regalo.Testing;
 
 namespace Inforigami.Regalo.Core.Tests.Unit

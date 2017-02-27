@@ -1,5 +1,6 @@
 ﻿using System;
 using Inforigami.Regalo.Interfaces;
+using Inforigami.Regalo.Messaging;
 using Inforigami.Regalo.Testing;
 using NUnit.Framework;
 

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.ObjectCompare;
 using Inforigami.Regalo.Testing;
 using NUnit.Framework;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
+using Inforigami.Regalo.EventSourcing;
 
 namespace Inforigami.Regalo.Core.Tests.Unit
 {

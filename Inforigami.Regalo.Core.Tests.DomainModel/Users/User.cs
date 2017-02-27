@@ -1,4 +1,5 @@
 using System;
+using Inforigami.Regalo.EventSourcing;
 
 namespace Inforigami.Regalo.Core.Tests.DomainModel.Users
 {

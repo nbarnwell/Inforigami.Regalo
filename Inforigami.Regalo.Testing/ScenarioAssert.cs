@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using NUnit.Framework;
-using Inforigami.Regalo.Core;
 using Inforigami.Regalo.ObjectCompare;
 
 namespace Inforigami.Regalo.Testing

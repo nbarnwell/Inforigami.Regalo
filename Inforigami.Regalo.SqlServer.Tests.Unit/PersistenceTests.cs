@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 using Inforigami.Regalo.Core;
-using Inforigami.Regalo.Core.EventSourcing;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.SqlServer.Tests.Unit.DomainModel.Customers;
 using Inforigami.Regalo.Testing;

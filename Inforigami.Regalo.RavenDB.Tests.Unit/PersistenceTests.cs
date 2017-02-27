@@ -9,7 +9,7 @@ using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Embedded;
 using Inforigami.Regalo.Core;
-using Inforigami.Regalo.Core.EventSourcing;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers;
 using Inforigami.Regalo.Testing;
 

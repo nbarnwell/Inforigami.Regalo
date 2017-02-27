@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.Messaging;
 using NUnit.Framework;
 using Inforigami.Regalo.Testing;
 

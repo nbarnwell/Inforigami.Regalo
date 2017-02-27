@@ -10,6 +10,8 @@ del $outputDir\*
 
 $projectsToPackage = @(
     'Inforigami.Regalo.Interfaces.csproj',
+    'Inforigami.Regalo.EventSourcing.csproj',
+    'Inforigami.Regalo.Messaging.csproj',
     'Inforigami.Regalo.Core.csproj',
     'Inforigami.Regalo.RavenDB.csproj',
     'Inforigami.Regalo.EventStore.csproj',

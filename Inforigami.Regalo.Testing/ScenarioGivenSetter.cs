@@ -1,5 +1,6 @@
 using System;
 using Inforigami.Regalo.Core;
+using Inforigami.Regalo.EventSourcing;
 
 namespace Inforigami.Regalo.Testing
 {

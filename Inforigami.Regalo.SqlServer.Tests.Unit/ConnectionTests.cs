@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO.IsolatedStorage;
 using Inforigami.Regalo.Core;
-using Inforigami.Regalo.Core.EventSourcing;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Testing;
 using NUnit.Framework;
 

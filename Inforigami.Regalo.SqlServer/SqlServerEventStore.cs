@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Transactions;
 using Inforigami.Regalo.Core;
-using Inforigami.Regalo.Core.EventSourcing;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using Newtonsoft.Json;
 using IsolationLevel = System.Transactions.IsolationLevel;

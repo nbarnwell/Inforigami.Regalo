@@ -36,12 +36,12 @@ namespace Inforigami.Regalo.Core
             _releaser = null;
         }
 
-        internal static T Resolve<T>()
+        public static T Resolve<T>()
         {
             return (T)Resolve(typeof(T));
         }
 
-        internal static object Resolve(Type type)
+        public static object Resolve(Type type)
         {
             if (_singleResolver == null)
             {
@@ -52,12 +52,12 @@ namespace Inforigami.Regalo.Core
             return _singleResolver.Invoke(type);
         }
 
-        internal static IEnumerable<T> ResolveAll<T>()
+        public static IEnumerable<T> ResolveAll<T>()
         {
             return (IEnumerable<T>)ResolveAll(typeof(T));
         }
 
-        internal static IEnumerable<object> ResolveAll(Type type)
+        public static IEnumerable<object> ResolveAll(Type type)
         {
             if (_multipleResolver == null)
             {
@@ -67,7 +67,7 @@ namespace Inforigami.Regalo.Core
             return _multipleResolver.Invoke(type);
         }
 
-        internal static void Release(object component)
+        public static void Release(object component)
         {
             if (_releaser == null)
             {

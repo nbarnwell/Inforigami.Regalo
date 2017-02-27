@@ -44,50 +44,17 @@
     <Compile Include="..\Inforigami.Regalo.Interfaces\Properties\AssemblyInfo.Version.cs">
       <Link>Properties\AssemblyInfo.Version.cs</Link>
     </Compile>
-    <Compile Include="AggregateRoot.cs" />
-    <Compile Include="CommandProcessor.cs" />
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Conventions.cs" />
     <Compile Include="DateTimeOffsetProvider.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="EventBus.cs" />
-    <Compile Include="EventHandlingFailedEvent.cs" />
-    <Compile Include="EventHandlingSucceededEvent.cs" />
-    <Compile Include="EventSourcing\ConcurrencyConflict.cs" />
-    <Compile Include="EventSourcing\ConcurrencyConflictsDetectedException.cs" />
-    <Compile Include="EventSourcing\EventSourcingRepository.cs" />
-    <Compile Include="EventSourcing\EventStoreConcurrencyException.cs" />
-    <Compile Include="EventSourcing\EventStream.cs" />
-    <Compile Include="EventSourcing\EventStreamVersion.cs" />
-    <Compile Include="EventSourcing\IConcurrencyMonitor.cs" />
-    <Compile Include="EventSourcing\IDelayedWriteEventStore.cs" />
-    <Compile Include="EventSourcing\IEventStore.cs" />
-    <Compile Include="EventSourcing\IEventStoreWithPreloading.cs" />
-    <Compile Include="EventSourcing\InMemoryEventStore.cs" />
-    <Compile Include="EventSourcing\StrictConcurrencyMonitor.cs" />
-    <Compile Include="EventStreamIdFormatter.cs" />
     <Compile Include="GuidProvider.cs" />
-    <Compile Include="ICommandHandler.cs" />
-    <Compile Include="ICommandProcessor.cs" />
-    <Compile Include="IdNotSetException.cs" />
-    <Compile Include="IEventBus.cs" />
-    <Compile Include="IEventHandler.cs" />
-    <Compile Include="IgnoreNoHandlerFoundStrategy.cs" />
     <Compile Include="ILogger.cs" />
-    <Compile Include="IMessageHandlerContext.cs" />
-    <Compile Include="INoHandlerFoundStrategy.cs" />
-    <Compile Include="INoHandlerFoundStrategyFactory.cs" />
-    <Compile Include="IRepository.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="MessageHandlerContext.cs" />
-    <Compile Include="MessageProcessorBase.cs" />
-    <Compile Include="NoHandlerFoundStrategyFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resolver.cs" />
     <Compile Include="StringExtensions.cs" />
-    <Compile Include="ThrowExceptionNoHandlerFoundStrategy.cs" />
     <Compile Include="TypeInspector.cs" />
-    <Compile Include="WarnNoHandlerFoundStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Inforigami.Regalo.Core.nuspec" />
@@ -98,6 +65,7 @@
       <Name>Inforigami.Regalo.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>powershell.exe -noprofile -noninteractive -command ". '$(ProjectDir)..\write-assemblyinfo.ps1' '$(ProjectName)' '$(ProjectDir)Properties\AssemblyInfo.Version.cs'"</PreBuildEvent>

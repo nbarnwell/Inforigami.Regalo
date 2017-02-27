@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Inforigami.Regalo.EventSourcing;
 
 namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 {

@@ -77,9 +77,17 @@
       <Project>{80473978-8D0F-4AD4-983E-600E516D49AB}</Project>
       <Name>Inforigami.Regalo.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj">
+      <Project>{d83668ca-7963-42f9-ad12-4926e56794ce}</Project>
+      <Name>Inforigami.Regalo.EventSourcing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj">
       <Project>{890D6FBB-4264-4A33-AAA5-302CB201B090}</Project>
       <Name>Inforigami.Regalo.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj">
+      <Project>{5f8f4c4c-57d0-401f-b501-571ab650b131}</Project>
+      <Name>Inforigami.Regalo.Messaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj">
       <Project>{bdc34219-6e54-4580-958e-dcc93b1676e3}</Project>
