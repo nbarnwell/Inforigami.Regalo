@@ -68,7 +68,7 @@ namespace Inforigami.Regalo.EventSourcing
             {
                 _eventStore.Save<TAggregateRoot>(streamId, item.BaseVersion, uncommittedEvents);
             }
-            catch (EventStoreConcurrencyException e)
+            catch (EventStoreConcurrencyException)
             {
                 EventStream<TAggregateRoot> stream = _eventStore.Load<TAggregateRoot>(streamId);
 
@@ -100,7 +100,6 @@ namespace Inforigami.Regalo.EventSourcing
                             throw exception;
                         }
                     }
-
                 }
             }
 

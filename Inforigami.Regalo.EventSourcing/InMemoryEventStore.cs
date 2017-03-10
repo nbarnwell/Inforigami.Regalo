@@ -50,13 +50,8 @@ namespace Inforigami.Regalo.EventSourcing
 
         private void LogSavingNewEventsList(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
-            var eventsList = string.Join(Environment.NewLine, (IEnumerable<string>)newEvents.Select(x => string.Format("{0}: {1}", x.GetType(), x.MessageId)));
-            var message = string.Format(
-                "Saving events for {0}@{1}{2}{3}",
-                aggregateId,
-                expectedVersion,
-                Environment.NewLine,
-                eventsList);
+            var eventsList = string.Join(Environment.NewLine, newEvents.Select(x => $"{x.GetType()}: {x.MessageId}"));
+            var message = $"Saving events for {aggregateId}@{expectedVersion}{Environment.NewLine}{eventsList}";
             _logger.Debug(this, message);
         }
 
