@@ -19,9 +19,10 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void SetUp()
         {
             _comparer = new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
-                                               .Ignore<IEvent, Guid>(x => x.CausationId)
-                                               .Ignore<IEvent, Guid>(x => x.CorrelationId)
-                                               .Ignore<IMessage, DateTimeOffset>(x => x.Timestamp);
+                                            .Ignore<IEvent, Guid>(x => x.CausationId)
+                                            .Ignore<IEvent, Guid>(x => x.CorrelationId)
+                                            .Ignore<IMessage, DateTimeOffset>(x => x.Timestamp)
+                                            .Ignore<IMessage, DateTimeOffset>(x => x.CorrelationTimestamp);
 
             ObjectComparisonResult.ThrowOnFail = true;
         }

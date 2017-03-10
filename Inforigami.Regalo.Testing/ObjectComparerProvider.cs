@@ -10,7 +10,8 @@ namespace Inforigami.Regalo.Testing
             () => new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
                                       .Ignore<IEvent, Guid>(x => x.CausationId)
                                       .Ignore<IEvent, Guid>(x => x.CorrelationId)
-                                      .Ignore<IMessage, DateTimeOffset>(x => x.Timestamp);
+                                      .Ignore<IMessage, DateTimeOffset>(x => x.Timestamp)
+                                      .Ignore<IMessage, DateTimeOffset>(x => x.CorrelationTimestamp);
 
         private static Func<IObjectComparer> _provider = __default;
 
