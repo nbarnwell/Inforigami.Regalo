@@ -11,7 +11,7 @@ namespace Inforigami.Regalo.Interfaces
         public Guid CorrelationId { get; set; }
         public DateTimeOffset CorrelationTimestamp { get; set; }
         public string UserId { get; set; }
-        public IDictionary<string, string> Tags { get; set; }
+        public Dictionary<string, string> Tags { get; set; }
 
         protected Message()
         {
