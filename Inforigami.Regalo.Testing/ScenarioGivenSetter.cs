@@ -12,27 +12,15 @@ namespace Inforigami.Regalo.Testing
 
         public ScenarioGivenSetter(THandler handler, TestingMessageHandlerContext<TEntity> context)
         {
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
             if (context == null) throw new ArgumentNullException("context");
 
             _handler = handler;
             _context = context;
         }
 
-        [Obsolete("Use the overload that takes an entity instead.")]
-        public IWhenSetter<TEntity, THandler> Given(ITestDataBuilder<TEntity> testDataBuilder)
-        {
-            var entity = testDataBuilder.Build();
-            return Given(entity);
-        }
-
         public IWhenSetter<TEntity, THandler> Given(TEntity entity)
         {
-            if (entity != null)
-            {
-                _context.SaveAndPublishEvents(entity);
-            }
-
-            _context.ClearGeneratedEvents();
             return new ScenarioWhenSetter<TEntity, THandler>(entity, _handler, _context);
         }
     }

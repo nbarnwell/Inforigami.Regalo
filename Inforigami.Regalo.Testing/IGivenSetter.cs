@@ -1,11 +1,11 @@
 using System;
+using Inforigami.Regalo.EventSourcing;
 
 namespace Inforigami.Regalo.Testing
 {
     public interface IGivenSetter<TEntity, THandler>
+        where TEntity : AggregateRoot, new()
     {
-        [Obsolete("Use the overload that takes an entity instead.")]
-        IWhenSetter<TEntity, THandler> Given(ITestDataBuilder<TEntity> testDataBuilder);
         IWhenSetter<TEntity, THandler> Given(TEntity entity);
     }
 }

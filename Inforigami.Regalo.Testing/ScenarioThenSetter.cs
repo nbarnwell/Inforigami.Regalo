@@ -6,15 +6,15 @@ using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Testing
 {
-    public class ScenarioThenSetter<TEntity, THandler, TCommand> : IThenSetter<TEntity, THandler, TCommand> 
+    public class ScenarioThenSetter<TEntity, THandler> : IThenSetter<TEntity, THandler> 
         where TEntity : AggregateRoot, new()
     {
         private readonly TEntity _entity;
         private readonly THandler _handler;
         private readonly TestingMessageHandlerContext<TEntity> _context;
-        private readonly TCommand _command;
+        private readonly IMessage _command;
 
-        public ScenarioThenSetter(TEntity entity, THandler handler, TestingMessageHandlerContext<TEntity> context, TCommand command)
+        public ScenarioThenSetter(TEntity entity, THandler handler, TestingMessageHandlerContext<TEntity> context, IMessage command)
         {
             if (context == null) throw new ArgumentNullException("context");
 
@@ -24,15 +24,14 @@ namespace Inforigami.Regalo.Testing
             _command = command;
         }
 
-        public IScenarioAssert<TEntity, THandler, TCommand> Then(Func<TEntity, TCommand, IEnumerable<IEvent>> func)
+        public IScenarioAssert<TEntity, THandler> Then(Func<TEntity, IMessage, IEnumerable<IEvent>> expected)
         {
-            var expected = func.Invoke(_entity, _command);
-            return new ScenarioAssert<TEntity, THandler, TCommand>(_entity, _handler, _command, _context, expected);
+            return new ScenarioAssert<TEntity, THandler>(_entity, _handler, _command, _context, expected);
         }
 
-        public IScenarioExceptionAssert<TException, TEntity, THandler, TCommand> Throws<TException>() where TException : Exception
+        public IScenarioExceptionAssert<TException, TEntity, THandler> Throws<TException>() where TException : Exception
         {
-            return new ScenarioExceptionAssert<TException, TEntity, THandler, TCommand>(_handler, _command);
+            return new ScenarioExceptionAssert<TException, TEntity, THandler>(_entity, _context, _handler, _command);
         }
     }
 }

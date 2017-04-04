@@ -1,23 +1,24 @@
 using System;
 using System.Reflection;
+using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Testing
 {
-    public abstract class ScenarioAssertBase<THandler, TCommand>
+    public abstract class ScenarioAssertBase<THandler>
     {
         private readonly THandler _handler;
-        private readonly TCommand _command;
+        private readonly IMessage _message;
 
-        protected ScenarioAssertBase(THandler handler, TCommand command)
+        protected ScenarioAssertBase(THandler handler, IMessage message)
         {
             _handler = handler;
-            _command = command;
+            _message = message;
         }
 
         protected void InvokeHandler()
         {
             Type handlerType = _handler.GetType();
-            Type commandType = _command.GetType();
+            Type commandType = _message.GetType();
 
             var handleMethod = handlerType.GetMethod("Handle", BindingFlags.Public | BindingFlags.Instance, null, new[] { commandType }, null);
 
@@ -28,12 +29,12 @@ namespace Inforigami.Regalo.Testing
                         @"Handler is of type {0} and has no public Handle({1}) method. 
 Two suggestions:
 1) Since often there may be multiple classes representing a message with the same name, be sure to check the handler handles the message in the assembly and namespace you are expecting.
-2) Check your Scenario-based test is passing in a command, and not accidentally passing in a Builder object, having forgotten to call .Build().",
+2) Check your Scenario-based test is passing in a message, and not accidentally passing in a Builder object, having forgotten to call .Build().",
                         handlerType,
                         commandType));
             }
 
-            handleMethod.Invoke(_handler, new object[] { _command });
+            handleMethod.Invoke(_handler, new object[] { _message });
         }
     }
 }

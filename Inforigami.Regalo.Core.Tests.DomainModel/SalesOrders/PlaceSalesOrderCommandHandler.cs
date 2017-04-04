@@ -1,4 +1,5 @@
 using System;
+using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Messaging;
 
 namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
@@ -15,9 +16,12 @@ namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 
         public void Handle(PlaceSalesOrder command)
         {
-            var order = _context.Get(command.SalesOrderId, command.SalesOrderVersion);
-            order.PlaceOrder();
-            _context.SaveAndPublishEvents(order);
+            using (var session = _context.OpenSession(command))
+            {
+                var order = session.Get(command.SalesOrderId, command.SalesOrderVersion);
+                order.PlaceOrder();
+                session.SaveAndPublishEvents(order);
+            }
         }
     }
 }

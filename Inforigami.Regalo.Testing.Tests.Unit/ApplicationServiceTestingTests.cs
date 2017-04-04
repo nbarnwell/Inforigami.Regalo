@@ -55,9 +55,9 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
 
             Scenario.For(Context)
                     .HandledBy(new CreateSalesOrderHandler(Context, id))
-                    .Given((SalesOrder)null)
+                    .Given(new SalesOrder())
                     .When(order => new CreateSalesOrder())
-                    .Then((order, cmd) => new EventChain(-1) { new SalesOrderCreated(id) })
+                    .Then((order, cmd) => new EventChain(order.BaseVersion) { new SalesOrderCreated(id) })
                     .Assert();
         }
 
@@ -91,9 +91,12 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
 
         public void Handle(CreateSalesOrder command)
         {
-            var so = new SalesOrder();
-            so.Create(_id);
-            _context.SaveAndPublishEvents(so);
+            using (var t = _context.OpenSession(command))
+            {
+                var so = new SalesOrder();
+                so.Create(_id);
+                t.SaveAndPublishEvents(so);
+            }
         }
     }
 }

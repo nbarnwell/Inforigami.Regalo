@@ -48,6 +48,10 @@ namespace Inforigami.Regalo.Testing
             CurrentDescription = newDescription;
         }
 
+        /// <summary>
+        /// Creates the instance to be returned, just before all the actions are applied.
+        /// </summary>
+        /// <returns></returns>
         protected abstract T CreateInstance();
 
         public static T None()

@@ -1,4 +1,5 @@
 using System;
+using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.Messaging;
 
 namespace Inforigami.Regalo.EventSourcing
@@ -18,21 +19,9 @@ namespace Inforigami.Regalo.EventSourcing
             _eventBus = eventBus;
         }
 
-        //public TEntity Get(Guid id)
-        //{
-        //    return _repository.Get(id);
-        //}
-
-        public TEntity Get(Guid id, int version)
+        public IMessageHandlerContextToken<TEntity> OpenSession(IMessage currentMessage)
         {
-            return _repository.Get(id, version);
-        }
-
-        public void SaveAndPublishEvents(TEntity entity)
-        {
-            var uncommittedEvents = entity.GetUncommittedEvents();
-            _repository.Save(entity);
-            _eventBus.Publish(uncommittedEvents);
+            return new MessageHandlerContextToken<TEntity>(_repository, _eventBus, currentMessage);
         }
     }
 }

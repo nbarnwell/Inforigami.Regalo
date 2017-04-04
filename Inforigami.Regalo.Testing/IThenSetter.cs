@@ -4,9 +4,9 @@ using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Testing
 {
-    public interface IThenSetter<TEntity, THandler, TCommand>
+    public interface IThenSetter<TEntity, THandler>
     {
-        IScenarioAssert<TEntity, THandler, TCommand> Then(Func<TEntity, TCommand, IEnumerable<IEvent>> func);
-        IScenarioExceptionAssert<TException, TEntity, THandler, TCommand> Throws<TException>() where TException : Exception;
+        IScenarioAssert<TEntity, THandler> Then(Func<TEntity, IMessage, IEnumerable<IEvent>> func);
+        IScenarioExceptionAssert<TException, TEntity, THandler> Throws<TException>() where TException : Exception;
     }
 }

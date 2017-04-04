@@ -3,7 +3,7 @@ using Inforigami.Regalo.ObjectCompare;
 
 namespace Inforigami.Regalo.Testing
 {
-    public interface IScenarioAssert<TEntity, THandler, TCommand>
+    public interface IScenarioAssert<TEntity, THandler>
     {
         void Assert();
     }
