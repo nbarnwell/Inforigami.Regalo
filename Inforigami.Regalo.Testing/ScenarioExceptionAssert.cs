@@ -5,18 +5,18 @@ using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Testing
 {
-    public class ScenarioExceptionAssert<TException, TEntity, THandler, TCommand> 
-        : ScenarioAssertBase<THandler, TCommand>
-        , IScenarioExceptionAssert<TException, TEntity, THandler, TCommand> 
+    public class ScenarioExceptionAssert<TException, TEntity, THandler, TMessage> 
+        : ScenarioAssertBase<THandler, TMessage>
+        , IScenarioExceptionAssert<TException, TEntity, THandler, TMessage> 
         where TEntity : AggregateRoot, new() 
-        where TCommand : IMessage
+        where TMessage : IMessage
         where TException : Exception
     {
-        private readonly TCommand _message;
+        private readonly TMessage _message;
         private readonly TEntity _entity;
         private readonly TestingMessageHandlerContext<TEntity> _context;
 
-        public ScenarioExceptionAssert(TEntity entity, TestingMessageHandlerContext<TEntity> context, THandler handler, TCommand message) 
+        public ScenarioExceptionAssert(TEntity entity, TestingMessageHandlerContext<TEntity> context, THandler handler, TMessage message) 
             : base(handler, message)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));

@@ -4,21 +4,21 @@ using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Testing
 {
-    public abstract class ScenarioAssertBase<THandler, TCommand>
+    public abstract class ScenarioAssertBase<THandler, TMessage>
     {
         private readonly THandler _handler;
-        private readonly TCommand _command;
+        private readonly TMessage _message;
 
-        protected ScenarioAssertBase(THandler handler, TCommand command)
+        protected ScenarioAssertBase(THandler handler, TMessage message)
         {
             _handler = handler;
-            _command = command;
+            _message = message;
         }
 
         protected void InvokeHandler()
         {
             Type handlerType = _handler.GetType();
-            Type commandType = _command.GetType();
+            Type commandType = _message.GetType();
 
             var handleMethod = handlerType.GetMethod("Handle", BindingFlags.Public | BindingFlags.Instance, null, new[] { commandType }, null);
 
@@ -34,7 +34,7 @@ Two suggestions:
                         commandType));
             }
 
-            handleMethod.Invoke(_handler, new object[] { _command });
+            handleMethod.Invoke(_handler, new object[] { _message });
         }
     }
 }

@@ -21,11 +21,11 @@ namespace Inforigami.Regalo.Testing
             _context = context;
         }
 
-        public IThenSetter<TEntity, THandler, TCommand> When<TCommand>(Func<TEntity, TCommand> func)
-            where TCommand : IMessage
+        public IThenSetter<TEntity, THandler, TMessage> When<TMessage>(Func<TEntity, TMessage> func)
+            where TMessage : IMessage
         {
             var command = func.Invoke(_entity);
-            return new ScenarioThenSetter<TEntity, THandler, TCommand>(_entity, _handler, _context, command);
+            return new ScenarioThenSetter<TEntity, THandler, TMessage>(_entity, _handler, _context, command);
         }
     }
 }
