@@ -8,15 +8,16 @@ using Inforigami.Regalo.ObjectCompare;
 
 namespace Inforigami.Regalo.Testing
 {
-    public class ScenarioAssert<TEntity, THandler> : ScenarioAssertBase<THandler>, IScenarioAssert<TEntity, THandler> 
+    public class ScenarioAssert<TEntity, THandler, TCommand> : ScenarioAssertBase<THandler, TCommand>, IScenarioAssert<TEntity, THandler, TCommand> 
         where TEntity : AggregateRoot, new()
+        where TCommand : IMessage
     {
         private readonly TEntity _entity;
-        private readonly IMessage _message;
+        private readonly TCommand _message;
         private readonly TestingMessageHandlerContext<TEntity> _context;
-        private readonly Func<TEntity, IMessage, IEnumerable<IEvent>> _expected;
+        private readonly Func<TEntity, TCommand, IEnumerable<IEvent>> _expected;
 
-        public ScenarioAssert(TEntity entity, THandler handler, IMessage message, TestingMessageHandlerContext<TEntity> context, Func<TEntity, IMessage, IEnumerable<IEvent>> expected) 
+        public ScenarioAssert(TEntity entity, THandler handler, TCommand message, TestingMessageHandlerContext<TEntity> context, Func<TEntity, TCommand, IEnumerable<IEvent>> expected) 
             : base(handler, message)
         {
             if (context == null) throw new ArgumentNullException("context");

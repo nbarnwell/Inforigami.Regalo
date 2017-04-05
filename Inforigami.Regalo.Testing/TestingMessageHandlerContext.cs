@@ -34,9 +34,9 @@ namespace Inforigami.Regalo.Testing
             _events.Clear();
         }
 
-        public IMessageHandlerContextToken<TEntity> OpenSession(IMessage currentMessage)
+        public IMessageHandlerContextSession<TEntity> OpenSession(IMessage currentMessage)
         {
-            return new TestMessageHandlerContextToken<TEntity>(_repository, _eventBus, currentMessage, this);
+            return new TestMessageHandlerContextSession<TEntity>(_repository, _eventBus, currentMessage, this);
         }
 
         public void AddEvent(IEvent evt)
@@ -45,7 +45,7 @@ namespace Inforigami.Regalo.Testing
         }
     }
 
-    public class TestMessageHandlerContextToken<TEntity> : IMessageHandlerContextToken<TEntity>
+    public class TestMessageHandlerContextSession<TEntity> : IMessageHandlerContextSession<TEntity>
         where TEntity : AggregateRoot, new()
     {
         private readonly IRepository<TEntity> _repository;
@@ -53,7 +53,7 @@ namespace Inforigami.Regalo.Testing
         private readonly IMessage _currentMessage;
         private readonly TestingMessageHandlerContext<TEntity> _context;
 
-        public TestMessageHandlerContextToken(IRepository<TEntity> repository, IEventBus eventBus, IMessage currentMessage, TestingMessageHandlerContext<TEntity> context)
+        public TestMessageHandlerContextSession(IRepository<TEntity> repository, IEventBus eventBus, IMessage currentMessage, TestingMessageHandlerContext<TEntity> context)
         {
             if (repository == null) throw new ArgumentNullException(nameof(repository));
             if (eventBus == null) throw new ArgumentNullException(nameof(eventBus));

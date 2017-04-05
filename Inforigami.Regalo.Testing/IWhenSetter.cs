@@ -5,6 +5,7 @@ namespace Inforigami.Regalo.Testing
 {
     public interface IWhenSetter<TEntity, THandler>
     {
-        IThenSetter<TEntity, THandler> When(Func<TEntity, IMessage> func);
+        IThenSetter<TEntity, THandler, TCommand> When<TCommand>(Func<TEntity, TCommand> func)
+            where TCommand : IMessage;
     }
 }

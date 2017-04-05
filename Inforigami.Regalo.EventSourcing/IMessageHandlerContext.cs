@@ -6,6 +6,6 @@ namespace Inforigami.Regalo.EventSourcing
     public interface IMessageHandlerContext<TEntity> 
         where TEntity : AggregateRoot, new()
     {
-        IMessageHandlerContextToken<TEntity> OpenSession(IMessage currentMessage);
+        IMessageHandlerContextSession<TEntity> OpenSession(IMessage currentMessage);
     }
 }

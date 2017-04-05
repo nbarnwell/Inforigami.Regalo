@@ -54,11 +54,11 @@
     <Compile Include="IEventStore.cs" />
     <Compile Include="IEventStoreWithPreloading.cs" />
     <Compile Include="IMessageHandlerContext.cs" />
-    <Compile Include="IMessageHandlerContextToken.cs" />
+    <Compile Include="IMessageHandlerContextSession.cs" />
     <Compile Include="InMemoryEventStore.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="MessageHandlerContext.cs" />
-    <Compile Include="MessageHandlerContextToken.cs" />
+    <Compile Include="MessageHandlerContextSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StrictConcurrencyMonitor.cs" />
   </ItemGroup>

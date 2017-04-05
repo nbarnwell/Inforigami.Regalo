@@ -19,9 +19,9 @@ namespace Inforigami.Regalo.EventSourcing
             _eventBus = eventBus;
         }
 
-        public IMessageHandlerContextToken<TEntity> OpenSession(IMessage currentMessage)
+        public IMessageHandlerContextSession<TEntity> OpenSession(IMessage currentMessage)
         {
-            return new MessageHandlerContextToken<TEntity>(_repository, _eventBus, currentMessage);
+            return new MessageHandlerContextSession<TEntity>(_repository, _eventBus, currentMessage);
         }
     }
 }
