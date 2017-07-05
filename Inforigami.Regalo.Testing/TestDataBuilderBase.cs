@@ -5,10 +5,17 @@ namespace Inforigami.Regalo.Testing
 {
     /// <summary>Useful base class for TestDataBuilders.</summary>
     /// <typeparam name="T">The type of object the test data builder is to create.</typeparam>
-    /// <remarks>Inherit from this class, then, to your subclass, add public methods that
-    /// return the databuilder (i.e. <code>return this;</code>), such that they can be used in the method-chaining style.<br />Each 
-    /// of those methods should call <code>AddAction()</code> with a delegate that will be queued-up
-    /// and used to build the finished object when <code>Build()</code> is called.</remarks>
+    /// <remarks>To use this class:
+    /// <list type="number">
+    /// <item><description>Create a class deriving from TestDataBuilderBase&lt;T&gt;, where T is the class of object to be built.</description></item>
+    /// <item><description>Create as many <code>public [Type][Property] { get; private set; }</code> properties as necessary for instances of T to be built/configured.</description></item>
+    /// <item><description>Note these are "public get" properties so that tests can access the values (even after they are customised) directly in assertions.</description></item>
+    /// <item><description>Implement the CreateInstance() abstract method to do nothing more than is required to create a new instance of T.
+    /// Note: This is to support the case where T has no default constructor, as opposed to using generic constraints to make a default constructor obligatory.</description></item>
+    /// <item><description>Create `public static [nameof(T)] Builder WithDefaults()` that returns a builder preconfigured in a default way.</description></item>
+    /// <item><description>Create methods to configure the instance of the builder either by assigning new values to the properties that will be used to build the object, or by calling `AddAction()` to build up a "script" that will be used to build the object.</description></item>
+    /// </list>
+    /// </remarks>
     /// <example><code>
     /// public SalesOrderTestDataBuilder NewOrder()
     /// {
