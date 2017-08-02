@@ -67,6 +67,7 @@
     <Compile Include="EventHandlerA.cs" />
     <Compile Include="EventHandlerB.cs" />
     <Compile Include="FailingEventHandler.cs" />
+    <Compile Include="MessageCausationTests.cs" />
     <Compile Include="NoHandlerFoundTests.cs" />
     <Compile Include="ObjectCommandHandler.cs" />
     <Compile Include="ObjectEventHandler.cs" />
