@@ -5,7 +5,7 @@ namespace Inforigami.Regalo.Core
 {
     public static class MessageExtensions
     {
-        public static void WasCausedBy(this IMessage source, IMessage target)
+        public static void WasCausedBy(this IMessage target, IMessage source)
         {
             target.Timestamp += GetTimeSince(source.Timestamp);
             target.CorrelationTimestamp = source.CorrelationTimestamp;

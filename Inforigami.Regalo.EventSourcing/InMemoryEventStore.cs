@@ -88,6 +88,24 @@ namespace Inforigami.Regalo.EventSourcing
             return BuildEventStream<T>(aggregateId, events);
         }
 
+        public void Delete<T>(string aggregateId, int version)
+        {
+            var events = FindEvents(aggregateId, version);
+
+            if (events.Last().Version != version)
+            {
+                var exception = new EventStoreConcurrencyException(
+                    string.Format("Expected version {0} does not match actual version {1}", version, events.Count));
+                exception.Data.Add("Existing stream", aggregateId);
+                throw exception;
+            }
+        }
+
+        public void Delete<T>(string aggregateId)
+        {
+            _eventStreams.Remove(aggregateId);
+        }
+
         private static EventStream<T> BuildEventStream<T>(string aggregateId, IList<IEvent> events)
         {
             if (events == null)

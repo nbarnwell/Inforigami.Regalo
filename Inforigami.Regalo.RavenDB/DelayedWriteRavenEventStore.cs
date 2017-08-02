@@ -90,14 +90,29 @@ namespace Inforigami.Regalo.RavenDB
             if (events.All(x => x.Version != maxVersion))
             {
                 throw new ArgumentOutOfRangeException(
-                    "maxVersion",
+                    nameof(maxVersion),
                     maxVersion,
-                    string.Format("BaseVersion {0} not found for aggregate {1}", maxVersion, aggregateId));
+                    $"BaseVersion {maxVersion} not found for aggregate {aggregateId}");
             }
 
             var result = new EventStream<T>(aggregateId);
             result.Append(GetEventsForVersion(events, maxVersion));
             return result;
+        }
+
+        public void Delete<T>(string aggregateId, int version)
+        {
+            var stream = _documentSession.Load<EventStream>(aggregateId);
+            var actualVersion = stream.Events.Last().Version;
+            if (actualVersion != version)
+            {
+                var exception = new EventStoreConcurrencyException(
+                    string.Format("Expected version {0} does not match actual version {1}", version, actualVersion));
+                exception.Data.Add("Existing stream", aggregateId);
+                throw exception;
+            }
+
+            _documentSession.Delete(stream);
         }
 
         private static IEnumerable<IEvent> GetEventsForVersion(IEnumerable<IEvent> events, int maxVersion)

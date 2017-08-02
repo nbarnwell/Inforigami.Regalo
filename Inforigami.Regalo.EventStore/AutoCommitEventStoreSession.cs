@@ -5,6 +5,7 @@ using EventStore.ClientAPI;
 
 namespace Inforigami.Regalo.EventStore
 {
+    [Obsolete("Use EventStoreSession instead, as it has transaction support")]
     public class AutoCommitEventStoreSession : IEventStoreSession
     {
         private readonly IEventStoreConnection _eventStoreConnection;
@@ -23,6 +24,11 @@ namespace Inforigami.Regalo.EventStore
         public Task<StreamEventsSlice> ReadStreamEventsForwardAsync(string streamId, int start, int count, bool resolveLinkTos)
         {
             return _eventStoreConnection.ReadStreamEventsForwardAsync(streamId, start, count, resolveLinkTos);
+        }
+
+        public Task<DeleteResult> Delete(string streamId, int expectedVersion)
+        {
+            return _eventStoreConnection.DeleteStreamAsync(streamId, expectedVersion);
         }
 
         public void Commit()

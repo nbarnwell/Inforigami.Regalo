@@ -29,6 +29,11 @@ namespace Inforigami.Regalo.EventStore
             return _eventStoreConnection.ReadStreamEventsForwardAsync(streamId, start, count, resolveLinkTos);
         }
 
+        public Task<DeleteResult> Delete(string streamId, int expectedVersion)
+        {
+            return _eventStoreConnection.DeleteStreamAsync(streamId, expectedVersion);
+        }
+
         public void Commit()
         {
             _committed = true;

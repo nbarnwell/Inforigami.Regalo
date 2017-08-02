@@ -100,6 +100,11 @@ namespace Inforigami.Regalo.EventStore
             return result;
         }
 
+        public void Delete<T>(string aggregateId, int version)
+        {
+            _eventStoreConnection.Delete(aggregateId, version);
+        }
+
         private static IEvent BuildDomainEvent(byte[] data, byte[] metadata)
         {
             var dataJson = Encoding.UTF8.GetString(data);
@@ -139,7 +144,10 @@ namespace Inforigami.Regalo.EventStore
 
         private static JsonSerializerSettings GetDefaultJsonSerializerSettings()
         {
-            return new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
+            return new JsonSerializerSettings
+                   {
+                       TypeNameHandling = TypeNameHandling.All
+                   };
         }
 
         private static string GetEventTypeFriendlyName(IEvent evt)

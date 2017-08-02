@@ -11,5 +11,6 @@ namespace Inforigami.Regalo.EventStore
         Task<StreamEventsSlice> ReadStreamEventsForwardAsync(string streamId, int start, int count, bool resolveLinkTos);
         void Commit();
         void Rollback();
+        Task<DeleteResult> Delete(string streamId, int expectedVersion);
     }
 }

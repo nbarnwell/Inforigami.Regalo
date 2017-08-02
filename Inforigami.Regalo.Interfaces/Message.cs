@@ -22,14 +22,5 @@ namespace Inforigami.Regalo.Interfaces
             CorrelationTimestamp = Timestamp;
             Tags                 = new Dictionary<string, string>();
         }
-
-        public void CausedBy(IMessage causationMessage)
-        {
-            CausationId          = causationMessage.MessageId;
-            CorrelationId        = causationMessage.CorrelationId;
-            CorrelationTimestamp = causationMessage.CorrelationTimestamp;
-            UserId               = causationMessage.UserId;
-            Tags                 = causationMessage.Tags;
-        }
     }
 }
