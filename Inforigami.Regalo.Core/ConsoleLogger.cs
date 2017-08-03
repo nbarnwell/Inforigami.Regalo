@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Inforigami.Regalo.Core
@@ -48,11 +49,22 @@ namespace Inforigami.Regalo.Core
 
         private string GetExceptionReport(Exception exception)
         {
-            var report = new StringBuilder();
+            var report = new StringBuilder("*** Exception Report ***").AppendLine();
 
-            foreach (var ex in GetExceptions(exception))
+            var exceptions = GetExceptions(exception).Reverse().ToArray();
+            foreach (var ex in exceptions)
             {
                 report.AppendLine(FormatException(ex));
+
+                if (ex != exceptions.Last())
+                {
+                    report.AppendLine(" - Inner Exception of:").AppendLine();
+                }
+                else if(exceptions.Length > 1)
+                {
+                    report.AppendLine(" (Top-most exception)");
+                }
+
             }
 
             return report.ToString();
@@ -72,7 +84,8 @@ namespace Inforigami.Regalo.Core
         {
             var result = new StringBuilder();
 
-            result.AppendFormat("*** {0}: \"{1}\"", ex.GetType().Name, ex.Message).AppendLine();
+            result.AppendFormat("   Type: \"{0}\"", ex.GetType().Name).AppendLine();
+            result.AppendFormat("   Message: \"{0}\"", ex.Message).AppendLine();
             result.AppendFormat("{0}", ex.StackTrace).AppendLine();
 
             return result.ToString();
