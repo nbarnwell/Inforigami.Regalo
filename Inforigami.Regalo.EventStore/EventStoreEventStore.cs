@@ -144,10 +144,15 @@ namespace Inforigami.Regalo.EventStore
 
         private static JsonSerializerSettings GetDefaultJsonSerializerSettings()
         {
-            return new JsonSerializerSettings
-                   {
-                       TypeNameHandling = TypeNameHandling.All
-                   };
+            var settings = new JsonSerializerSettings();
+
+            settings.TypeNameHandling = TypeNameHandling.All;
+
+            settings.Converters.Add(new DomainValueConverter<Guid>(Guid.Parse));
+            settings.Converters.Add(new DomainValueConverter<int>(int.Parse));
+            settings.Converters.Add(new DomainValueConverter<string>(s => s));
+
+            return settings;
         }
 
         private static string GetEventTypeFriendlyName(IEvent evt)

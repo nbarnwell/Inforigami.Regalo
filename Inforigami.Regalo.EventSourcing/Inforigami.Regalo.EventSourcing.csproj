@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,6 +47,8 @@
     <Compile Include="AggregateRoot.cs" />
     <Compile Include="ConcurrencyConflict.cs" />
     <Compile Include="ConcurrencyConflictsDetectedException.cs" />
+    <Compile Include="DomainValue.cs" />
+    <Compile Include="DomainValueConverter.cs" />
     <Compile Include="EventSourcingRepository.cs" />
     <Compile Include="EventStoreConcurrencyException.cs" />
     <Compile Include="EventStream.cs" />
@@ -75,6 +81,9 @@
       <Project>{5f8f4c4c-57d0-401f-b501-571ab650b131}</Project>
       <Name>Inforigami.Regalo.Messaging</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
