@@ -27,9 +27,10 @@ namespace Inforigami.Regalo.Messaging
             }
             catch (Exception e)
             {
+                _logger.Error(this, e, "Failed to handle {0}", evt);
+
                 if (ExceptionShouldBubble(evt, e))
                 {
-                    _logger.Error(this, e, "Failed to handle {0}, allowing exception to propagate...", evt);
                     throw;
                 }
 
