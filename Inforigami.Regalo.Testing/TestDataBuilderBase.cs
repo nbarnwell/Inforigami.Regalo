@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Inforigami.Regalo.Testing
 {
@@ -27,12 +28,20 @@ namespace Inforigami.Regalo.Testing
         where T: class
     {
         private readonly IList<Action<T>> _actions = new List<Action<T>>();
+        private Action _defaults;
 
         public string CurrentDescription { get; private set; }
         
         public T Build()
         {
             var aggregate = CreateInstance();
+
+            // Apply the defaults if there are no actions,
+            // which should then register the default actions
+            if (!_actions.Any())
+            {
+                _defaults?.Invoke();
+            }
 
             foreach (var action in _actions)
             {
@@ -51,8 +60,23 @@ namespace Inforigami.Regalo.Testing
         /// <param name="newDescription">A description of the state of the object once this action has been performed.</param>
         protected void AddAction(Action<T> action, string newDescription)
         {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+
             _actions.Add(action);
             CurrentDescription = newDescription;
+        }
+
+        /// <summary>
+        /// If your object requires at least default values, even if no AddAction() calls are made,
+        /// set them by calling AddDefault() in the ctor. The builder will only apply them if no
+        /// actions have been provided by the time Build() is called.
+        /// </summary>
+        /// <param name="action">The action to queue for modifying the resulting object.</param>
+        protected void SetDefaults(Action action)
+        {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+
+            _defaults = action;
         }
 
         /// <summary>

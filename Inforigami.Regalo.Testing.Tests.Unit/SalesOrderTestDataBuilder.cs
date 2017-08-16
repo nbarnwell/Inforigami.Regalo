@@ -5,10 +5,9 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
 {
     public class SalesOrderTestDataBuilder : TestDataBuilderBase<SalesOrder>
     {
-        public static SalesOrderTestDataBuilder WithDefaults()
+        public SalesOrderTestDataBuilder()
         {
-            var b = new SalesOrderTestDataBuilder();
-            return b.NewOrder();
+            SetDefaults(() => NewOrder());
         }
 
         public SalesOrderTestDataBuilder NewOrder()
