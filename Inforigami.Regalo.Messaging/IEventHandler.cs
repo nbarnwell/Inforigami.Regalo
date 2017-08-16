@@ -1,7 +1,6 @@
 namespace Inforigami.Regalo.Messaging
 {
-    public interface IEventHandler<TEvent>
+    public interface IEventHandler<TEvent> : IMessageHandler<TEvent>
     {
-        void Handle(TEvent evt);
     }
 }

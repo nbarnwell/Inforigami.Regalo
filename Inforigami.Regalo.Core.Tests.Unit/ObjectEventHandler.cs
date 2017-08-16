@@ -18,16 +18,16 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             MessageTypes.Add(evt.GetType());
         }
 
-        void IEventHandler<SimpleEventBase>.Handle(SimpleEventBase evt)
-        {
-            TargetsCalled.Add(typeof(SimpleEventBase));
-            MessageTypes.Add(evt.GetType());
-        }
-
         public void Handle(SimpleEvent evt)
         {
             TargetsCalled.Add(typeof(SimpleEvent));
             MessageTypes.Add(evt.GetType());
+        }
+
+        public void Handle(SimpleEventBase message)
+        {
+            TargetsCalled.Add(typeof(SimpleEventBase));
+            MessageTypes.Add(message.GetType());
         }
     }
 }

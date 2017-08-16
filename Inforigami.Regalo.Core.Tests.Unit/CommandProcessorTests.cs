@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Inforigami.Regalo.Messaging;
 using NUnit.Framework;
-using Inforigami.Regalo.Testing;
 
 namespace Inforigami.Regalo.Core.Tests.Unit
 {
@@ -33,6 +32,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void TearDown()
         {
             Resolver.Reset();
+            Conventions.ResetToDefaults();
         }
 
         [Test]
@@ -83,15 +83,51 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         }
 
         [Test]
-        public void GivenAMessageHandledMultipleHandlers_WhenAskedToProcess_ShouldInvokeAllCommandHandlersInCorrectSequence()
+        public void GivenAMessageHandledByMultipleHandlers_WhenAskedToProcess_ShouldInvokeAllCommandHandlersInCorrectSequence()
         {
             var processor = new CommandProcessorTestDataBuilder().Build();
 
-            processor.Process(new CommandHandledByMultipleHandlers());
+            var command = new CommandHandledByMultipleHandlers();
+            processor.Process(command);
 
-            CollectionAssert.AreEqual(new [] { typeof(object) }, _objectCommandHandler.Messages);
-            CollectionAssert.AreEqual(new [] { typeof(CommandHandledByMultipleHandlers) }, _commandHandlerA.Messages);
-            CollectionAssert.AreEqual(new [] { typeof(CommandHandledByMultipleHandlers) }, _commandHandlerB.Messages);
+            var expected =
+                new[]
+                {
+                    typeof(ObjectCommandHandler),
+                    typeof(CommandHandlerA),
+                    typeof(CommandHandlerB)
+                };
+
+            CollectionAssert.AreEqual(
+                expected,
+                command.HandlersThatHandledThisMessage
+                       .Select(x => x.GetType())
+                       .ToArray());
+        }
+
+        [Test]
+        public void GivenAMessageHandledByMultipleHandlers_WhenAskedToProcessWithDifferentHandlerOrdering_ShouldInvokeAllCommandHandlersInCorrectSequence()
+        {
+            Conventions.SetHandlerSortingMethod((x, y) => string.Compare(y.GetType().FullName, x.GetType().FullName, StringComparison.InvariantCultureIgnoreCase));
+
+            var processor = new CommandProcessorTestDataBuilder().Build();
+
+            var command = new CommandHandledByMultipleHandlers();
+            processor.Process(command);
+
+            var expected =
+                new[]
+                {
+                    typeof(ObjectCommandHandler),
+                    typeof(CommandHandlerB),
+                    typeof(CommandHandlerA)
+                };
+
+            CollectionAssert.AreEqual(
+                expected,
+                command.HandlersThatHandledThisMessage
+                       .Select(x => x.GetType())
+                       .ToArray());
         }
     }
 }

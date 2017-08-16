@@ -1,7 +1,6 @@
 namespace Inforigami.Regalo.Messaging
 {
-    public interface ICommandHandler<TCommand>
+    public interface ICommandHandler<TCommand> : IMessageHandler<TCommand>
     {
-        void Handle(TCommand command);
     }
 }

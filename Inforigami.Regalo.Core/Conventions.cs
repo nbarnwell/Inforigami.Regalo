@@ -1,21 +1,24 @@
 using System;
+using System.Collections.Generic;
 
 namespace Inforigami.Regalo.Core
 {
     public class Conventions
     {
-        private static bool _aggregatesMustImplementApplyMethods = false;
-        private static Func<Type, Type> _findAggregateTypeForEventType = null;
-        private static Func<object, Exception, bool> _eventHandlingExceptionFilter = null;
-        private static NoMessageHandlerBehaviour _behaviourWhenNoMessageHandlerFound = NoMessageHandlerBehaviour.Throw;
-        private static NoMessageHandlerBehaviour _behaviourWhenNoSuccessMessageHandlerFound = NoMessageHandlerBehaviour.Ignore;
-        private static NoMessageHandlerBehaviour _behaviourWhenNoFailedMessageHandlerFound = NoMessageHandlerBehaviour.Warn;
+        private static bool _aggregatesMustImplementApplyMethods;
+        private static Func<Type, Type> _findAggregateTypeForEventType;
+        private static Func<object, Exception, bool> _eventHandlingExceptionFilter;
+        private static NoMessageHandlerBehaviour _behaviourWhenNoMessageHandlerFound;
+        private static NoMessageHandlerBehaviour _behaviourWhenNoSuccessMessageHandlerFound;
+        private static NoMessageHandlerBehaviour _behaviourWhenNoFailedMessageHandlerFound;
+        private static Comparison<object> _handlerSortingMethod;
 
-        public static bool AggregatesMustImplementApplyMethods { get { return _aggregatesMustImplementApplyMethods; } }
-        public static Func<Type, Type> FindAggregateTypeForEventType { get { return _findAggregateTypeForEventType; } }
-        public static NoMessageHandlerBehaviour BehaviourWhenNoMessageHandlerFound { get { return _behaviourWhenNoMessageHandlerFound;} }
-        public static NoMessageHandlerBehaviour BehaviourWhenNoSuccessMessageHandlerFound { get { return _behaviourWhenNoSuccessMessageHandlerFound;} }
-        public static NoMessageHandlerBehaviour BehaviourWhenNoFailedMessageHandlerFound { get { return _behaviourWhenNoFailedMessageHandlerFound;} }
+        public static bool AggregatesMustImplementApplyMethods => _aggregatesMustImplementApplyMethods;
+        public static Func<Type, Type> FindAggregateTypeForEventType => _findAggregateTypeForEventType;
+        public static NoMessageHandlerBehaviour BehaviourWhenNoMessageHandlerFound => _behaviourWhenNoMessageHandlerFound;
+        public static NoMessageHandlerBehaviour BehaviourWhenNoSuccessMessageHandlerFound => _behaviourWhenNoSuccessMessageHandlerFound;
+        public static NoMessageHandlerBehaviour BehaviourWhenNoFailedMessageHandlerFound => _behaviourWhenNoFailedMessageHandlerFound;
+        public static Comparison<object> HandlerSortingMethod => _handlerSortingMethod;
 
         public static string StreamIdFormat
         {
@@ -27,6 +30,27 @@ namespace Inforigami.Regalo.Core
         /// publish an EventHandlingFailedEvent that should be handled by an appropriate handler.
         /// </summary>
         public static Func<object, Exception, bool> EventPublishingExceptionFilter { get { return _eventHandlingExceptionFilter; } }
+
+        static Conventions()
+        {
+            ResetToDefaults();
+        }
+
+        public static void ResetToDefaults()
+        {
+            _aggregatesMustImplementApplyMethods = false;
+            _findAggregateTypeForEventType = null;
+            _eventHandlingExceptionFilter = null;
+            _behaviourWhenNoMessageHandlerFound = NoMessageHandlerBehaviour.Throw;
+            _behaviourWhenNoSuccessMessageHandlerFound = NoMessageHandlerBehaviour.Ignore;
+            _behaviourWhenNoFailedMessageHandlerFound = NoMessageHandlerBehaviour.Warn;
+            _handlerSortingMethod =
+                (x, y) =>
+                    string.Compare(
+                        x.GetType().FullName,
+                        y.GetType().FullName,
+                        StringComparison.InvariantCultureIgnoreCase);
+        }
 
         public static void SetAggregatesMustImplementApplymethods(bool value)
         {
@@ -56,6 +80,13 @@ namespace Inforigami.Regalo.Core
         public static void SetBehaviourWhenNoFailedEventHandlerFound(NoMessageHandlerBehaviour newBehaviour)
         {
             _behaviourWhenNoFailedMessageHandlerFound = newBehaviour;
+        }
+
+        public static void SetHandlerSortingMethod(Comparison<object> comparison)
+        {
+            if (comparison == null) throw new ArgumentNullException(nameof(comparison));
+
+            _handlerSortingMethod = comparison;
         }
     }
 

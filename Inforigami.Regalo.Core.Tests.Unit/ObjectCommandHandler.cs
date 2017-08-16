@@ -14,16 +14,22 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void Handle(object command)
         {
             Messages.Add(typeof(object));
-        }
 
-        void ICommandHandler<SimpleCommandBase>.Handle(SimpleCommandBase command)
-        {
-            Messages.Add(typeof(SimpleCommandBase));
+            var updatableMessage = command as CommandHandledByMultipleHandlers;
+            if (updatableMessage != null)
+            {
+                updatableMessage.HandlersThatHandledThisMessage.Add(this);
+            }
         }
 
         public void Handle(SimpleCommand command)
         {
             Messages.Add(typeof(SimpleCommand));
+        }
+
+        public void Handle(SimpleCommandBase message)
+        {
+            Messages.Add(typeof(SimpleCommandBase));
         }
     }
 }

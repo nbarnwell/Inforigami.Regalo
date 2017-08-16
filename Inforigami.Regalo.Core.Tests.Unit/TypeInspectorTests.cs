@@ -16,6 +16,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         [TestCase(typeof(ClassWithNoSpecificBaseThatImplementsAnInterface),   new[] { typeof(object), typeof(IAmAnInterface),          typeof(ClassWithNoSpecificBaseThatImplementsAnInterface) })]
         [TestCase(typeof(VerySpecificSuperClass),                             new[] { typeof(object), typeof(ClassWithNoSpecificBase), typeof(ClassNotDirectlyInheritingObject),                typeof(VerySpecificSuperClass)                             })]
         [TestCase(typeof(ClassWithNoSpecificBaseThatImplementsTwoInterfaces), new[] { typeof(object), typeof(IAmAnInterface),          typeof(IAmAnInterfaceToo),                               typeof(ClassWithNoSpecificBaseThatImplementsTwoInterfaces) })]
+        [TestCase(typeof(IAmAnInterfaceThatExtendsTwoInterfaces), new[] { typeof(IAmAnInterface),          typeof(IAmAnInterfaceToo),                               typeof(IAmAnInterfaceThatExtendsTwoInterfaces) })]
         [TestCase(typeof(SimpleEvent), new[] { typeof(object), typeof(IMessage), typeof(Message), typeof(IEvent), typeof(Event), typeof(SimpleEventBase), typeof(SimpleEvent) })]
         public void GivenAType_WhenSearchingForTypeHierarchy_ShouldReturnBaseTypesAndInputType(Type input, IEnumerable<Type> expectedResult)
         {
@@ -37,6 +38,9 @@ namespace Inforigami.Regalo.Core.Tests.Unit
     { }
 
     public interface IAmAnInterfaceToo
+    { }
+
+    public interface IAmAnInterfaceThatExtendsTwoInterfaces : IAmAnInterface, IAmAnInterfaceToo
     { }
 
     public class VerySpecificSuperClass : ClassNotDirectlyInheritingObject

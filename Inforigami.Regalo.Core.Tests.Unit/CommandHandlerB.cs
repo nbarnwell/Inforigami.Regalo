@@ -11,6 +11,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void Handle(CommandHandledByMultipleHandlers command)
         {
             Messages.Add(typeof(CommandHandledByMultipleHandlers));
+            command.HandlersThatHandledThisMessage.Add(this);
         }
     }
 }

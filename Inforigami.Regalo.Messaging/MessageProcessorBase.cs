@@ -75,13 +75,19 @@ namespace Inforigami.Regalo.Messaging
 
             var targets = messageTypes.Select(x => new { MessageType = x, HandlerType = messageHandlerOpenType.MakeGenericType(x) })
                                       .SelectMany(
-                                          x => Resolver.ResolveAll(x.HandlerType),
+                                          x =>
+                                          {
+                                              var handlers = Resolver.ResolveAll(x.HandlerType)?.ToList();
+                                              handlers?.Sort(Conventions.HandlerSortingMethod);
+                                              return handlers;
+                                          },
                                           (x, handler) => new HandlerDescriptor
                                           {
                                               MethodInfo = FindHandleMethod(x.MessageType, x.HandlerType),
                                               Handler = handler
                                           })
                                       .ToList();
+
             return targets;
         }
 
@@ -110,7 +116,7 @@ namespace Inforigami.Regalo.Messaging
                 MethodInfo handleMethod;
                 if (false == _handleMethodCache.TryGetValue(handlerType.TypeHandle, out handleMethod))
                 {
-                    handleMethod = handlerType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                    handleMethod = GetAllMethods(handlerType)
                                               .Where(m => m.Name == "Handle")
                                               .Where(
                                                   m =>
@@ -124,6 +130,17 @@ namespace Inforigami.Regalo.Messaging
                 }
 
                 return handleMethod;
+            }
+        }
+
+        private IEnumerable<MethodInfo> GetAllMethods(Type type)
+        {
+            foreach (var @interface in TypeInspector.GetHierarchy(type, TypeHierarchyOrder.TopDown))
+            {
+                foreach (var methodInfo in @interface.GetMethods())
+                {
+                    yield return methodInfo;
+                }
             }
         }
 

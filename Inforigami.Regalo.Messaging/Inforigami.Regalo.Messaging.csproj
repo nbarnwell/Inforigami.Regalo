@@ -49,6 +49,7 @@
     <Compile Include="IEventBus.cs" />
     <Compile Include="IEventHandler.cs" />
     <Compile Include="IgnoreNoHandlerFoundStrategy.cs" />
+    <Compile Include="IMessageHandler.cs" />
     <Compile Include="INoHandlerFoundStrategy.cs" />
     <Compile Include="INoHandlerFoundStrategyFactory.cs" />
     <Compile Include="MessageProcessorBase.cs" />
