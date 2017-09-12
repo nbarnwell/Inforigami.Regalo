@@ -37,7 +37,10 @@ namespace Inforigami.Regalo.Testing
         {
             var aggregate = CreateInstance();
 
-            _defaults?.Invoke();
+            if (!_actions.Any())
+            {
+                _defaults?.Invoke();
+            }
 
             foreach (var action in _actions)
             {
@@ -45,15 +48,6 @@ namespace Inforigami.Regalo.Testing
             }
 
             return aggregate;
-        }
-
-        /// <summary>
-        /// If one of the configurations of your builder requires that the defaults not
-        /// be applied when the object is built, you can clear them by calling ClearDefaults().
-        /// </summary>
-        protected void ClearDefaults()
-        {
-            _defaults = null;
         }
 
         /// <summary>
@@ -78,8 +72,6 @@ namespace Inforigami.Regalo.Testing
         /// <param name="action">The action to queue for modifying the resulting object.</param>
         protected void SetDefaults(Action action)
         {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-
             _defaults = action;
         }
 
