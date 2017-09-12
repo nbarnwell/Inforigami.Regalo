@@ -9,6 +9,7 @@ namespace Inforigami.Regalo.Testing
     /// <remarks>To use this class:
     /// <list type="number">
     /// <item><description>Create a class deriving from TestDataBuilderBase&lt;T&gt;, where T is the class of object to be built.</description></item>
+    /// <item><description></description></item>
     /// <item><description>Create as many <code>public [Type][Property] { get; private set; }</code> properties as necessary for instances of T to be built/configured.</description></item>
     /// <item><description>Note these are "public get" properties so that tests can access the values (even after they are customised) directly in assertions.</description></item>
     /// <item><description>Implement the CreateInstance() abstract method to do nothing more than is required to create a new instance of T.
@@ -31,17 +32,12 @@ namespace Inforigami.Regalo.Testing
         private Action _defaults;
 
         public string CurrentDescription { get; private set; }
-        
+
         public T Build()
         {
             var aggregate = CreateInstance();
 
-            // Apply the defaults if there are no actions,
-            // which should then register the default actions
-            if (!_actions.Any())
-            {
-                _defaults?.Invoke();
-            }
+            _defaults?.Invoke();
 
             foreach (var action in _actions)
             {
@@ -49,6 +45,15 @@ namespace Inforigami.Regalo.Testing
             }
 
             return aggregate;
+        }
+
+        /// <summary>
+        /// If one of the configurations of your builder requires that the defaults not
+        /// be applied when the object is built, you can clear them by calling ClearDefaults().
+        /// </summary>
+        protected void ClearDefaults()
+        {
+            _defaults = null;
         }
 
         /// <summary>
@@ -68,8 +73,7 @@ namespace Inforigami.Regalo.Testing
 
         /// <summary>
         /// If your object requires at least default values, even if no AddAction() calls are made,
-        /// set them by calling AddDefault() in the ctor. The builder will only apply them if no
-        /// actions have been provided by the time Build() is called.
+        /// set them by calling SetDefaults() in the ctor.
         /// </summary>
         /// <param name="action">The action to queue for modifying the resulting object.</param>
         protected void SetDefaults(Action action)
@@ -77,6 +81,17 @@ namespace Inforigami.Regalo.Testing
             if (action == null) throw new ArgumentNullException(nameof(action));
 
             _defaults = action;
+        }
+
+        /// <summary>
+        /// Since a base class can't "return this" to return the subclass, this method makes it 
+        /// simple to implement a "WithDefaults" method on overriding classes, which should
+        /// simply call <code>base.InvokeDefaults(); return this;</code>. This allows for a call
+        /// to <code>WithDefaults()</code> to be chained with other customisation methods.
+        /// </summary>
+        protected void InvokeDefaults()
+        {
+            _defaults?.Invoke();
         }
 
         /// <summary>

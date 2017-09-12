@@ -22,6 +22,12 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
             return this;
         }
 
+        public SalesOrderTestDataBuilder WithDefaults()
+        {
+            InvokeDefaults();
+            return this;
+        }
+
         protected override SalesOrder CreateInstance()
         {
             return new SalesOrder();
