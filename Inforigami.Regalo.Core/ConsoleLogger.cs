@@ -8,12 +8,15 @@ namespace Inforigami.Regalo.Core
     public class ConsoleLogger : ILogger
     {
         private readonly object _syncLock = new object();
+        private DateTime _lastLogDateTime;
 
         public bool ShowDebugMessages { get; set; }
+        public TimeSpan QuietTime { get; set; }
 
         public ConsoleLogger()
         {
             ShowDebugMessages = false;
+            QuietTime = TimeSpan.FromMinutes(1);
         }
 
         public void Debug(object sender, string format, params object[] args)
@@ -95,6 +98,12 @@ namespace Inforigami.Regalo.Core
         {
             lock (_syncLock)
             {
+                var timeSinceLastWrite = TimeSinceLastWrite();
+                if (timeSinceLastWrite > QuietTime)
+                {
+                    WriteQuietTimeMessage(timeSinceLastWrite);
+                }
+
                 WriteTimestamp();
                 WriteDivider();
                 WriteSeverity(severity);
@@ -104,7 +113,20 @@ namespace Inforigami.Regalo.Core
                 WriteMessage(message);
 
                 Console.WriteLine();
+
+                _lastLogDateTime = DateTime.Now;
             }
+        }
+
+        private void WriteQuietTimeMessage(TimeSpan timeSinceLastWrite)
+        {
+            WriteText("<<<");
+            Console.WriteLine();
+            WriteTimeSinceLastWrite(timeSinceLastWrite);
+            Console.WriteLine();
+            WriteText(">>>");
+            Console.WriteLine();
+            Console.WriteLine();
         }
 
         private void WriteMessage(string message)
@@ -116,6 +138,11 @@ namespace Inforigami.Regalo.Core
         {
             var senderName = $"\"{sender.GetType().Name}\"";
             WriteText(senderName);
+        }
+
+        private void WriteTimeSinceLastWrite(TimeSpan since)
+        {
+            WriteText($"Quiet period of {since}");
         }
 
         private void WriteTimestamp()
@@ -189,6 +216,16 @@ namespace Inforigami.Regalo.Core
         private void WriteText(string text)
         {
             Console.Write(text);
+        }
+
+        private TimeSpan TimeSinceLastWrite()
+        {
+            if (_lastLogDateTime > DateTime.MinValue)
+            {
+                return DateTime.Now - _lastLogDateTime;
+            }
+
+            return TimeSpan.Zero;
         }
 
         private enum Severity

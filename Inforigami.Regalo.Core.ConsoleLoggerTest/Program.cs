@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Inforigami.Regalo.Core.ConsoleLoggerTest
@@ -30,6 +31,8 @@ namespace Inforigami.Regalo.Core.ConsoleLoggerTest
             {
                 l.Error(this, e, "Exception message with {0}", "argument");
             }
+
+            Thread.Sleep(6000);
 
             l.Debug(this, "Debug message with {0}", "argument");
             l.Info(this, "Information message with {0}", "argument");
