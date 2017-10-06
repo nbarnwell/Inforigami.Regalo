@@ -88,7 +88,7 @@ namespace Inforigami.Regalo.EventSourcing
             return BuildEventStream<T>(aggregateId, events);
         }
 
-        public void Delete<T>(string aggregateId, int version)
+        public void Delete(string aggregateId, int version)
         {
             var events = FindEvents(aggregateId, version);
 

@@ -100,7 +100,7 @@ namespace Inforigami.Regalo.RavenDB
             return result;
         }
 
-        public void Delete<T>(string aggregateId, int version)
+        public void Delete(string aggregateId, int version)
         {
             var stream = _documentSession.Load<EventStream>(aggregateId);
             var actualVersion = stream.Events.Last().Version;

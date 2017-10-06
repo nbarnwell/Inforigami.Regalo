@@ -114,7 +114,7 @@ namespace Inforigami.Regalo.SqlServer
             }
         }
 
-        public void Delete<T>(string aggregateId, int version)
+        public void Delete(string aggregateId, int version)
         {
             Guid aggregateIdGuid;
             if (!Guid.TryParse(aggregateId, out aggregateIdGuid))

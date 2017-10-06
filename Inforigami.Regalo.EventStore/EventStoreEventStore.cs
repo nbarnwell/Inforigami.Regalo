@@ -100,7 +100,7 @@ namespace Inforigami.Regalo.EventStore
             return result;
         }
 
-        public void Delete<T>(string aggregateId, int version)
+        public void Delete(string aggregateId, int version)
         {
             _eventStoreConnection.Delete(aggregateId, version);
         }
