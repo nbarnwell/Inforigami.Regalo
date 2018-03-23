@@ -115,6 +115,20 @@ namespace Inforigami.Regalo.RavenDB
             _documentSession.Delete(stream);
         }
 
+        public void Commit()
+        {
+            Flush();
+        }
+
+        public void Rollback()
+        {
+            if (_hasChanges)
+            {
+                throw new InvalidOperationException(
+                    "Disposing a delayed-write event store with pending changes. Be sure to call Flush() when all operations are completed.");
+            }
+        }
+
         private static IEnumerable<IEvent> GetEventsForVersion(IEnumerable<IEvent> events, int maxVersion)
         {
             return events.Where(x => x.Version <= maxVersion);
@@ -124,10 +138,7 @@ namespace Inforigami.Regalo.RavenDB
         {
             if (_documentSession != null)
             {
-                if (_hasChanges)
-                {
-                    throw new InvalidOperationException("Disposing a delayed-write event store with pending changes. Be sure to call Flush() when all operations are completed.");
-                }
+                Rollback();
 
                 _documentSession.Dispose();
                 _documentSession = null;

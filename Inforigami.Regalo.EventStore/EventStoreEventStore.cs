@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using Inforigami.Regalo.Core;
@@ -12,12 +13,15 @@ using ILogger = Inforigami.Regalo.Core.ILogger;
 
 namespace Inforigami.Regalo.EventStore
 {
-    public class EventStoreEventStore : IEventStore, IDisposable
+    public class EventStoreEventStore : IDelayedWriteEventStore, IDisposable
     {
-        private readonly IEventStoreSession _eventStoreConnection;
+        private bool _committed;
+
+        private readonly IEventStoreConnection _eventStoreConnection;
+        private readonly IDictionary<string, EventStoreTransaction> _transactions = new Dictionary<string, EventStoreTransaction>();
         private readonly ILogger _logger;
 
-        public EventStoreEventStore(IEventStoreSession eventStoreConnection, ILogger logger)
+        public EventStoreEventStore(IEventStoreConnection eventStoreConnection, ILogger logger)
         {
             if (eventStoreConnection == null) throw new ArgumentNullException("eventStoreConnection");
             if (logger == null) throw new ArgumentNullException("logger");
@@ -34,7 +38,8 @@ namespace Inforigami.Regalo.EventStore
             {
                 _logger.Debug(this, "Saving " + typeof(T) + " to stream " + aggregateId);
 
-                _eventStoreConnection.AppendToStreamAsync(aggregateId, eventStoreExpectedVersion, GetEventData(newEvents)).Wait();
+                var transaction = GetTransaction(aggregateId, eventStoreExpectedVersion);
+                transaction.WriteAsync(GetEventData(newEvents)).Wait();
             }
             catch (WrongExpectedVersionException ex)
             {
@@ -102,7 +107,31 @@ namespace Inforigami.Regalo.EventStore
 
         public void Delete(string aggregateId, int version)
         {
-            _eventStoreConnection.Delete(aggregateId, version);
+            _eventStoreConnection.DeleteStreamAsync(aggregateId, version).Wait();
+        }
+
+        public void Rollback()
+        {
+            _logger.Warn(this, "Rolling-back changes to EventStore...");
+
+            foreach (var transaction in _transactions.Values)
+            {
+                transaction.Rollback();
+            }
+        }
+
+        public void Flush()
+        {
+            _committed = true;
+
+            _logger.Debug(this, "Committing EventStore transactions for streams: {0}...", string.Join(", ", _transactions.Keys));
+
+            Task.WaitAll(
+                _transactions.Values
+                             .ToArray()
+                             .Select(x => x.CommitAsync())
+                             .Cast<Task>()
+                             .ToArray());
         }
 
         private static IEvent BuildDomainEvent(byte[] data, byte[] metadata)
@@ -116,6 +145,10 @@ namespace Inforigami.Regalo.EventStore
 
         public void Dispose()
         {
+            if (!_committed)
+            {
+                Rollback();
+            }
         }
 
         private static IEnumerable<EventData> GetEventData(IEnumerable<IEvent> newEvents)
@@ -161,5 +194,18 @@ namespace Inforigami.Regalo.EventStore
 
             return evt.GetType().Name.ToCamelCase();
         }
-    }
+
+        private EventStoreTransaction GetTransaction(string streamId, int expectedVersion)
+        {
+            EventStoreTransaction transaction;
+            if (!_transactions.TryGetValue(streamId, out transaction))
+            {
+                _logger.Debug(this, $"Starting new transaction for stream {streamId} at expected version {expectedVersion}");
+                transaction = _eventStoreConnection.StartTransactionAsync(streamId, expectedVersion).Result;
+                _transactions.Add(streamId, transaction);
+            }
+
+            return transaction;
+        }
+   }
 }

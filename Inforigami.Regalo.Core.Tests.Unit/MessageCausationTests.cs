@@ -1,4 +1,5 @@
-﻿using Inforigami.Regalo.Interfaces;
+﻿using System;
+using Inforigami.Regalo.Interfaces;
 using NUnit.Framework;
 
 namespace Inforigami.Regalo.Core.Tests.Unit
@@ -32,6 +33,18 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             Assert.That(event1.CorrelationId, Is.EqualTo(command.CorrelationId));
             Assert.That(event1.UserId, Is.EqualTo(command.UserId));
             Assert.That(event1.CorrelationTimestamp, Is.EqualTo(command.CorrelationTimestamp));
+        }
+
+        [Test]
+        public void Message_with_MinValue_timestamp_can_be_updated_from_another_with_current_date()
+        {
+            var causer = new MyCommand();
+            causer.Timestamp = new DateTimeOffset(2017, 10, 9, 14, 38, 0, TimeSpan.FromHours(1));
+
+            var causee = new MyEvent();
+            causee.Timestamp = new DateTimeOffset();
+
+            causee.WasCausedBy(causer);
         }
 
         public class MyCommand : Command

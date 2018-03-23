@@ -55,7 +55,6 @@
     <Compile Include="EventStoreConnectionBehavior.cs" />
     <Compile Include="EventStoreConnectionProvider.cs" />
     <Compile Include="EventStoreEventStore.cs" />
-    <Compile Include="EventStoreSession.cs" />
     <Compile Include="IEventStoreConfiguration.cs" />
     <Compile Include="IEventStoreConnectionProvider.cs" />
     <Compile Include="IEventStoreSession.cs" />
