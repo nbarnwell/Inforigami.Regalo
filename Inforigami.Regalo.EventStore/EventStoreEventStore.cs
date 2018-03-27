@@ -19,6 +19,7 @@ namespace Inforigami.Regalo.EventStore
 
         private readonly IEventStoreConnection _eventStoreConnection;
         private readonly IDictionary<string, EventStoreTransaction> _transactions = new Dictionary<string, EventStoreTransaction>();
+        private readonly IDictionary<string, IList<IEvent>> _streamCache = new Dictionary<string, IList<IEvent>>();
         private readonly ILogger _logger;
 
         public EventStoreEventStore(IEventStoreConnection eventStoreConnection, ILogger logger)
@@ -38,8 +39,33 @@ namespace Inforigami.Regalo.EventStore
             {
                 _logger.Debug(this, "Saving " + typeof(T) + " to stream " + aggregateId);
 
+                var eventsToAppend = newEvents.ToList();
+
                 var transaction = GetTransaction(aggregateId, eventStoreExpectedVersion);
-                transaction.WriteAsync(GetEventData(newEvents)).Wait();
+                transaction.WriteAsync(GetEventData(eventsToAppend)).Wait();
+
+                IList<IEvent> cachedEvents;
+                if (!_streamCache.TryGetValue(aggregateId, out cachedEvents))
+                {
+                    cachedEvents = new List<IEvent>();
+                    _streamCache[aggregateId] = cachedEvents;
+                }
+
+                foreach (var evt in eventsToAppend)
+                {
+                    if (cachedEvents.IsEmpty() || evt.Version == cachedEvents.Last().Version + 1)
+                    {
+                        cachedEvents.Add(evt);
+                    }
+                    else
+                    {
+                        var existingVersions = string.Join(", ", cachedEvents.Select(x => x.Version.ToString()));
+                        var newVersions = string.Join(", ", eventsToAppend.Select(x => x.Version.ToString()));
+                        throw new EventStoreConcurrencyException(
+                            $"Failed to update session cache for stream {aggregateId} given expected "
+                            + $"version {expectedVersion}, appending versions {newVersions} to {existingVersions}");
+                    }
+                }
             }
             catch (WrongExpectedVersionException ex)
             {
@@ -63,6 +89,41 @@ namespace Inforigami.Regalo.EventStore
                 throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EventStreamVersion.NoStream (-1) value.");
             }
 
+            IEnumerable<IEvent> domainEvents;
+
+            IList<IEvent> cachedEvents;
+            if (_streamCache.TryGetValue(aggregateId, out cachedEvents))
+            {
+                domainEvents = LoadEventsFromCache<T>(aggregateId, version, cachedEvents);
+            }
+            else
+            {
+                domainEvents = LoadEventsFromEventStore<T>(aggregateId, version);
+            }
+
+            if (!domainEvents.Any())
+            {
+                return null;
+            }
+
+            var result = new EventStream<T>(aggregateId);
+            result.Append(domainEvents);
+
+            if (version != EventStreamVersion.Max && result.GetVersion() != version)
+            {
+                var exception = new ArgumentOutOfRangeException(
+                    "version",
+                    version,
+                    string.Format("Event for version {0} could not be found for stream {1}", version, aggregateId));
+                exception.Data.Add("Existing stream", domainEvents);
+                throw exception;
+            }
+
+            return result;
+        }
+
+        private IEnumerable<IEvent> LoadEventsFromEventStore<T>(string aggregateId, int version)
+        {
             _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from stream " + aggregateId);
 
             var streamEvents = new List<ResolvedEvent>();
@@ -71,7 +132,9 @@ namespace Inforigami.Regalo.EventStore
             var nextSliceStart = StreamPosition.Start;
             do
             {
-                currentSlice = _eventStoreConnection.ReadStreamEventsForwardAsync(aggregateId, nextSliceStart, 200, false).Result;
+                currentSlice = _eventStoreConnection
+                               .ReadStreamEventsForwardAsync(aggregateId, nextSliceStart, 200, false)
+                               .Result;
 
                 nextSliceStart = currentSlice.NextEventNumber;
 
@@ -83,26 +146,16 @@ namespace Inforigami.Regalo.EventStore
                         break;
                     }
                 }
-
             } while (!currentSlice.IsEndOfStream);
 
-            if (streamEvents.Count == 0)
-            {
-                return null;
-            }
+            return streamEvents.Select(x => BuildDomainEvent(x.OriginalEvent.Data, x.OriginalEvent.Metadata))
+                               .ToList();
+        }
 
-            var domainEvents = streamEvents.Select(x => BuildDomainEvent(x.OriginalEvent.Data, x.OriginalEvent.Metadata)).ToList();
-            var result = new EventStream<T>(aggregateId);
-            result.Append(domainEvents);
-
-            if (version != EventStreamVersion.Max && result.GetVersion() != version)
-            {
-                var exception = new ArgumentOutOfRangeException("version", version, string.Format("Event for version {0} could not be found for stream {1}", version, aggregateId));
-                exception.Data.Add("Existing stream", domainEvents);
-                throw exception;
-            }
-
-            return result;
+        private IEnumerable<IEvent> LoadEventsFromCache<T>(string aggregateId, int version, IEnumerable<IEvent> cachedEvents)
+        {
+            _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from cache " + aggregateId);
+            return cachedEvents.Where(x => x.Version == EventStreamVersion.Max || x.Version <= version).ToList();
         }
 
         public void Delete(string aggregateId, int version)
@@ -118,6 +171,8 @@ namespace Inforigami.Regalo.EventStore
             {
                 transaction.Rollback();
             }
+
+            _streamCache.Clear();
         }
 
         public void Flush()
