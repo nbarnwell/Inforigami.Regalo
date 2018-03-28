@@ -39,39 +39,42 @@ namespace Inforigami.Regalo.EventStore
             {
                 _logger.Debug(this, "Saving " + typeof(T) + " to stream " + aggregateId);
 
-                var eventsToAppend = newEvents.ToList();
-
                 var transaction = GetTransaction(aggregateId, eventStoreExpectedVersion);
-                transaction.WriteAsync(GetEventData(eventsToAppend)).Wait();
+                transaction.WriteAsync(GetEventData(newEvents)).Wait();
 
-                IList<IEvent> cachedEvents;
-                if (!_streamCache.TryGetValue(aggregateId, out cachedEvents))
-                {
-                    cachedEvents = new List<IEvent>();
-                    _streamCache[aggregateId] = cachedEvents;
-                }
-
-                foreach (var evt in eventsToAppend)
-                {
-                    if (cachedEvents.IsEmpty() || evt.Version == cachedEvents.Last().Version + 1)
-                    {
-                        cachedEvents.Add(evt);
-                    }
-                    else
-                    {
-                        var existingVersions = string.Join(", ", cachedEvents.Select(x => x.Version.ToString()));
-                        var newVersions = string.Join(", ", eventsToAppend.Select(x => x.Version.ToString()));
-                        throw new EventStoreConcurrencyException(
-                            $"Failed to update session cache for stream {aggregateId} given expected "
-                            + $"version {expectedVersion}, appending versions {newVersions} to {existingVersions}");
-                    }
-                }
+                CacheNewEvents(aggregateId, expectedVersion, newEvents);
             }
             catch (WrongExpectedVersionException ex)
             {
                 // Wrap in a Regalo-defined exception so that callers don't have to worry what impl is in place
                 var concurrencyException = new EventStoreConcurrencyException("Unable to save to EventStore", ex);
                 throw concurrencyException;
+            }
+        }
+
+        private void CacheNewEvents(string aggregateId, int expectedVersion, IEnumerable<IEvent> eventsToAppend)
+        {
+            IList<IEvent> cachedEvents;
+            if (!_streamCache.TryGetValue(aggregateId, out cachedEvents))
+            {
+                cachedEvents = new List<IEvent>();
+                _streamCache[aggregateId] = cachedEvents;
+            }
+
+            foreach (var evt in eventsToAppend)
+            {
+                if (cachedEvents.IsEmpty() || evt.Version == cachedEvents.Last().Version + 1)
+                {
+                    cachedEvents.Add(evt);
+                }
+                else
+                {
+                    var existingVersions = string.Join(", ", cachedEvents.Select(x => x.Version.ToString()));
+                    var newVersions = string.Join(", ", eventsToAppend.Select(x => x.Version.ToString()));
+                    throw new EventStoreConcurrencyException(
+                        $"Failed to update session cache for stream {aggregateId} given expected "
+                        + $"version {expectedVersion}, appending versions {newVersions} to {existingVersions}");
+                }
             }
         }
 

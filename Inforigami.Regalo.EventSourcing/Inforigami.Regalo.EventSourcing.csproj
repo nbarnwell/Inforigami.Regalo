@@ -53,7 +53,6 @@
     <Compile Include="EventStoreConcurrencyException.cs" />
     <Compile Include="EventStream.cs" />
     <Compile Include="EventStreamIdFormatter.cs" />
-    <Compile Include="EventStreamVersion.cs" />
     <Compile Include="IConcurrencyMonitor.cs" />
     <Compile Include="IdNotSetException.cs" />
     <Compile Include="IEventStore.cs" />
