@@ -31,12 +31,10 @@ namespace Inforigami.Regalo.EventSourcing
         private TAggregateRoot Get(Guid id, int? version)
         {
             var aggregateId = EventStreamIdFormatter.GetStreamId<TAggregateRoot>(id.ToString());
-            _logger.Debug(this, "Loading stream with ID {0} at version {1}", aggregateId, version);
+            var entityVersion = version ?? EntityVersion.Latest;
+            _logger.Debug(this, $"Loading stream {aggregateId}@{EntityVersion.GetName(entityVersion)}");
 
-            var stream =
-                version == null
-                    ? _eventStore.Load<TAggregateRoot>(aggregateId)
-                    : _eventStore.Load<TAggregateRoot>(aggregateId, version.Value);
+            var stream = _eventStore.Load<TAggregateRoot>(aggregateId, entityVersion);
 
             if (stream == null)
             {
@@ -46,7 +44,7 @@ namespace Inforigami.Regalo.EventSourcing
 
             if (!stream.HasEvents)
             {
-                _logger.Warn(this, "Stream for ID {0} has no events for version {1}", aggregateId, version);
+                _logger.Warn(this, "Stream for ID {0} has no events for version {1}", aggregateId, EntityVersion.GetName(entityVersion));
             }
 
             var aggregateRoot = new TAggregateRoot();

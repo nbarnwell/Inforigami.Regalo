@@ -120,7 +120,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             store.Save<User>(user2.Id.ToString(), 0, user2.GetUncommittedEvents());
 
             // Act
-            EventStream<User> eventsForUser1 = store.Load<User>(user1.Id.ToString(), EventStreamVersion.Max);
+            EventStream<User> eventsForUser1 = store.Load<User>(user1.Id.ToString(), EntityVersion.Latest);
 
             // Assert
             CollectionAssert.AreEqual(user1.GetUncommittedEvents(), eventsForUser1.Events, "Store didn't return user1's events properly.");

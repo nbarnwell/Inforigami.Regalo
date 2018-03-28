@@ -39,7 +39,7 @@ namespace Inforigami.Regalo.SqlServer
             {
                 connection.Open();
 
-                if (expectedVersion == EventStreamVersion.NoStream)
+                if (expectedVersion == EntityVersion.New)
                 {
                     InsertAggregateRow(aggregateIdGuid, newEvents, connection);
                 }
@@ -56,19 +56,19 @@ namespace Inforigami.Regalo.SqlServer
 
         public EventStream<T> Load<T>(string aggregateId)
         {
-            return Load<T>(aggregateId, EventStreamVersion.Max);
+            return Load<T>(aggregateId, EntityVersion.Latest);
         }
 
         public EventStream<T> Load<T>(string aggregateId, int version)
         {
             if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentException("An aggregate ID is required", "aggregateId");
 
-            if (version == EventStreamVersion.NoStream)
+            if (version == EntityVersion.New)
             {
-                throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EventStreamVersion.NoStream (-1) value.");
+                throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EntityVersion.New (-1) value.");
             }
 
-            _logger.Debug(this, "Loading " + typeof(T) + " version " + EventStreamVersion.GetName(version) + " from stream " + aggregateId);
+            _logger.Debug(this, "Loading " + typeof(T) + " version " + EntityVersion.GetName(version) + " from stream " + aggregateId);
 
             using (var transaction = GetTransaction())
             using (var connection = GetConnection())
@@ -83,7 +83,7 @@ namespace Inforigami.Regalo.SqlServer
                 var versionParameter     = command.Parameters.Add("@Version", SqlDbType.Int);
 
                 aggregateIdParameter.Value = Guid.Parse(aggregateId);
-                versionParameter.Value = version == EventStreamVersion.Max ? int.MaxValue : version;
+                versionParameter.Value = version == EntityVersion.Latest ? int.MaxValue : version;
 
                 var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
 
@@ -101,7 +101,7 @@ namespace Inforigami.Regalo.SqlServer
                 var result = new EventStream<T>(aggregateId);
                 result.Append(events);
 
-                if (version != EventStreamVersion.Max && result.GetVersion() != version)
+                if (version != EntityVersion.Latest && result.GetVersion() != version)
                 {
                     var exception = new ArgumentOutOfRangeException("version", version, string.Format("Event for version {0} could not be found for stream {1}", version, aggregateId));
                     exception.Data.Add("Existing stream", events);

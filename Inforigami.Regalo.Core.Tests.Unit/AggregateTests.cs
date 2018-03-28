@@ -122,7 +122,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             user.ApplyAll(Enumerable.Empty<IEvent>());
 
             // Assert
-            Assert.That(user.BaseVersion, Is.EqualTo(EventStreamVersion.NoStream));
+            Assert.That(user.BaseVersion, Is.EqualTo(EntityVersion.New));
         }
         
         [Test]
@@ -130,7 +130,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         {
             // Arrange
             var user = new User();
-            var events = new IEvent[] { new UserRegistered(user.Id), new UserChangedPassword("newpassword"), new UserChangedPassword("newerpassword") };
+            var events = new IEvent[] { new UserRegistered(Guid.NewGuid()), new UserChangedPassword("newpassword"), new UserChangedPassword("newerpassword") };
 
             // Act
             user.ApplyAll(events);
@@ -181,8 +181,6 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         public void InvokingBehaviourOnObjectWithNoIdThatDoesntSetTheId_ShouldFail()
         {
             var user = new User();
-            var events = new IEvent[] { /*new UserRegistered(user.Id), */new UserChangedPassword("newpassword"), new UserChangedPassword("newpassword") };
-            user.ApplyAll(events);
 
             Assert.Throws<IdNotSetException>(() => user.ChangePassword("newnewpassword"));
         }

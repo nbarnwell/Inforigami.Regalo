@@ -136,7 +136,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             var userId = Guid.NewGuid();
             eventStore.Save<User>(
                 EventStreamIdFormatter.GetStreamId<User>(userId.ToString()),
-                EventStreamVersion.NoStream,
+                EntityVersion.New,
                 new EventChain
                 {
                     new UserRegistered(userId),

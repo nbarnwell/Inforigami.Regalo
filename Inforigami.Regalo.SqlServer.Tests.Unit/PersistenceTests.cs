@@ -56,7 +56,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             // Act
             var id = Guid.NewGuid();
             var evt = new CustomerSignedUp(id);
-            store.Save<Customer>(id.ToString(), EventStreamVersion.NoStream, new[] { evt });
+            store.Save<Customer>(id.ToString(), EntityVersion.New, new[] { evt });
             var stream = store.Load<Customer>(id.ToString());
 
             // Assert
@@ -82,7 +82,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
 
             customer.AssignAccountManager(accountManager.Id, startDate);
 
-            store.Save<Customer>(customer.Id.ToString(), EventStreamVersion.NoStream, customer.GetUncommittedEvents());
+            store.Save<Customer>(customer.Id.ToString(), EntityVersion.New, customer.GetUncommittedEvents());
 
             // Act
             var acctMgrAssignedEvent = (AccountManagerAssigned)store.Load<Customer>(customer.Id.ToString())
@@ -103,7 +103,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             // Act
             var customer = new Customer();
             customer.Signup();
-            store.Save<Customer>(customer.Id.ToString(), EventStreamVersion.NoStream, customer.GetUncommittedEvents());
+            store.Save<Customer>(customer.Id.ToString(), EntityVersion.New, customer.GetUncommittedEvents());
             var stream = store.Load<Customer>(customer.Id.ToString());
 
             // Assert
@@ -120,7 +120,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
 
             // Act
             var id = Guid.NewGuid();
-            store.Save<Customer>(id.ToString(), EventStreamVersion.NoStream, Enumerable.Empty<IEvent>());
+            store.Save<Customer>(id.ToString(), EntityVersion.New, Enumerable.Empty<IEvent>());
             var stream = store.Load<Customer>(id.ToString());
 
             // Assert
@@ -139,7 +139,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
                                                .Add(new SubscribedToNewsletter("top"));
-            store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
+            store.Save<Customer>(customerId.ToString(), EntityVersion.New, storedEvents);
 
             // Act
             var stream = store.Load<Customer>(customerId.ToString(), version);
@@ -157,10 +157,10 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
                                                .Add(new SubscribedToNewsletter("top"));
-            store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
+            store.Save<Customer>(customerId.ToString(), EntityVersion.New, storedEvents);
 
             // Act
-            var stream = store.Load<Customer>(customerId.ToString(), EventStreamVersion.Max);
+            var stream = store.Load<Customer>(customerId.ToString(), EntityVersion.Latest);
 
             // Assert
             CollectionAssert.AreEqual(storedEvents, stream.Events, "Events loaded from store do not match version requested.");
@@ -178,7 +178,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
                                   new SubscribedToNewsletter("latest"), 
                                   new SubscribedToNewsletter("top")
                               };
-            store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
+            store.Save<Customer>(customerId.ToString(), EntityVersion.New, storedEvents);
 
             // Act / Assert
             Assert.Throws<ArgumentOutOfRangeException>(() => store.Load<Customer>(customerId.ToString(), 10));
@@ -196,10 +196,10 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
                                   new SubscribedToNewsletter("latest"), 
                                   new SubscribedToNewsletter("top")
                               };
-            store.Save<Customer>(customerId.ToString(), EventStreamVersion.NoStream, storedEvents);
+            store.Save<Customer>(customerId.ToString(), EntityVersion.New, storedEvents);
 
             // Act / Assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => store.Load<Customer>(customerId.ToString(), EventStreamVersion.NoStream));
+            Assert.Throws<ArgumentOutOfRangeException>(() => store.Load<Customer>(customerId.ToString(), EntityVersion.New));
         }
     }
 }

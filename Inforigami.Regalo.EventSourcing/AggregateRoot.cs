@@ -45,8 +45,6 @@ namespace Inforigami.Regalo.EventSourcing
                 return;
             }
 
-            __logger.Debug(this, "Accepting uncommitted events");
-
             BaseVersion = Version;
             int eventCount = _uncommittedEvents.Count;
             _uncommittedEvents.Clear();
@@ -59,40 +57,38 @@ namespace Inforigami.Regalo.EventSourcing
 
             foreach (var evt in eventList)
             {
-                ApplyEvent(evt);
+                ApplyEvent(evt, false);
             }
 
             BaseVersion = Version;
 
-            Debug("Applied {0} events. Now at base version {1}", eventList.Count, BaseVersion);
+            Debug("Replayed {0} old events to base version {1}.", eventList.Count, BaseVersion);
         }
 
         protected void Record(IEvent evt)
         {
-            Debug("Recording new event: {0}", evt);
-
             evt.Version = Version + 1;
 
-            ApplyEvent(evt);
-
-            ValidateHasId();
+            ApplyEvent(evt, true);
 
             _uncommittedEvents.Add(evt);
         }
 
-        private void ApplyEvent(IEvent evt)
+        private void ApplyEvent(IEvent evt, bool newEvent)
         {
             Version = evt.Version;
 
             var applyMethods = FindApplyMethods(evt);
 
             var applyMethodNames = string.Join(", ", applyMethods.Select(x => x.ToString()));
-            Debug("Applying {0} via {1}...", evt.GetType(), applyMethodNames);
+            Debug("{0} {1} via {2}...", newEvent ? "Recording" : "Replaying", Conventions.EventDescriptor(evt), applyMethodNames);
 
             foreach (var applyMethod in applyMethods)
             {
                 applyMethod.Invoke(this, new[] { evt });
             }
+
+            ValidateHasId();
         }
 
         private void ValidateHasId()
@@ -155,7 +151,7 @@ namespace Inforigami.Regalo.EventSourcing
         private void Debug(string format, params object[] values)
         {
             var message = string.Format(format, values);
-            __logger.Debug(this, "{0}@{1}<{2}: {3}", Id, BaseVersion, Version, message);
+            __logger.Debug(this, "{0}@{1}+{2}: {3}", Id, BaseVersion, Version - BaseVersion, message);
         }
     }
 }

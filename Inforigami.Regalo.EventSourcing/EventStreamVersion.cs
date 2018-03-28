@@ -1,5 +1,8 @@
-﻿namespace Inforigami.Regalo.EventSourcing
+﻿using System;
+
+namespace Inforigami.Regalo.EventSourcing
 {
+    [Obsolete("Use Inforigami.Regalo.Core.EntityVersion instead.", true)]
     public static class EventStreamVersion
     {
         public const int NoStream = -1;

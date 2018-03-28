@@ -77,29 +77,24 @@ namespace Inforigami.Regalo.EventStore
 
         public EventStream<T> Load<T>(string aggregateId)
         {
-            return Load<T>(aggregateId, EventStreamVersion.Max);
+            return Load<T>(aggregateId, EntityVersion.Latest);
         }
 
         public EventStream<T> Load<T>(string aggregateId, int version)
         {
-            if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentException("An aggregate ID is required", "aggregateId");
+            if (string.IsNullOrWhiteSpace(aggregateId))
+                throw new ArgumentException("An aggregate ID is required", "aggregateId");
 
-            if (version == EventStreamVersion.NoStream)
+            if (version == EntityVersion.New)
             {
-                throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EventStreamVersion.NoStream (-1) value.");
+                throw new ArgumentOutOfRangeException(
+                    "version",
+                    "By definition you cannot load a stream when specifying the EntityVersion.New (-1) value.");
             }
 
-            IEnumerable<IEvent> domainEvents;
-
-            IList<IEvent> cachedEvents;
-            if (_streamCache.TryGetValue(aggregateId, out cachedEvents))
-            {
-                domainEvents = LoadEventsFromCache<T>(aggregateId, version, cachedEvents);
-            }
-            else
-            {
-                domainEvents = LoadEventsFromEventStore<T>(aggregateId, version);
-            }
+            var domainEvents =
+                LoadEventsFromEventStore<T>(aggregateId, version)
+                    .Concat(LoadEventsFromCache<T>(aggregateId, version));
 
             if (!domainEvents.Any())
             {
@@ -109,12 +104,12 @@ namespace Inforigami.Regalo.EventStore
             var result = new EventStream<T>(aggregateId);
             result.Append(domainEvents);
 
-            if (version != EventStreamVersion.Max && result.GetVersion() != version)
+            if (version != EntityVersion.Latest && result.GetVersion() != version)
             {
                 var exception = new ArgumentOutOfRangeException(
                     "version",
                     version,
-                    string.Format("Event for version {0} could not be found for stream {1}", version, aggregateId));
+                    string.Format("Event for version {0} could not be found for stream {1}", EntityVersion.GetName(version), aggregateId));
                 exception.Data.Add("Existing stream", domainEvents);
                 throw exception;
             }
@@ -124,7 +119,7 @@ namespace Inforigami.Regalo.EventStore
 
         private IEnumerable<IEvent> LoadEventsFromEventStore<T>(string aggregateId, int version)
         {
-            _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from stream " + aggregateId);
+            _logger.Debug(this, "Loading " + typeof(T) + " version " + EntityVersion.GetName(version) + " from stream " + aggregateId);
 
             var streamEvents = new List<ResolvedEvent>();
 
@@ -148,14 +143,23 @@ namespace Inforigami.Regalo.EventStore
                 }
             } while (!currentSlice.IsEndOfStream);
 
-            return streamEvents.Select(x => BuildDomainEvent(x.OriginalEvent.Data, x.OriginalEvent.Metadata))
-                               .ToList();
+            var events = streamEvents.Select(x => BuildDomainEvent(x.OriginalEvent.Data, x.OriginalEvent.Metadata))
+                                     .ToList();
+
+            return events;
         }
 
-        private IEnumerable<IEvent> LoadEventsFromCache<T>(string aggregateId, int version, IEnumerable<IEvent> cachedEvents)
+        private IEnumerable<IEvent> LoadEventsFromCache<T>(string aggregateId, int version)
         {
-            _logger.Debug(this, "Loading " + typeof(T) + " version " + version + " from cache " + aggregateId);
-            return cachedEvents.Where(x => x.Version == EventStreamVersion.Max || x.Version <= version).ToList();
+            IList<IEvent> cachedEvents;
+            if (_streamCache.TryGetValue(aggregateId, out cachedEvents))
+            {
+                _logger.Debug(this, "Loading " + typeof(T) + " version " + EntityVersion.GetName(version) + " from cache " + aggregateId);
+                return cachedEvents.Where(x => version == EntityVersion.Latest || x.Version <= version)
+                                   .ToList();
+            }
+
+            return new IEvent[0];
         }
 
         public void Delete(string aggregateId, int version)
@@ -173,20 +177,28 @@ namespace Inforigami.Regalo.EventStore
             }
 
             _streamCache.Clear();
+            _transactions.Clear();
         }
 
         public void Flush()
         {
             _committed = true;
 
-            _logger.Debug(this, "Committing EventStore transactions for streams: {0}...", string.Join(", ", _transactions.Keys));
+            var transactionsToCommit = _transactions.Values.ToArray();
+
+            _logger.Debug(
+                this,
+                "Committing EventStore transactions for {0} streams: [{1}]...",
+                transactionsToCommit.Length,
+                string.Join(", ", _transactions.Keys));
 
             Task.WaitAll(
-                _transactions.Values
-                             .ToArray()
-                             .Select(x => x.CommitAsync())
-                             .Cast<Task>()
-                             .ToArray());
+                transactionsToCommit.Select(x => x.CommitAsync())
+                                    .Cast<Task>()
+                                    .ToArray());
+
+            _streamCache.Clear();
+            _transactions.Clear();
         }
 
         private static IEvent BuildDomainEvent(byte[] data, byte[] metadata)
@@ -262,5 +274,5 @@ namespace Inforigami.Regalo.EventStore
 
             return transaction;
         }
-   }
+    }
 }

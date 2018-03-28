@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Inforigami.Regalo.Interfaces;
 
 namespace Inforigami.Regalo.Core
 {
@@ -12,6 +13,7 @@ namespace Inforigami.Regalo.Core
         private static NoMessageHandlerBehaviour _behaviourWhenNoSuccessMessageHandlerFound;
         private static NoMessageHandlerBehaviour _behaviourWhenNoFailedMessageHandlerFound;
         private static Comparison<object> _handlerSortingMethod;
+        private static Func<IEvent, string> _eventDescriptor;
 
         public static bool AggregatesMustImplementApplyMethods => _aggregatesMustImplementApplyMethods;
         public static Func<Type, Type> FindAggregateTypeForEventType => _findAggregateTypeForEventType;
@@ -19,6 +21,7 @@ namespace Inforigami.Regalo.Core
         public static NoMessageHandlerBehaviour BehaviourWhenNoSuccessMessageHandlerFound => _behaviourWhenNoSuccessMessageHandlerFound;
         public static NoMessageHandlerBehaviour BehaviourWhenNoFailedMessageHandlerFound => _behaviourWhenNoFailedMessageHandlerFound;
         public static Comparison<object> HandlerSortingMethod => _handlerSortingMethod;
+        public static Func<IEvent, string> EventDescriptor => _eventDescriptor;
 
         public static string StreamIdFormat
         {
@@ -50,6 +53,8 @@ namespace Inforigami.Regalo.Core
                         x.GetType().FullName,
                         y.GetType().FullName,
                         StringComparison.InvariantCultureIgnoreCase);
+
+            _eventDescriptor = evt => evt.GetType().ToString() + " (Id " + evt.MessageId + ", Ver " + EntityVersion.GetName(evt.Version) + ")";
         }
 
         public static void SetAggregatesMustImplementApplymethods(bool value)
@@ -87,6 +92,13 @@ namespace Inforigami.Regalo.Core
             if (comparison == null) throw new ArgumentNullException(nameof(comparison));
 
             _handlerSortingMethod = comparison;
+        }
+
+        public static void SetEventDescriptor(Func<IEvent, string> descriptor)
+        {
+            if (descriptor == null) throw new ArgumentNullException(nameof(descriptor));
+
+            _eventDescriptor = descriptor;
         }
     }
 

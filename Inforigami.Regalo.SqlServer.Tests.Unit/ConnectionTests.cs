@@ -44,7 +44,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             user.Register();
             user.ChangePassword("password");
             Assert.Throws<InvalidOperationException>(
-                () => store.Save<User>(user.Id.ToString(), EventStreamVersion.NoStream, user.GetUncommittedEvents()));
+                () => store.Save<User>(user.Id.ToString(), EntityVersion.New, user.GetUncommittedEvents()));
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             user.Register();
             user.ChangePassword("password");
             Assert.Throws<InvalidOperationException>(
-                () => store.Save<User>(user.Id.ToString(), EventStreamVersion.NoStream, user.GetUncommittedEvents()));
+                () => store.Save<User>(user.Id.ToString(), EntityVersion.New, user.GetUncommittedEvents()));
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             user.Register();
             user.ChangePassword("password");
             Assert.DoesNotThrow(
-                () => store.Save<User>(user.Id.ToString(), EventStreamVersion.NoStream, user.GetUncommittedEvents()));
+                () => store.Save<User>(user.Id.ToString(), EntityVersion.New, user.GetUncommittedEvents()));
         }
     }
 }

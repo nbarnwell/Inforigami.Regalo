@@ -126,12 +126,12 @@ namespace Inforigami.Regalo.EventSourcing
                 return null;
             }
 
-            if (version == EventStreamVersion.NoStream)
+            if (version == EntityVersion.New)
             {
-                throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EventStreamVersion.NoStream (-1) value.");
+                throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EntityVersion.New (-1) value.");
             }
 
-            if (version.HasValue && version != EventStreamVersion.Max)
+            if (version.HasValue && version != EntityVersion.Latest)
             {
                 events = events.Where(x => x.Version <= version.Value).ToList();
             }

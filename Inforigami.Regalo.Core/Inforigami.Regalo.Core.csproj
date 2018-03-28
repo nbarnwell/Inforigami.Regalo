@@ -47,6 +47,7 @@
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="Conventions.cs" />
     <Compile Include="DateTimeOffsetProvider.cs" />
+    <Compile Include="EntityVersion.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="GuidProvider.cs" />
     <Compile Include="ILogger.cs" />
