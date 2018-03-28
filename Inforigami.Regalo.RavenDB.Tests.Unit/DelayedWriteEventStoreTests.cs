@@ -52,7 +52,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             Assert.Throws<InvalidOperationException>(
                 () =>
                 {
-                    using (var eventStore = new DelayedWriteRavenEventStore(_documentStore))
+                    using (var eventStore = new RavenEventStore(_documentStore))
                     {
                         var customerId = Guid.NewGuid();
 

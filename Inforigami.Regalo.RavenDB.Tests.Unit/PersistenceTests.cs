@@ -55,7 +55,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Loading_GivenEmptyStore_ShouldReturnNull()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(_documentStore);
 
             // Act
             EventStream<Customer> stream = store.Load<Customer>(Guid.NewGuid().ToString());
@@ -68,7 +68,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenSingleEvent_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(_documentStore);
 
             // Act
             var id = Guid.NewGuid();
@@ -88,7 +88,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenEventWithGuidProperty_ShouldAllowReloadingToGuidType()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(_documentStore);
 
             var customer = new Customer();
             customer.Signup();
@@ -115,7 +115,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenEvents_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(_documentStore);
 
             // Act
             var customer = new Customer();
@@ -133,7 +133,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenNoEvents_ShouldDoNothing()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(_documentStore);
 
             // Act
             var id = Guid.NewGuid();
@@ -148,7 +148,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersion_ThenShouldOnlyReturnRequestedEvents()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(_documentStore);
             var customerId = Guid.NewGuid();
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
@@ -166,7 +166,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersionThatNoEventHas_ThenShouldFail()
         {
             // Arrange
-            IEventStore store = new DelayedWriteRavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(_documentStore);
             var customerId = Guid.NewGuid();
             var storedEvents = new IEvent[]
                               {
@@ -185,7 +185,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         {
             var customerId = Guid.NewGuid();
             
-            using (var eventStore = new DelayedWriteRavenEventStore(_documentStore))
+            using (var eventStore = new RavenEventStore(_documentStore))
             {
                 Conventions.SetFindAggregateTypeForEventType(
                     type =>

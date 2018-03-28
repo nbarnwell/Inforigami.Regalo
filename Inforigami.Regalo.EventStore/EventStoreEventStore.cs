@@ -13,7 +13,7 @@ using ILogger = Inforigami.Regalo.Core.ILogger;
 
 namespace Inforigami.Regalo.EventStore
 {
-    public class EventStoreEventStore : IDelayedWriteEventStore, IDisposable
+    public class EventStoreEventStore : IEventStore, IDisposable
     {
         private bool _committed;
 
@@ -110,7 +110,6 @@ namespace Inforigami.Regalo.EventStore
                     "version",
                     version,
                     string.Format("Event for version {0} could not be found for stream {1}", EntityVersion.GetName(version), aggregateId));
-                exception.Data.Add("Existing stream", domainEvents);
                 throw exception;
             }
 

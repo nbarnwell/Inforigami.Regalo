@@ -10,12 +10,12 @@ using Inforigami.Regalo.EventSourcing;
 
 namespace Inforigami.Regalo.RavenDB
 {
-    public class DelayedWriteRavenEventStore : IDelayedWriteEventStore, IEventStoreWithPreloading, IDisposable
+    public class RavenEventStore : IEventStore, IEventStoreWithPreloading, IDisposable
     {
         private bool _hasChanges;
         private IDocumentSession _documentSession;
 
-        public DelayedWriteRavenEventStore(IDocumentStore documentStore)
+        public RavenEventStore(IDocumentStore documentStore)
         {
             if (documentStore == null) throw new ArgumentNullException("documentStore");
 

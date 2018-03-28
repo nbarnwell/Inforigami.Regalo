@@ -9,5 +9,6 @@ namespace Inforigami.Regalo.EventSourcing
         EventStream<T> Load<T>(string aggregateId);
         EventStream<T> Load<T>(string aggregateId, int version);
         void Delete(string aggregateId, int version);
+        void Flush();
     }
 }

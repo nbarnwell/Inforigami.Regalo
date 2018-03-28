@@ -134,6 +134,11 @@ namespace Inforigami.Regalo.SqlServer
             }
         }
 
+        public void Flush()
+        {
+            // Nothing to do
+        }
+
         public void Dispose()
         {
         }

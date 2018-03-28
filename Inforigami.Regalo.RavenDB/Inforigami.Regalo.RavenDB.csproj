@@ -58,7 +58,7 @@
     <Compile Include="..\Inforigami.Regalo.Interfaces\Properties\AssemblyInfo.Version.cs">
       <Link>Properties\AssemblyInfo.Version.cs</Link>
     </Compile>
-    <Compile Include="DelayedWriteRavenEventStore.cs" />
+    <Compile Include="RavenEventStore.cs" />
     <Compile Include="EventStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -101,6 +101,11 @@ namespace Inforigami.Regalo.EventSourcing
             }
         }
 
+        public void Flush()
+        {
+            // Nothing to do
+        }
+
         public void Delete<T>(string aggregateId)
         {
             _eventStreams.Remove(aggregateId);
