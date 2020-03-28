@@ -1,51 +1,49 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29924.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Core", "Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj", "{80473978-8D0F-4AD4-983E-600E516D49AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Core", "Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj", "{80473978-8D0F-4AD4-983E-600E516D49AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Core.Tests.Unit", "Inforigami.Regalo.Core.Tests.Unit\Inforigami.Regalo.Core.Tests.Unit.csproj", "{09055902-1429-4A6F-B3A7-01C3C2715FF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Core.Tests.Unit", "Inforigami.Regalo.Core.Tests.Unit\Inforigami.Regalo.Core.Tests.Unit.csproj", "{09055902-1429-4A6F-B3A7-01C3C2715FF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Core.Tests.DomainModel", "Inforigami.Regalo.Core.Tests.DomainModel\Inforigami.Regalo.Core.Tests.DomainModel.csproj", "{332AA28A-3912-4ED3-AE65-0D9F0C2AE90E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Core.Tests.DomainModel", "Inforigami.Regalo.Core.Tests.DomainModel\Inforigami.Regalo.Core.Tests.DomainModel.csproj", "{332AA28A-3912-4ED3-AE65-0D9F0C2AE90E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.RavenDB", "Inforigami.Regalo.RavenDB\Inforigami.Regalo.RavenDB.csproj", "{50C78CDB-3754-4AA7-A349-895FB0AB095E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.RavenDB", "Inforigami.Regalo.RavenDB\Inforigami.Regalo.RavenDB.csproj", "{50C78CDB-3754-4AA7-A349-895FB0AB095E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.RavenDB.Tests.Unit", "Inforigami.Regalo.RavenDB.Tests.Unit\Inforigami.Regalo.RavenDB.Tests.Unit.csproj", "{DB02B697-1579-431D-BC09-9D801B95E5AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.RavenDB.Tests.Unit", "Inforigami.Regalo.RavenDB.Tests.Unit\Inforigami.Regalo.RavenDB.Tests.Unit.csproj", "{DB02B697-1579-431D-BC09-9D801B95E5AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Testing", "Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj", "{50425006-B901-4461-99D5-7BAE8FFAFA54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Testing", "Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj", "{50425006-B901-4461-99D5-7BAE8FFAFA54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Testing.Tests.Unit", "Inforigami.Regalo.Testing.Tests.Unit\Inforigami.Regalo.Testing.Tests.Unit.csproj", "{48AF838B-F524-47A6-B8FF-CD804F768885}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Testing.Tests.Unit", "Inforigami.Regalo.Testing.Tests.Unit\Inforigami.Regalo.Testing.Tests.Unit.csproj", "{48AF838B-F524-47A6-B8FF-CD804F768885}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.ObjectCompare.Tests.Unit", "Inforigami.Regalo.ObjectCompare.Tests.Unit\Inforigami.Regalo.ObjectCompare.Tests.Unit.csproj", "{700F5B3B-838D-4F38-94BF-95B7C8767834}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.ObjectCompare.Tests.Unit", "Inforigami.Regalo.ObjectCompare.Tests.Unit\Inforigami.Regalo.ObjectCompare.Tests.Unit.csproj", "{700F5B3B-838D-4F38-94BF-95B7C8767834}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.ObjectCompare", "Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj", "{BDC34219-6E54-4580-958E-DCC93B1676E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.ObjectCompare", "Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj", "{BDC34219-6E54-4580-958E-DCC93B1676E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Interfaces", "Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj", "{890D6FBB-4264-4A33-AAA5-302CB201B090}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Interfaces", "Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj", "{890D6FBB-4264-4A33-AAA5-302CB201B090}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CAC1BEFE-0B22-4057-82BE-9775166544C8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{CAC1BEFE-0B22-4057-82BE-9775166544C8}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		BuildPackage.ps1 = BuildPackage.ps1
-		Get-Version.ps1 = Get-Version.ps1
+		Directory.Build.props = Directory.Build.props
 		Packaging Regalo.txt = Packaging Regalo.txt
 		PushPackage.ps1 = PushPackage.ps1
 		README.md = README.md
-		write-assemblyinfo.ps1 = write-assemblyinfo.ps1
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.EventStore", "Inforigami.Regalo.EventStore\Inforigami.Regalo.EventStore.csproj", "{86437787-9D5B-4489-A410-4AED6268B20D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.EventStore", "Inforigami.Regalo.EventStore\Inforigami.Regalo.EventStore.csproj", "{86437787-9D5B-4489-A410-4AED6268B20D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.EventStore.Tests.Unit", "Inforigami.Regalo.EventStore.Tests.Unit\Inforigami.Regalo.EventStore.Tests.Unit.csproj", "{2B896F6E-11DD-479F-A23E-6CDBF1AF48AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.EventStore.Tests.Unit", "Inforigami.Regalo.EventStore.Tests.Unit\Inforigami.Regalo.EventStore.Tests.Unit.csproj", "{2B896F6E-11DD-479F-A23E-6CDBF1AF48AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.SqlServer", "Inforigami.Regalo.SqlServer\Inforigami.Regalo.SqlServer.csproj", "{A33527A2-4FFE-429F-93A8-3A8DD5C9AE76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.SqlServer", "Inforigami.Regalo.SqlServer\Inforigami.Regalo.SqlServer.csproj", "{A33527A2-4FFE-429F-93A8-3A8DD5C9AE76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.SqlServer.Tests.Unit", "Inforigami.Regalo.SqlServer.Tests.Unit\Inforigami.Regalo.SqlServer.Tests.Unit.csproj", "{C8909090-16E1-4E60-B702-3A50FC8F5E54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.SqlServer.Tests.Unit", "Inforigami.Regalo.SqlServer.Tests.Unit\Inforigami.Regalo.SqlServer.Tests.Unit.csproj", "{C8909090-16E1-4E60-B702-3A50FC8F5E54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Core.ConsoleLoggerTest", "Inforigami.Regalo.Core.ConsoleLoggerTest\Inforigami.Regalo.Core.ConsoleLoggerTest.csproj", "{83108286-289A-4FC1-985E-F19BA7A419E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Core.ConsoleLoggerTest", "Inforigami.Regalo.Core.ConsoleLoggerTest\Inforigami.Regalo.Core.ConsoleLoggerTest.csproj", "{83108286-289A-4FC1-985E-F19BA7A419E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.EventSourcing", "Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj", "{D83668CA-7963-42F9-AD12-4926E56794CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.EventSourcing", "Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj", "{D83668CA-7963-42F9-AD12-4926E56794CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.Messaging", "Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj", "{5F8F4C4C-57D0-401F-B501-571AB650B131}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Messaging", "Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj", "{5F8F4C4C-57D0-401F-B501-571AB650B131}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -124,5 +122,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C8F5880D-D93C-41EC-B9B2-F218CB6FDB50}
 	EndGlobalSection
 EndGlobal

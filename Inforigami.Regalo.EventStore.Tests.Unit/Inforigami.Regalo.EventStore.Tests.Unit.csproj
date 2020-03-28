@@ -1,87 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2B896F6E-11DD-479F-A23E-6CDBF1AF48AB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Inforigami.Regalo.EventStore.Tests.Unit</RootNamespace>
-    <AssemblyName>Inforigami.Regalo.EventStore.Tests.Unit</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFrameworks>net48</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EventStore.ClientAPI, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EventStore.Client.3.0.2\lib\net40\EventStore.ClientAPI.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
+    <PackageReference Include="EventStore.Client" Version="3.0.2" />
+    <PackageReference Include="NUnit" Version="2.6.4" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.EventStore\Inforigami.Regalo.EventStore.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ConnectionTests.cs" />
-    <Compile Include="DomainModel\Customers\AccountManager.cs" />
-    <Compile Include="DomainModel\Customers\Customer.cs" />
-    <Compile Include="DomainModel\Customers\CustomerSignedUp.cs" />
-    <Compile Include="DomainModel\Customers\Employed.cs" />
-    <Compile Include="DomainModel\Customers\SubscribedToNewsletter.cs" />
-    <Compile Include="DomainModel\InvariantNotSatisfiedException.cs" />
-    <Compile Include="PersistenceTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj">
-      <Project>{80473978-8D0F-4AD4-983E-600E516D49AB}</Project>
-      <Name>Inforigami.Regalo.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj">
-      <Project>{D83668CA-7963-42F9-AD12-4926E56794CE}</Project>
-      <Name>Inforigami.Regalo.EventSourcing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.EventStore\Inforigami.Regalo.EventStore.csproj">
-      <Project>{86437787-9D5B-4489-A410-4AED6268B20D}</Project>
-      <Name>Inforigami.Regalo.EventStore</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj">
-      <Project>{890D6FBB-4264-4A33-AAA5-302CB201B090}</Project>
-      <Name>Inforigami.Regalo.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj">
-      <Project>{50425006-B901-4461-99D5-7BAE8FFAFA54}</Project>
-      <Name>Inforigami.Regalo.Testing</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,107 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{50425006-B901-4461-99D5-7BAE8FFAFA54}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Inforigami.Regalo.Testing</RootNamespace>
-    <AssemblyName>Inforigami.Regalo.Testing</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net472</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
+    <PackageReference Include="GitVersionTask" Version="5.2.4" PrivateAssets="all" />
+    <PackageReference Include="NUnit" Version="2.6.3" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\Inforigami.Regalo.Interfaces\Properties\AssemblyInfo.Version.cs">
-      <Link>Properties\AssemblyInfo.Version.cs</Link>
-    </Compile>
-    <Compile Include="TestDataBuilderBase.cs" />
-    <Compile Include="ApplicationServiceTestBase.cs" />
-    <Compile Include="EventChain.cs" />
-    <Compile Include="FakeEventBus.cs" />
-    <Compile Include="IGivenSetter.cs" />
-    <Compile Include="IHandlerSetter.cs" />
-    <Compile Include="IScenarioAssert.cs" />
-    <Compile Include="IScenarioExceptionAssert.cs" />
-    <Compile Include="ITestDataBuilder.cs" />
-    <Compile Include="IThenSetter.cs" />
-    <Compile Include="IWhenSetter.cs" />
-    <Compile Include="ObjectComparerProvider.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scenario.cs" />
-    <Compile Include="ScenarioAssert.cs" />
-    <Compile Include="ScenarioAssertBase.cs" />
-    <Compile Include="ScenarioExceptionAssert.cs" />
-    <Compile Include="ScenarioGivenSetter.cs" />
-    <Compile Include="ScenarioHandlerSetter.cs" />
-    <Compile Include="ScenarioThenSetter.cs" />
-    <Compile Include="ScenarioWhenSetter.cs" />
-    <Compile Include="TestingMessageHandlerContext.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj">
-      <Project>{80473978-8D0F-4AD4-983E-600E516D49AB}</Project>
-      <Name>Inforigami.Regalo.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj">
-      <Project>{d83668ca-7963-42f9-ad12-4926e56794ce}</Project>
-      <Name>Inforigami.Regalo.EventSourcing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj">
-      <Project>{890D6FBB-4264-4A33-AAA5-302CB201B090}</Project>
-      <Name>Inforigami.Regalo.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj">
-      <Project>{5f8f4c4c-57d0-401f-b501-571ab650b131}</Project>
-      <Name>Inforigami.Regalo.Messaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj">
-      <Project>{bdc34219-6e54-4580-958e-dcc93b1676e3}</Project>
-      <Name>Inforigami.Regalo.ObjectCompare</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="Inforigami.Regalo.Testing.nuspec">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>powershell.exe -noprofile -noninteractive -command ". '$(ProjectDir)..\write-assemblyinfo.ps1' '$(ProjectName)' '$(ProjectDir)Properties\AssemblyInfo.Version.cs'"</PreBuildEvent>
-  </PropertyGroup>
 </Project>

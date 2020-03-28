@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <Authors>Neil Barnwell</Authors>
+    <PackageProjectUrl>https://github.com/nbarnwell/Inforigami.Regalo</PackageProjectUrl>
+    <PackageTags>CQRS EventSourcing</PackageTags>
+    <LangVersion>8.0</LangVersion>
+    <DebugType>embedded</DebugType>
+    <RepoDir>$(SolutionDir)</RepoDir>
+    <PackageOutputPath>$(RepoDir)nugets</PackageOutputPath>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright $([System.DateTime]::UtcNow.ToString(yyyy)). All rights reserved</Copyright>
+  </PropertyGroup>
+</Project>

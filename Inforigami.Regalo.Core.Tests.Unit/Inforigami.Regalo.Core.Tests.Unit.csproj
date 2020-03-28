@@ -1,120 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{09055902-1429-4A6F-B3A7-01C3C2715FF1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Inforigami.Regalo.Core.Tests.Unit</RootNamespace>
-    <AssemblyName>Inforigami.Regalo.Core.Tests.Unit</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFrameworks>net48</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Moq">
-      <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
+    <PackageReference Include="Moq" Version="4.0.10827" />
+    <PackageReference Include="Newtonsoft.Json" Version="7.0.1" />
+    <PackageReference Include="NUnit" Version="2.6.3" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\Inforigami.Regalo.Core.Tests.DomainModel\Inforigami.Regalo.Core.Tests.DomainModel.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AggregateTests.cs" />
-    <Compile Include="CommandHandledByMultipleHandlers.cs" />
-    <Compile Include="CommandHandlerA.cs" />
-    <Compile Include="CommandHandlerB.cs" />
-    <Compile Include="CommandProcessorTestDataBuilder.cs" />
-    <Compile Include="CommandProcessorTests.cs" />
-    <Compile Include="EventBusTestDataBuilder.cs" />
-    <Compile Include="EventBusTests.cs" />
-    <Compile Include="EventHandledByMultipleHandlers.cs" />
-    <Compile Include="EventHandlerA.cs" />
-    <Compile Include="EventHandlerB.cs" />
-    <Compile Include="FailingEventHandler.cs" />
-    <Compile Include="MessageCausationTests.cs" />
-    <Compile Include="NoHandlerFoundTests.cs" />
-    <Compile Include="ObjectCommandHandler.cs" />
-    <Compile Include="ObjectEventHandler.cs" />
-    <Compile Include="SimpleCommand.cs" />
-    <Compile Include="SimpleCommandBase.cs" />
-    <Compile Include="SimpleConcurrencyTests.cs" />
-    <Compile Include="RepositoryTests.cs" />
-    <Compile Include="InMemoryEventStoreTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleEvent.cs" />
-    <Compile Include="SimpleEventBase.cs" />
-    <Compile Include="TestFixtureBase.cs" />
-    <Compile Include="TypeInspectorTests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Inforigami.Regalo.Core.Tests.DomainModel\Inforigami.Regalo.Core.Tests.DomainModel.csproj">
-      <Project>{332AA28A-3912-4ED3-AE65-0D9F0C2AE90E}</Project>
-      <Name>Inforigami.Regalo.Core.Tests.DomainModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj">
-      <Project>{80473978-8D0F-4AD4-983E-600E516D49AB}</Project>
-      <Name>Inforigami.Regalo.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj">
-      <Project>{D83668CA-7963-42F9-AD12-4926E56794CE}</Project>
-      <Name>Inforigami.Regalo.EventSourcing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj">
-      <Project>{890D6FBB-4264-4A33-AAA5-302CB201B090}</Project>
-      <Name>Inforigami.Regalo.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj">
-      <Project>{5f8f4c4c-57d0-401f-b501-571ab650b131}</Project>
-      <Name>Inforigami.Regalo.Messaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj">
-      <Project>{BDC34219-6E54-4580-958E-DCC93B1676E3}</Project>
-      <Name>Inforigami.Regalo.ObjectCompare</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj">
-      <Project>{50425006-B901-4461-99D5-7BAE8FFAFA54}</Project>
-      <Name>Inforigami.Regalo.Testing</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
