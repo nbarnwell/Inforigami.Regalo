@@ -45,6 +45,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.EventSour
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Messaging", "Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj", "{5F8F4C4C-57D0-401F-B501-571AB650B131}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.AzureTableStorage", "Inforigami.Regalo.AzureTableStorage\Inforigami.Regalo.AzureTableStorage.csproj", "{BB224C7D-838A-495F-93B9-C7834E92DCFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.EventSourcing.Tests.Unit", "Inforigami.Regalo.EventSourcing.Tests.Unit\Inforigami.Regalo.EventSourcing.Tests.Unit.csproj", "{CA470042-47EB-4B3A-814A-4B9D79413EE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,6 +123,14 @@ Global
 		{5F8F4C4C-57D0-401F-B501-571AB650B131}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F8F4C4C-57D0-401F-B501-571AB650B131}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F8F4C4C-57D0-401F-B501-571AB650B131}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB224C7D-838A-495F-93B9-C7834E92DCFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB224C7D-838A-495F-93B9-C7834E92DCFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB224C7D-838A-495F-93B9-C7834E92DCFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB224C7D-838A-495F-93B9-C7834E92DCFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA470042-47EB-4B3A-814A-4B9D79413EE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA470042-47EB-4B3A-814A-4B9D79413EE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA470042-47EB-4B3A-814A-4B9D79413EE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA470042-47EB-4B3A-814A-4B9D79413EE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

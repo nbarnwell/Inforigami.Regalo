@@ -100,14 +100,20 @@ namespace Inforigami.Regalo.RavenDB
             return result;
         }
 
+        [Obsolete("Use Delete<T> instead", true)]
         public void Delete(string aggregateId, int version)
+        {
+            throw new NotImplementedException("Replaced by Delete<T>");
+        }
+
+        public void Delete<T>(string aggregateId, int expectedVersion)
         {
             var stream = _documentSession.Load<EventStream>(aggregateId);
             var actualVersion = stream.Events.Last().Version;
-            if (actualVersion != version)
+            if (actualVersion != expectedVersion)
             {
                 var exception = new EventStoreConcurrencyException(
-                    string.Format("Expected version {0} does not match actual version {1}", version, actualVersion));
+                    string.Format("Expected version {0} does not match actual version {1}", expectedVersion, actualVersion));
                 exception.Data.Add("Existing stream", aggregateId);
                 throw exception;
             }

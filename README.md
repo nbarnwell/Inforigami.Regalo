@@ -13,3 +13,10 @@ Inforigami.Regalo comes in two significant parts - there's _Regalo.Core_ itself.
 Getting started is a case of installing one of the event store implementation packages via nuget.org e.g. `install-package Inforigami.Regalo.Ravendb`, then configuring a few dependencies (all Inforigami.Regalo libraries rely on the Dependency Inversion principle).
 
 I'll try to build a "getting started" page on the wiki asap.
+
+Full Disclosure
+===============
+There are a couple of things you probably won't like...
+
+1. Having a reference to one of these assemblies in your Domain Model projects. There's really no problem here. You've made a decision to use this library, and you're not going to just swap it out for another one - you'd have to re-write everything anyway. It's opinionated, if you go with it you'll be fine.
+2. Having a reference in your Domain Commands/Events. This is also fine. It seems like it would mean that you'd have to reference Inforigami.Regalo.Interfaces in consuming projects to, which would be bad. In fact, don't do that. Instead create proper inter-service events and an anti-corruption layer instead. Your domain events then stay inside your domain and your externally-published events are free to be happy little POCOs, just as intended.

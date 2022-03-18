@@ -116,6 +116,11 @@ namespace Inforigami.Regalo.SqlServer
 
         public void Delete(string aggregateId, int version)
         {
+            throw new NotImplementedException("Replaced with Delete<T>");
+        }
+
+        public void Delete<T>(string aggregateId, int version)
+        {
             Guid aggregateIdGuid;
             if (!Guid.TryParse(aggregateId, out aggregateIdGuid))
             {

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net472</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net48</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
@@ -12,7 +12,5 @@
     <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj" />
-    <Compile Remove="IMessageHandlerContextToken.cs" />
-    <Compile Remove="MessageHandlerContextToken.cs" />
   </ItemGroup>
 </Project>

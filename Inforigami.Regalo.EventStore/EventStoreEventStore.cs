@@ -164,9 +164,15 @@ namespace Inforigami.Regalo.EventStore
             return new IEvent[0];
         }
 
+        [Obsolete("Use Delete<T> instead", true)]
         public void Delete(string aggregateId, int version)
         {
-            _eventStoreConnection.DeleteStreamAsync(aggregateId, version).Wait();
+            throw new NotImplementedException("Replaced by Delete<T>");
+        }
+
+        public void Delete<T>(string aggregateId, int expectedVersion)
+        {
+            _eventStoreConnection.DeleteStreamAsync(aggregateId, expectedVersion).Wait();
         }
 
         public void Rollback()
