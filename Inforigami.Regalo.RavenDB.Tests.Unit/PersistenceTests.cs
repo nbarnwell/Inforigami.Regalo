@@ -217,5 +217,27 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
                 Assert.That(entityName, Is.EqualTo("Customers"));
             }
         }
+
+        [Test]
+        public void Disposing_a_delayedwriteeventstore_with_pending_changes_should_throw_exception()
+        {
+            Assert.Throws<InvalidOperationException>(
+                () =>
+                {
+                    using (var eventStore = new RavenEventStore(GetDocumentStore()))
+                    {
+                        var customerId = Guid.NewGuid();
+
+                        var storedEvents = new EventChain
+                                           {
+                                               new CustomerSignedUp(customerId),
+                                               new SubscribedToNewsletter("latest"),
+                                               new SubscribedToNewsletter("top")
+                                           };
+
+                        eventStore.Save<Customer>(customerId.ToString(), 0, storedEvents);
+                    }
+                });
+        }
     }
 }
