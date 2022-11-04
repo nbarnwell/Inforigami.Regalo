@@ -7,6 +7,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="nunit" Version="3.13.2" />
+    <PackageReference Include="gitversion.msbuild" Version="5.10.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="nunit3testadapter" Version="4.2.1" />
   </ItemGroup>
 
