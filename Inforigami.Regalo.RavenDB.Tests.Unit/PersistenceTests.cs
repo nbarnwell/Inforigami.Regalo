@@ -1,43 +1,41 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Inforigami.Regalo.Interfaces;
-using Moq;
 using NUnit.Framework;
-using Raven.Abstractions.Data;
-using Raven.Client;
-using Raven.Client.Document;
-using Raven.Client.Embedded;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers;
 using Inforigami.Regalo.Testing;
+using Raven.Client.Documents;
+using Raven.Embedded;
+using Raven.TestDriver;
+using Conventions = Inforigami.Regalo.Core.Conventions;
 
 namespace Inforigami.Regalo.RavenDB.Tests.Unit
 {
     [TestFixture]
-    public class PersistenceTests
+    public class PersistenceTests : RavenTestDriver
     {
-        private IDocumentStore _documentStore;
+        public PersistenceTests()
+        {
+            ConfigureServer(new TestServerOptions
+                    {
+                        ServerUrl        = "http://localhost:8080",
+                        FrameworkVersion = "6.0.10",
+                        CommandLineArgs  = new[] { "Security.UnsecuredAccessAllowed=PublicNetwork" }.ToList()
+                    });
+        }
 
         [SetUp]
         public void SetUp()
         {
-            //_documentStore = new EmbeddableDocumentStore { RunInMemory = true };
-            _documentStore = new DocumentStore
-            {
-                Url = "http://localhost:8080/",
-                DefaultDatabase = GetType().FullName
-            };
-            _documentStore.Initialize();
-
             Resolver.Configure(type =>
-            {
-                if (type == typeof(ILogger)) return new ConsoleLogger();
-                throw new InvalidOperationException(string.Format("No type of {0} registered.", type));
-            },
-            type => null,
-            o => { });
+                               {
+                                   if (type == typeof(ILogger)) return new ConsoleLogger();
+                                   throw new InvalidOperationException(string.Format("No type of {0} registered.", type));
+                               },
+                               type => null,
+                               o => { });
         }
 
         [TearDown]
@@ -46,16 +44,13 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             Conventions.SetFindAggregateTypeForEventType(null);
 
             Resolver.Reset();
-
-            _documentStore.Dispose();
-            _documentStore = null;
         }
 
         [Test]
         public void Loading_GivenEmptyStore_ShouldReturnNull()
         {
             // Arrange
-            IEventStore store = new RavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(GetDocumentStore());
 
             // Act
             EventStream<Customer> stream = store.Load<Customer>(Guid.NewGuid().ToString());
@@ -68,7 +63,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenSingleEvent_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new RavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(GetDocumentStore());
 
             // Act
             var id = Guid.NewGuid();
@@ -88,7 +83,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenEventWithGuidProperty_ShouldAllowReloadingToGuidType()
         {
             // Arrange
-            IEventStore store = new RavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(GetDocumentStore());
 
             var customer = new Customer();
             customer.Signup();
@@ -115,7 +110,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenEvents_ShouldAllowReloading()
         {
             // Arrange
-            IEventStore store = new RavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(GetDocumentStore());
 
             // Act
             var customer = new Customer();
@@ -133,7 +128,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void Saving_GivenNoEvents_ShouldDoNothing()
         {
             // Arrange
-            IEventStore store = new RavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(GetDocumentStore());
 
             // Act
             var id = Guid.NewGuid();
@@ -148,7 +143,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersion_ThenShouldOnlyReturnRequestedEvents()
         {
             // Arrange
-            IEventStore store = new RavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(GetDocumentStore());
             var customerId = Guid.NewGuid();
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
@@ -166,7 +161,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersionThatNoEventHas_ThenShouldFail()
         {
             // Arrange
-            IEventStore store = new RavenEventStore(_documentStore);
+            IEventStore store = new RavenEventStore(GetDocumentStore());
             var customerId = Guid.NewGuid();
             var storedEvents = new IEvent[]
                               {
@@ -183,9 +178,9 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
         [Test]
         public void Saving_GivenEventMappedToAggregateType_ThenShouldSetRavenCollectionName()
         {
-            var customerId = Guid.NewGuid();
-            
-            using (var eventStore = new RavenEventStore(_documentStore))
+            var customerId    = Guid.NewGuid();
+            var documentStore = GetDocumentStore();
+            using (var eventStore = new RavenEventStore(documentStore))
             {
                 Conventions.SetFindAggregateTypeForEventType(
                     type =>
@@ -209,10 +204,11 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
                 eventStore.Flush();
             }
 
-            using (var session = _documentStore.OpenSession())
+            using (var session = documentStore.OpenSession())
             {
-                var eventStream = session.Load<EventStream>(customerId.ToString());
-                var entityName = session.Advanced.GetMetadataFor(eventStream)[Constants.RavenEntityName].ToString();
+                var eventStream        = session.Load<EventStream>(customerId.ToString());
+                var metadataDictionary = session.Advanced.GetMetadataFor(eventStream);
+                var entityName         = metadataDictionary["@collection"].ToString();
 
                 Assert.That(entityName, Is.EqualTo("Customers"));
             }

@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Inforigami.Regalo.Interfaces;
-using Raven.Abstractions.Data;
 using Raven.Client;
-using Raven.Client.Document;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.EventSourcing;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Conventions;
+using Raven.Client.Documents.Session;
+using Conventions = Inforigami.Regalo.Core.Conventions;
 
 namespace Inforigami.Regalo.RavenDB
 {
@@ -56,8 +58,8 @@ namespace Inforigami.Regalo.RavenDB
             if (Conventions.FindAggregateTypeForEventType != null)
             {
                 var aggregateType = Conventions.FindAggregateTypeForEventType(events.First().GetType());
-                session.Advanced.GetMetadataFor(stream)[Constants.RavenEntityName] =
-                    DocumentConvention.DefaultTypeTagName(aggregateType);
+                session.Advanced.GetMetadataFor(stream)["Raven-Entity-Name"] =
+                    DocumentConventions.DefaultGetCollectionName(aggregateType);
             }
         }
 
