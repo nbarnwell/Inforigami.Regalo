@@ -12,7 +12,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
     public abstract class TestFixtureBase
     {
         [SetUp]
-        public void SetUp()
+        public virtual void SetUp()
         {
             var _nullLogger = new ConsoleLogger();
 
@@ -31,7 +31,7 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         }
 
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
             Resolver.Reset();
         }

@@ -126,7 +126,7 @@ namespace Inforigami.Regalo.EventStore
             var streamEvents = new List<ResolvedEvent>();
 
             StreamEventsSlice currentSlice;
-            var nextSliceStart = StreamPosition.Start;
+            var               nextSliceStart = 0L;
             do
             {
                 currentSlice = _eventStoreConnection

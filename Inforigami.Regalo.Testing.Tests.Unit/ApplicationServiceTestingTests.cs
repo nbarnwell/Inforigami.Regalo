@@ -11,8 +11,9 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
     public class ApplicationServiceTestingTests : ApplicationServiceTestBase<SalesOrder>
     {
         [SetUp]
-        public void SetUp()
+        public override void SetUp()
         {
+            base.SetUp();
             Resolver.Configure(
                 type =>
                 {
@@ -30,8 +31,9 @@ namespace Inforigami.Regalo.Testing.Tests.Unit
         }
 
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
+            base.TearDown();
             ObjectComparisonResult.ThrowOnFail = false;
 
             Resolver.Reset();

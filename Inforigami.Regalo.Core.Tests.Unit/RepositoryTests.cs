@@ -18,8 +18,9 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         private ILogger _logger;
 
         [SetUp]
-        public void SetUp()
+        public override void SetUp()
         {
+            base.SetUp();
             _comparer = new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
                                             .Ignore<IEvent, Guid>(x => x.CausationId)
                                             .Ignore<IEvent, Guid>(x => x.CorrelationId)

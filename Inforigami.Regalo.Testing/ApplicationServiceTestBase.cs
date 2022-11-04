@@ -10,7 +10,7 @@ namespace Inforigami.Regalo.Testing
         protected TestingMessageHandlerContext<TEntity> Context { get; set; } 
 
         [SetUp]
-        public void SetUp()
+        public virtual void SetUp()
         {
             var eventStore = new InMemoryEventStore(new ConsoleLogger());
             var repository = new EventSourcingRepository<TEntity>(eventStore, new StrictConcurrencyMonitor(), new ConsoleLogger());
@@ -19,7 +19,7 @@ namespace Inforigami.Regalo.Testing
         }
 
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
             Context = null;
         }

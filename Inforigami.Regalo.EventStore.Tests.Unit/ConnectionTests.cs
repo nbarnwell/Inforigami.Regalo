@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using EventStore.ClientAPI;
-using EventStore.ClientAPI.Exceptions;
-using EventStore.ClientAPI.SystemData;
 using NUnit.Framework;
 
 namespace Inforigami.Regalo.EventStore.Tests.Unit
@@ -11,50 +10,30 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
     public class ConnectionTests
     {
         [Test]
-        public void Connect_to_single_node()
+        public async Task Connect_to_single_node()
         {
-            var config = new ConnectionConfiguration
-                         {
-                             ConnectionBehavior = EventStoreConnectionBehavior.NoClustering,
-                             EventStoreEndpoints = "localhost:1113"
-                         };
-            TestConnection(config);
-        }
+            var connection = EventStoreConnection.Create(new Uri("tcp://admin:changeit@localhost:1113"));
+            await connection.ConnectAsync();
 
-        private static void TestConnection(IEventStoreConfiguration config)
-        {
-            var connectionProvider = new EventStoreConnectionProvider(config);
-            connectionProvider.SetConnectionSettingsBuilder(
-                () => ConnectionSettings.Create()
-                                        .FailOnNoServerResponse()
-                                        .SetDefaultUserCredentials(new UserCredentials("Inforigami.Regalo.EventStore", "changeit")));
+            const string streamName = "newstream";
+            const string eventType  = "event-type";
+            const string data       = "{ \"a\":\"2\"}";
+            const string metadata   = "{}";
 
-            var connection = connectionProvider.GetConnection();
-            Assert.DoesNotThrow(() => connection.ConnectAsync().Wait());
-            Assert.DoesNotThrow(
-                () =>
-                {
-                    try
-                    {
-                        connection.ReadAllEventsForwardAsync(Position.Start, 512, false).Wait();
-                    }
-                    catch (AggregateException e)
-                    {
-                        if (e.InnerExceptions.Any(x => x is AccessDeniedException))
-                        {
-                            throw new InvalidOperationException(
-                                "Unable to authenticate with the eventstore instance at 'localhost:1113'. Ensure there is an admin user "
-                                + "configured called 'Inforigami.Regalo.EventStore', with password 'changeit'.", e);
-                        }
-                    }
-                });
-        }
+            var eventPayload = new EventData(
+                eventId: Guid.NewGuid(),
+                type: eventType,
+                isJson: true,
+                data: Encoding.UTF8.GetBytes(data),
+                metadata: Encoding.UTF8.GetBytes(metadata)
+            );
+            var result     = await connection.AppendToStreamAsync(streamName, ExpectedVersion.Any, eventPayload);
+            var readEvents = await connection.ReadStreamEventsForwardAsync(streamName, 0, 10, true);
 
-        private class ConnectionConfiguration : IEventStoreConfiguration
-        {
-            public EventStoreConnectionBehavior ConnectionBehavior { get; set; }
-
-            public string EventStoreEndpoints { get; set; }
+            foreach (var evt in readEvents.Events)
+            {
+                Console.WriteLine(Encoding.UTF8.GetString(evt.Event.Data));
+            }
         }
     }
 }

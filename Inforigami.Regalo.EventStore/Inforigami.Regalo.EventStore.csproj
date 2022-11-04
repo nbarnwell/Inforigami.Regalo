@@ -2,11 +2,9 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;net48</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="EventStore.Client" Version="3.0.2" />
-    <PackageReference Include="GitVersionTask" Version="5.2.4" PrivateAssets="all" />
+    <PackageReference Include="EventStore.Client" Version="21.2.2" />
     <PackageReference Include="gitversion.msbuild" Version="5.10.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
