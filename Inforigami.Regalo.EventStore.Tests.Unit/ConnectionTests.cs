@@ -12,7 +12,8 @@ namespace Inforigami.Regalo.EventStore.Tests.Unit
         [Test]
         public async Task Connect_to_single_node()
         {
-            var connection = EventStoreConnection.Create(new Uri("tcp://admin:changeit@localhost:1113"));
+            var connectionSettings = ConnectionSettings.Create().UseConsoleLogger().EnableVerboseLogging().Build();
+            var connection = EventStoreConnection.Create(connectionSettings, new Uri("tcp://admin:changeit@localhost:1113"));
             await connection.ConnectAsync();
 
             const string streamName = "newstream";
