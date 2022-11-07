@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net48</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +11,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
     <PackageReference Include="nunit" Version="3.13.3" />
-    <PackageReference Include="nunit3testadapter" Version="4.2.1" />
+    <PackageReference Include="nunit3testadapter" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Transactions;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Interfaces;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using IsolationLevel = System.Transactions.IsolationLevel;
 
@@ -254,7 +252,7 @@ namespace Inforigami.Regalo.SqlServer
 
         private SqlConnection GetConnection()
         {
-            var connectionStringSetting = ConfigurationManager.ConnectionStrings[_connectionName];
+            var connectionStringSetting = System.Configuration.ConfigurationManager.ConnectionStrings[_connectionName];
 
             if (connectionStringSetting == null)
             {

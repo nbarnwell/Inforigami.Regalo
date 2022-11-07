@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="gitversion.msbuild" Version="5.10.3">

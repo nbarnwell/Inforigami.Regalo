@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net48</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="eventstore.client" Version="5.0.6" />
@@ -10,8 +10,7 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.3.0" />
     <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.EventStore\Inforigami.Regalo.EventStore.csproj" />

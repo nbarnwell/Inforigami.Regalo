@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
@@ -8,11 +8,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
     <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />
