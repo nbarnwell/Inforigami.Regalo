@@ -7,6 +7,7 @@ using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.SqlServer.Tests.Unit.DomainModel.Customers;
 using Inforigami.Regalo.Testing;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using ILogger = Inforigami.Regalo.Core.ILogger;
 

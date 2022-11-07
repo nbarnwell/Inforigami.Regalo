@@ -1,10 +1,8 @@
 ﻿using System;
-using System.IO.IsolatedStorage;
 using System.Threading.Tasks;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
-using Inforigami.Regalo.EventSourcing;
-using Inforigami.Regalo.Testing;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace Inforigami.Regalo.SqlServer.Tests.Unit
@@ -13,10 +11,15 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
     public class ConnectionTests
     {
         private ILogger _logger;
+        private IConfiguration _configuration;
 
         [SetUp]
         public async Task SetUp()
         {
+            _configuration =
+                new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                                          .Build();
+
             _logger = new ConsoleLogger();
 
             Resolver.Configure(type =>
@@ -40,31 +43,9 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
         }
 
         [Test]
-        public void Connecting_to_undefined_database_name_throws_exception()
-        {
-            var store = new SqlServerEventStore("InvalidConnnectionName", _logger);
-            var user = new User();
-            user.Register();
-            user.ChangePassword("password");
-            Assert.Throws<InvalidOperationException>(
-                () => store.Save<User>(user.Id.ToString(), EntityVersion.New, user.GetUncommittedEvents()));
-        }
-
-        [Test]
-        public void Connecting_to_non_SqlClient_throws_exception()
-        {
-            var store = new SqlServerEventStore("NonSqlClientConnection", _logger);
-            var user = new User();
-            user.Register();
-            user.ChangePassword("password");
-            Assert.Throws<InvalidOperationException>(
-                () => store.Save<User>(user.Id.ToString(), EntityVersion.New, user.GetUncommittedEvents()));
-        }
-
-        [Test]
         public void Connecting_to_SqlClient_does_not_throw_exception()
         {
-            var store = new SqlServerEventStore("SqlClientConnection", _logger);
+            var store = new SqlServerEventStore(_configuration.GetConnectionString("RegaloConnection"), _logger);
             var user = new User();
             user.Register();
             user.ChangePassword("password");

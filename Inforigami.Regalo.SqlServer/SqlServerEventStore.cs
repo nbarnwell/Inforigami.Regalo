@@ -14,15 +14,15 @@ namespace Inforigami.Regalo.SqlServer
 {
     public class SqlServerEventStore : IEventStore, IDisposable
     {
-        private readonly string _connectionName;
+        private readonly string _connectionString;
         private readonly ILogger _logger;
 
-        public SqlServerEventStore(string connectionName, ILogger logger)
+        public SqlServerEventStore(string connectionString, ILogger logger)
         {
-            if (connectionName == null) throw new ArgumentNullException("connectionName");
+            if (connectionString == null) throw new ArgumentNullException("connectionString");
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            _connectionName = connectionName;
+            _connectionString = connectionString;
             _logger = logger;
         }
 
@@ -252,22 +252,7 @@ namespace Inforigami.Regalo.SqlServer
 
         private SqlConnection GetConnection()
         {
-            var connectionStringSetting = System.Configuration.ConfigurationManager.ConnectionStrings[_connectionName];
-
-            if (connectionStringSetting == null)
-            {
-                throw new InvalidOperationException(string.Format("There is no connection named {0}.", _connectionName));
-            }
-
-            if (connectionStringSetting.ProviderName.Equals("System.Data.SqlClient") == false)
-            {
-                throw new InvalidOperationException(
-                    string.Format(
-                        "Connection string {0} may not be correct as it is not using the 'System.Data.SqlClient' provider.",
-                        _connectionName));
-            }
-
-            return new SqlConnection(connectionStringSetting.ConnectionString);
+            return new SqlConnection(_connectionString);
         }
 
         private string GetJson(IEvent evt)
