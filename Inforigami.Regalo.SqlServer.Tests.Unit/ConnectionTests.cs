@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.IsolatedStorage;
+using System.Threading.Tasks;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.Core.Tests.DomainModel.Users;
 using Inforigami.Regalo.EventSourcing;
@@ -14,7 +15,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
         private ILogger _logger;
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _logger = new ConsoleLogger();
 
@@ -28,6 +29,8 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             },
             type => null,
             o => { });
+
+            await DatabaseInstaller.Install();
         }
 
         [TearDown]

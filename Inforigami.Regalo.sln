@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29924.181
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Core", "Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj", "{80473978-8D0F-4AD4-983E-600E516D49AB}"
 EndProject
@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
+		docker-compose.yml = docker-compose.yml
 		Packaging Regalo.txt = Packaging Regalo.txt
 		PushPackage.ps1 = PushPackage.ps1
 		README.md = README.md
@@ -47,7 +48,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.Messaging
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.AzureTableStorage", "Inforigami.Regalo.AzureTableStorage\Inforigami.Regalo.AzureTableStorage.csproj", "{BB224C7D-838A-495F-93B9-C7834E92DCFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inforigami.Regalo.EventSourcing.Tests.Unit", "Inforigami.Regalo.EventSourcing.Tests.Unit\Inforigami.Regalo.EventSourcing.Tests.Unit.csproj", "{CA470042-47EB-4B3A-814A-4B9D79413EE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inforigami.Regalo.EventSourcing.Tests.Unit", "Inforigami.Regalo.EventSourcing.Tests.Unit\Inforigami.Regalo.EventSourcing.Tests.Unit.csproj", "{CA470042-47EB-4B3A-814A-4B9D79413EE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

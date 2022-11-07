@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   eventstore:
-    container_name: esdb-docs
+    container_name: eventstoredb
     image: eventstore/eventstore:release-5.0.10
     ports:
       - '2113:2113'
@@ -14,3 +14,11 @@ services:
       EVENTSTORE_RUN_PROJECTIONS: all
       EVENTSTORE_START_STANDARD_PROJECTIONS: 'true'
       PROJECTION_THREADS: 8
+  sqlserver:
+    container_name: sqlserver
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - '1433:1433'
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: Inforigami1

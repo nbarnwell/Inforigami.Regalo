@@ -3,11 +3,17 @@
     <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\Inforigami.Regalo.SqlServer\InstallEventStreamTables.sql" Link="InstallEventStreamTables.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="gitversion.msbuild" Version="5.10.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NUnit" Version="3.13.3" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\Inforigami.Regalo.Core.Tests.DomainModel\Inforigami.Regalo.Core.Tests.DomainModel.csproj" />
@@ -16,5 +22,10 @@
     <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.SqlServer\Inforigami.Regalo.SqlServer.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="CreateDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

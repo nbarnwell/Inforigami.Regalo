@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Interfaces;
@@ -15,7 +16,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
     public class PersistenceTests
     {
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             Resolver.Configure(type =>
             {
@@ -24,6 +25,8 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             },
             type => null,
             o => { });
+
+            await DatabaseInstaller.Install();
         }
 
         [TearDown]
