@@ -241,7 +241,20 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
 
         private AzureTableStorageEventStore NewEventStore()
         {
-            return new AzureTableStorageEventStore("azuretablestoragetestnrb", "1JvbYM6BFAYzcUb2xZg88AdLMdm68wRAiLC1NK5hu5BuJYHCu/sUzHCu4GQQt6ppVQ/W9BeFAYM0+nstbSJatA==", _logger);
+            var name = GetEnvironmentVariable("Inforigami_Regalo_AzureTableStorage_UnitTest_AzureStorageAccountName");
+            var key  = GetEnvironmentVariable("Inforigami_Regalo_AzureTableStorage_UnitTest_AzureStorageAccountKey");
+            return new AzureTableStorageEventStore(name, key, _logger);
+        }
+
+        private static string GetEnvironmentVariable(string envVarName)
+        {
+            var result = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                throw new InvalidOperationException(
+                    $@"Unable to find USER environment variable value for {envVarName}");
+            }
+            return result;
         }
     }
 }
