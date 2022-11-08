@@ -14,6 +14,6 @@ gci "$outputDir\*" -filter *.nupkg |
         Write-Host -ForegroundColor Green "$_"
 
         if ($PSCmdLet.ShouldProcess("Push $($_.Fullname) to default source")) {
-            dotnet nuget push $_.FullName
+            dotnet nuget push $_.FullName --source nuget.org --api-key oy2hbbqsxchsjmxxf7samqp2vpisl2bujjaaxjhtc4bxkq
         }
     }
