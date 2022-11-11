@@ -33,10 +33,6 @@ namespace Inforigami.Regalo.AzureTableStorage
 
             if (!newEvents.Any()) return;
 
-            Guid aggregateIdGuid;
-            if (!Guid.TryParse(aggregateId, out aggregateIdGuid))
-                throw new ArgumentException(string.Format("\"{0}\" is not a valid Guid", aggregateId), "aggregateId");
-
             var actions = new List<TableTransactionAction>();
 
             var aggregateTable = GetTableClient<T>();
