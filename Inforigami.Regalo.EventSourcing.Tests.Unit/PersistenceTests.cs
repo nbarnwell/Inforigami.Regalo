@@ -11,6 +11,8 @@ using ILogger = Inforigami.Regalo.Core.ILogger;
 
 namespace Inforigami.Regalo.EventSourcing.Tests.Unit
 {
+    // TODO: Replace these with tests that use Repository rather than going straight to IEventStore, and then make them
+    // run repeatedly with each of the IEventStore implementations.
     [TestFixture]
     public class PersistenceTests
     {
@@ -165,6 +167,16 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
         [TestCase(0)]
         [TestCase(1)]
         [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(5)]
+        [TestCase(6)]
+        [TestCase(7)]
+        [TestCase(8)]
+        [TestCase(9)]
+        [TestCase(10)]
+        [TestCase(11)]
+        [TestCase(12)]
         public void GivenAggregateWithMultipleEvents_WhenLoadingSpecificVersion_ThenShouldOnlyReturnRequestedEvents(int version)
         {
             // Arrange
@@ -173,6 +185,13 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
                                                .Add(new SubscribedToNewsletter("top"));
+
+            // Ensure there are double-digits of events to reload, because AzureTableStorage rowkey is a string
+            for (int i = 0; i < 10; i++)
+            {
+                storedEvents.Add(new SubscribedToNewsletter($"newsletter{i}"));
+            }
+
             store.Save<Customer>(customerId.ToString(), EntityVersion.New, storedEvents);
             store.Flush();
 
@@ -192,13 +211,6 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
                                                .Add(new SubscribedToNewsletter("top"));
-
-            // Ensure there are double-digits of events to reload, because AzureTableStorage rowkey is a string
-            for (int i = 0; i < 10; i++)
-            {
-                storedEvents.Add(new SubscribedToNewsletter($"newsletter{i}"));
-            }
-
             store.Save<Customer>(customerId.ToString(), EntityVersion.New, storedEvents);
             store.Flush();
 

@@ -14,7 +14,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.3.0" />
     <ProjectReference Include="..\Inforigami.Regalo.Core.Tests.DomainModel\Inforigami.Regalo.Core.Tests.DomainModel.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
-    <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Messaging\Inforigami.Regalo.Messaging.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.ObjectCompare\Inforigami.Regalo.ObjectCompare.csproj" />

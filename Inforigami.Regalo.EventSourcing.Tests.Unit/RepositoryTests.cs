@@ -1,26 +1,38 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.Core;
+using Inforigami.Regalo.Core.Tests.DomainModel.Users;
 using Inforigami.Regalo.Interfaces;
+using Inforigami.Regalo.ObjectCompare;
 using Inforigami.Regalo.Testing;
 using Moq;
 using NUnit.Framework;
-using Inforigami.Regalo.Core.Tests.DomainModel.Users;
-using Inforigami.Regalo.EventSourcing;
-using Inforigami.Regalo.ObjectCompare;
 
-namespace Inforigami.Regalo.Core.Tests.Unit
+namespace Inforigami.Regalo.EventSourcing.Tests.Unit
 {
     [TestFixture]
-    public class RepositoryTests : TestFixtureBase
+    public class RepositoryTests
     {
         private IObjectComparer _comparer;
         private ILogger _logger;
 
         [SetUp]
-        public override void SetUp()
+        public void SetUp()
         {
-            base.SetUp();
+            Resolver.Configure(
+                type =>
+                {
+                    if (type == typeof(ILogger))
+                    {
+                        return new ConsoleLogger();
+                    }
+
+                    throw new NotSupportedException(string.Format("TestFixtureBase::SetUp - Nothing registered for {0}", type));
+                },
+                type => null,
+                o => { });
+
             _comparer = new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
                                             .Ignore<IEvent, Guid>(x => x.CausationId)
                                             .Ignore<IEvent, Guid>(x => x.CorrelationId)
@@ -29,6 +41,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             _logger = new ConsoleLogger();
 
             ObjectComparisonResult.ThrowOnFail = true;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Resolver.Reset();
         }
 
         [Test]
@@ -45,7 +63,8 @@ namespace Inforigami.Regalo.Core.Tests.Unit
             repository.Save(user);
 
             // Assert
-            CollectionAssertAreJsonEqual(expectedEvents, eventStore.GetAllEvents());
+            //CollectionAssertAreJsonEqual(expectedEvents, eventStore.GetAllEvents());
+            _comparer.AreEqual(expectedEvents, eventStore.GetAllEvents());
         }
 
         [Test]
@@ -96,13 +115,17 @@ namespace Inforigami.Regalo.Core.Tests.Unit
         {
             // Arrange
             var eventStore = new InMemoryEventStore(new ConsoleLogger());
-            var userId = Guid.NewGuid();
+            var userId     = Guid.NewGuid();
             var events = new EventChain
             {
                 new UserRegistered(userId), 
-                new UserChangedPassword("newpassword"), 
-                new UserChangedPassword("newnewpassword")
             };
+
+            for (int i = 0; i < 11; i++)
+            {
+                events.Add(new UserChangedPassword($"password{i}"));
+            }
+
             eventStore.Save<User>(EventStreamIdFormatter.GetStreamId<User>(userId.ToString()), 0, events);
 
             var repository = new EventSourcingRepository<User>(eventStore, new Mock<IConcurrencyMonitor>().Object, _logger);

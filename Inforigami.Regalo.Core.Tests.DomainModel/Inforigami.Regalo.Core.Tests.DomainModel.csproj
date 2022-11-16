@@ -9,8 +9,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />

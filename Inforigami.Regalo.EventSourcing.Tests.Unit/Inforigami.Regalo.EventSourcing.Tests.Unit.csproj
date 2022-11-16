@@ -10,12 +10,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+    <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="nunit" Version="3.13.3" />
     <PackageReference Include="nunit3testadapter" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Inforigami.Regalo.AzureTableStorage\Inforigami.Regalo.AzureTableStorage.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.Core.Tests.DomainModel\Inforigami.Regalo.Core.Tests.DomainModel.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj" />
   </ItemGroup>

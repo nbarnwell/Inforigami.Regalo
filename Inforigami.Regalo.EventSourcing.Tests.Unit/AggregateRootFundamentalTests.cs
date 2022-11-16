@@ -1,24 +1,36 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.Core;
+using Inforigami.Regalo.Core.Tests.DomainModel.Users;
 using Inforigami.Regalo.Interfaces;
 using Inforigami.Regalo.ObjectCompare;
 using Inforigami.Regalo.Testing;
 using NUnit.Framework;
-using Inforigami.Regalo.Core.Tests.DomainModel.Users;
-using Inforigami.Regalo.EventSourcing;
 
-namespace Inforigami.Regalo.Core.Tests.Unit
+namespace Inforigami.Regalo.EventSourcing.Tests.Unit
 {
     [TestFixture]
-    public class AggregateTests : TestFixtureBase
+    public class AggregateRootFundamentalTests
     {
         private IObjectComparer _comparer;
 
         [SetUp]
-        public override void SetUp()
+        public void SetUp()
         {
-            base.SetUp();
+            Resolver.Configure(
+                type =>
+                {
+                    if (type == typeof(ILogger))
+                    {
+                        return new ConsoleLogger();
+                    }
+
+                    throw new NotSupportedException(string.Format("TestFixtureBase::SetUp - Nothing registered for {0}", type));
+                },
+                type => null,
+                o => { });
+
             _comparer = new ObjectComparer().Ignore<IMessage, Guid>(x => x.MessageId)
                                             .Ignore<IEvent, Guid>(x => x.CausationId)
                                             .Ignore<IEvent, Guid>(x => x.CorrelationId)
@@ -26,6 +38,12 @@ namespace Inforigami.Regalo.Core.Tests.Unit
                                             .Ignore<IMessage, DateTimeOffset>(x => x.CorrelationTimestamp);
 
             ObjectComparisonResult.ThrowOnFail = true;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Resolver.Reset();
         }
 
         [Test]
