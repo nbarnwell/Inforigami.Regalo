@@ -86,14 +86,16 @@ namespace Inforigami.Regalo.AzureTableStorage
             var aggregateTable = GetTableClient<T>();
 
             var filter = $"PartitionKey eq '{aggregateId}' and RowKey ne '{AggregateHeaderRowKey}'";
-            if (version != EntityVersion.Latest) {
-                filter += $" and Version le {version}";
-            }
 
-            var rows   = aggregateTable.Query<AzureTableStorageAggregateEventRow>(filter).ToList();
+            // It's a shame to load all rows and filter client-side, but the querying on RowKey
+            // in Azure Table Storage is alphanumeric, so version "10" is "less than" version "2"...
             var events =
-                rows.Select(x => (IEvent)JsonConvert.DeserializeObject(x.EventJson, GetJsonSerialisationSettings()))
-                    .ToList();
+                aggregateTable.Query<AzureTableStorageAggregateEventRow>(filter)
+                              .Select(x => new { Version = Convert.ToInt64(x.RowKey), Row = x })
+                              .Where(x => version == EntityVersion.Latest || (0 <= x.Version && x.Version <= version))
+                              .OrderBy(x => x.Version)
+                              .Select(x => (IEvent)JsonConvert.DeserializeObject(x.Row.EventJson, GetJsonSerialisationSettings()))
+                              .ToList();
 
             if (!events.Any())
             {

@@ -192,6 +192,13 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
             var storedEvents = new EventChain().Add(new CustomerSignedUp(customerId))
                                                .Add(new SubscribedToNewsletter("latest"))
                                                .Add(new SubscribedToNewsletter("top"));
+
+            // Ensure there are double-digits of events to reload, because AzureTableStorage rowkey is a string
+            for (int i = 0; i < 10; i++)
+            {
+                storedEvents.Add(new SubscribedToNewsletter($"newsletter{i}"));
+            }
+
             store.Save<Customer>(customerId.ToString(), EntityVersion.New, storedEvents);
             store.Flush();
 
