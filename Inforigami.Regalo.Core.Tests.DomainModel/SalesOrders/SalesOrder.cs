@@ -6,7 +6,15 @@ namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
 {
     public class SalesOrder : AggregateRoot
     {
-        private readonly IDictionary<string, uint> _products = new Dictionary<string, uint>();
+        /*
+         * IMPORTANT NOTE!
+         * There should normally be no public getters (let alone setters) on AggregateRoot-derived
+         * entities. These here are purely because this class is used for unit testing. Normally
+         * these should be private fields, and only those required for invariant logic to be
+         * validated.
+         */
+        public readonly IDictionary<string, uint> Products = new Dictionary<string, uint>();
+        public bool IsPlaced { get; private set; }
 
         public void Create(Guid id)
         {
@@ -35,25 +43,30 @@ namespace Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders
             AddProduct(evt.Sku, evt.Quantity);
         }
 
+        private void Apply(SalesOrderPlaced evt)
+        {
+            IsPlaced = true;
+        }
+
         private bool OrderHasProducts()
         {
-            return _products.Count > 0;
+            return Products.Count > 0;
         }
 
         private bool OrderIncludesProduct(string sku)
         {
-            return _products.ContainsKey(sku);
+            return Products.ContainsKey(sku);
         }
 
         private void AddProduct(string sku, uint quantity)
         {
             if (false == OrderIncludesProduct(sku))
             {
-                _products.Add(sku, quantity);
+                Products.Add(sku, quantity);
             }
             else
             {
-                _products[sku] += quantity;
+                Products[sku] += quantity;
             }
         }
     }

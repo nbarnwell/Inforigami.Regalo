@@ -71,17 +71,12 @@ namespace Inforigami.Regalo.RavenDB
 
         public EventStream<T> Load<T>(string aggregateId)
         {
-            var aggregateIdAsString = aggregateId.ToString();
+            var stream = _documentSession.Load<EventStream>(aggregateId);
 
-            var stream = _documentSession.Load<EventStream>(aggregateIdAsString);
+            if (stream == null) return null;
 
-            var result = new EventStream<T>(aggregateIdAsString);
-
-            if (stream != null)
-            {
-                result.Append(stream.Events);
-            }
-
+            var result = new EventStream<T>(aggregateId);
+            result.Append(stream.Events);
             return result;
         }
 
@@ -89,7 +84,7 @@ namespace Inforigami.Regalo.RavenDB
         {
             var events = Load<T>(aggregateId).Events.ToList();
 
-            if (events.All(x => x.Version != maxVersion))
+            if (maxVersion != EntityVersion.Latest && events.All(x => x.Version != maxVersion))
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(maxVersion),
@@ -139,7 +134,7 @@ namespace Inforigami.Regalo.RavenDB
 
         private static IEnumerable<IEvent> GetEventsForVersion(IEnumerable<IEvent> events, int maxVersion)
         {
-            return events.Where(x => x.Version <= maxVersion);
+            return events.Where(x => maxVersion == EntityVersion.Latest || x.Version <= maxVersion);
         }
 
         public void Dispose()
