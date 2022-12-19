@@ -1,11 +1,10 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
-namespace Inforigami.Regalo.SqlServer.Tests.Unit
+namespace Inforigami.Regalo.EventSourcing.Tests.Unit.Support
 {
     public static class DatabaseInstaller
     {

@@ -27,7 +27,7 @@ namespace Inforigami.Regalo.AzureTableStorage
             _azureStorageAccountUri  = $"https://{azureStorageAccountName}.table.core.windows.net";
         }
 
-        public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
+        public void Save<T>(string eventStreamId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
             if (newEvents == null) throw new ArgumentNullException("newEvents");
 
@@ -43,7 +43,7 @@ namespace Inforigami.Regalo.AzureTableStorage
                     TableTransactionActionType.UpsertReplace,
                     new AzureTableStorageAggregateRow
                     {
-                        PartitionKey = aggregateId,
+                        PartitionKey = eventStreamId,
                         RowKey       = AggregateHeaderRowKey,
                         ETag         = new ETag(expectedVersion.ToString()),
                         Timestamp    = DateTimeOffsetProvider.Now(),
@@ -55,7 +55,7 @@ namespace Inforigami.Regalo.AzureTableStorage
                              x =>
                                  new AzureTableStorageAggregateEventRow()
                                  {
-                                     PartitionKey = aggregateId,
+                                     PartitionKey = eventStreamId,
                                      RowKey       = x.Version.ToString(),
                                      Timestamp    = x.Timestamp,
                                      ETag         = new ETag(x.Version.ToString()),
@@ -67,25 +67,25 @@ namespace Inforigami.Regalo.AzureTableStorage
             aggregateTable.SubmitTransaction(actions);
         }
 
-        public EventStream<T> Load<T>(string aggregateId)
+        public EventStream<T> Load<T>(string eventStreamId)
         {
-            return Load<T>(aggregateId, EntityVersion.Latest);
+            return Load<T>(eventStreamId, EntityVersion.Latest);
         }
 
-        public EventStream<T> Load<T>(string aggregateId, int version)
+        public EventStream<T> Load<T>(string eventStreamId, int version)
         {
-            if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentException("An aggregate ID is required", "aggregateId");
+            if (string.IsNullOrWhiteSpace(eventStreamId)) throw new ArgumentException("An aggregate ID is required", "eventStreamId");
 
             if (version == EntityVersion.New)
             {
                 throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EntityVersion.New (-1) value.");
             }
 
-            _logger.Debug(this, "Loading " + typeof(T) + " version " + EntityVersion.GetName(version) + " from stream " + aggregateId);
+            _logger.Debug(this, "Loading " + typeof(T) + " version " + EntityVersion.GetName(version) + " from stream " + eventStreamId);
 
             var aggregateTable = GetTableClient<T>();
 
-            var filter = $"PartitionKey eq '{aggregateId}' and RowKey ne '{AggregateHeaderRowKey}'";
+            var filter = $"PartitionKey eq '{eventStreamId}' and RowKey ne '{AggregateHeaderRowKey}'";
 
             // It's a shame to load all rows and filter client-side, but the querying on RowKey
             // in Azure Table Storage is alphanumeric, so version "10" is "less than" version "2"...
@@ -102,7 +102,7 @@ namespace Inforigami.Regalo.AzureTableStorage
                 return null;
             }
 
-            var result = new EventStream<T>(aggregateId);
+            var result = new EventStream<T>(eventStreamId);
             result.Append(events);
 
             if (version != EntityVersion.Latest && result.GetVersion() != version)
@@ -110,7 +110,7 @@ namespace Inforigami.Regalo.AzureTableStorage
                 var exception = new ArgumentOutOfRangeException("version", version,
                                                                 string.Format(
                                                                     "Event for version {0} could not be found for stream {1}",
-                                                                    version, aggregateId));
+                                                                    version, eventStreamId));
                 exception.Data.Add("Existing stream", events);
                 throw exception;
             }
@@ -118,12 +118,12 @@ namespace Inforigami.Regalo.AzureTableStorage
             return result;
         }
 
-        public void Delete(string aggregateId, int version)
+        public void Delete(string eventStreamId, int version)
         {
             throw new NotImplementedException("Replaced with Delete<T>");
         }
 
-        public void Delete<T>(string aggregateId, int expectedVersion)
+        public void Delete<T>(string eventStreamId, int expectedVersion)
         {
             var table = GetTableClient<T>();
 
@@ -132,14 +132,14 @@ namespace Inforigami.Regalo.AzureTableStorage
             actions.Add(
                 new TableTransactionAction(
                     TableTransactionActionType.Delete,
-                    new TableEntity(aggregateId, AggregateHeaderRowKey)
+                    new TableEntity(eventStreamId, AggregateHeaderRowKey)
                     {
                         ETag = new ETag(expectedVersion.ToString())
                     }));
 
             actions.AddRange(
                 Enumerable.Range(EntityVersion.New, expectedVersion)
-                          .Select(x => new TableTransactionAction(TableTransactionActionType.Delete, new TableEntity(aggregateId, x.ToString()))));
+                          .Select(x => new TableTransactionAction(TableTransactionActionType.Delete, new TableEntity(eventStreamId, x.ToString()))));
 
             table.SubmitTransaction(actions);
         }

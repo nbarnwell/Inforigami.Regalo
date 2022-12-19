@@ -22,22 +22,22 @@ namespace Inforigami.Regalo.EventSourcing
             return _eventStreams.Values.SelectMany(x => x);
         }
 
-        public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
+        public void Save<T>(string eventStreamId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
-            if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentNullException("aggregateId");
+            if (string.IsNullOrWhiteSpace(eventStreamId)) throw new ArgumentNullException("eventStreamId");
             if (expectedVersion < -1)                   throw new ArgumentOutOfRangeException("expectedVersion", "Expected version should be greater than or equal to -1.");
             if (newEvents == null)                      throw new ArgumentNullException("newEvents");
 
-            LogSavingNewEventsList(aggregateId, expectedVersion, newEvents);
+            LogSavingNewEventsList(eventStreamId, expectedVersion, newEvents);
 
             var newEventsList = newEvents.ToList();
-            var existingStream = FindEvents(aggregateId);
+            var existingStream = FindEvents(eventStreamId);
 
             CheckConcurrency(expectedVersion, existingStream);
 
             if (existingStream == null)
             {
-                _eventStreams.Add(aggregateId, newEventsList);
+                _eventStreams.Add(eventStreamId, newEventsList);
             }
             else
             {
@@ -74,35 +74,35 @@ namespace Inforigami.Regalo.EventSourcing
             }
         }
 
-        public EventStream<T> Load<T>(string aggregateId)
+        public EventStream<T> Load<T>(string eventStreamId)
         {
-            var events = FindEvents(aggregateId);
+            var events = FindEvents(eventStreamId);
 
-            return BuildEventStream<T>(aggregateId, events);
+            return BuildEventStream<T>(eventStreamId, events);
         }
 
-        public EventStream<T> Load<T>(string aggregateId, int version)
+        public EventStream<T> Load<T>(string eventStreamId, int version)
         {
-            var events = FindEvents(aggregateId, version);
+            var events = FindEvents(eventStreamId, version);
 
-            return BuildEventStream<T>(aggregateId, events);
+            return BuildEventStream<T>(eventStreamId, events);
         }
 
         [Obsolete("Use Delete<T> instead", true)]
-        public void Delete(string aggregateId, int version)
+        public void Delete(string eventStreamId, int version)
         {
             throw new NotImplementedException("Replaced by Delete<T>");
         }
 
-        public void Delete<T>(string aggregateId, int expectedVersion)
+        public void Delete<T>(string eventStreamId, int expectedVersion)
         {
-            var events = FindEvents(aggregateId, expectedVersion);
+            var events = FindEvents(eventStreamId, expectedVersion);
 
             if (events.Last().Version != expectedVersion)
             {
                 var exception = new EventStoreConcurrencyException(
                     string.Format("Expected version {0} does not match actual version {1}", expectedVersion, events.Count));
-                exception.Data.Add("Existing stream", aggregateId);
+                exception.Data.Add("Existing stream", eventStreamId);
                 throw exception;
             }
         }
@@ -112,9 +112,9 @@ namespace Inforigami.Regalo.EventSourcing
             // Nothing to do
         }
 
-        public void Delete<T>(string aggregateId)
+        public void Delete<T>(string eventStreamId)
         {
-            _eventStreams.Remove(aggregateId);
+            _eventStreams.Remove(eventStreamId);
         }
 
         private static EventStream<T> BuildEventStream<T>(string aggregateId, IList<IEvent> events)

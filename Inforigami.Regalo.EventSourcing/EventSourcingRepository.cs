@@ -14,13 +14,9 @@ namespace Inforigami.Regalo.EventSourcing
 
         public EventSourcingRepository(IEventStore eventStore, IConcurrencyMonitor concurrencyMonitor, ILogger logger)
         {
-            if (eventStore == null)         throw new ArgumentNullException(nameof(eventStore));
-            if (concurrencyMonitor == null) throw new ArgumentNullException(nameof(concurrencyMonitor));
-            if (logger == null)             throw new ArgumentNullException(nameof(logger));
-
-            _eventStore         = eventStore;
-            _concurrencyMonitor = concurrencyMonitor;
-            _logger             = logger;
+            _eventStore         = eventStore         ?? throw new ArgumentNullException(nameof(eventStore));
+            _concurrencyMonitor = concurrencyMonitor ?? throw new ArgumentNullException(nameof(concurrencyMonitor));
+            _logger             = logger             ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public TAggregateRoot Get(Guid id, int version)

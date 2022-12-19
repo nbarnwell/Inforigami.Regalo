@@ -25,15 +25,13 @@ namespace Inforigami.Regalo.RavenDB
             _documentSession.Advanced.UseOptimisticConcurrency = true;
         }
 
-        public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> events)
+        public void Save<T>(string eventStreamId, int expectedVersion, IEnumerable<IEvent> events)
         {
-            var aggregateIdAsString = aggregateId.ToString();
-
-            var stream = _documentSession.Load<EventStream>(aggregateIdAsString);
+            var stream = _documentSession.Load<EventStream>(eventStreamId);
 
             if (stream == null)
             {
-                stream = new EventStream(aggregateId.ToString());
+                stream = new EventStream(eventStreamId);
                 stream.Append(events);
                 _documentSession.Store(stream);
 
@@ -63,55 +61,57 @@ namespace Inforigami.Regalo.RavenDB
             }
         }
 
-        public void Preload(IEnumerable<Guid> aggregateIds)
+        public void Preload(IEnumerable<string> aggregateIds)
         {
-            var idValues = aggregateIds.Select(x => x.ToString());
-            _documentSession.Load<EventStream>(idValues);
+            _documentSession.Load<EventStream>(aggregateIds);
         }
 
-        public EventStream<T> Load<T>(string aggregateId)
+        public EventStream<T> Load<T>(string eventStreamId)
         {
-            var stream = _documentSession.Load<EventStream>(aggregateId);
+            var stream = _documentSession.Load<EventStream>(eventStreamId);
 
-            if (stream == null) return null;
+            var result = new EventStream<T>(eventStreamId);
 
-            var result = new EventStream<T>(aggregateId);
-            result.Append(stream.Events);
+            if (stream != null)
+            {
+                result.Append(stream.Events);
+            }
+
             return result;
         }
 
-        public EventStream<T> Load<T>(string aggregateId, int maxVersion)
+        public EventStream<T> Load<T>(string eventStreamId, int maxVersion)
         {
-            var events = Load<T>(aggregateId).Events.ToList();
+            var events = Load<T>(eventStreamId).Events.ToList();
 
             if (maxVersion != EntityVersion.Latest && events.All(x => x.Version != maxVersion))
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(maxVersion),
                     maxVersion,
-                    $"BaseVersion {maxVersion} not found for aggregate {aggregateId}");
+                    $"BaseVersion {maxVersion} not found for aggregate {eventStreamId}");
             }
 
-            var result = new EventStream<T>(aggregateId);
+            var result = new EventStream<T>(eventStreamId);
             result.Append(GetEventsForVersion(events, maxVersion));
             return result;
         }
 
         [Obsolete("Use Delete<T> instead", true)]
-        public void Delete(string aggregateId, int version)
+        public void Delete(string eventStreamId, int version)
         {
             throw new NotImplementedException("Replaced by Delete<T>");
         }
 
-        public void Delete<T>(string aggregateId, int expectedVersion)
+        public void Delete<T>(string eventStreamId, int expectedVersion)
         {
-            var stream = _documentSession.Load<EventStream>(aggregateId);
+            var stream = _documentSession.Load<EventStream>(eventStreamId);
             var actualVersion = stream.Events.Last().Version;
             if (actualVersion != expectedVersion)
             {
                 var exception = new EventStoreConcurrencyException(
                     string.Format("Expected version {0} does not match actual version {1}", expectedVersion, actualVersion));
-                exception.Data.Add("Existing stream", aggregateId);
+                exception.Data.Add("Existing stream", eventStreamId);
                 throw exception;
             }
 

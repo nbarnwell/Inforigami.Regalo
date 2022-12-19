@@ -26,11 +26,9 @@ namespace Inforigami.Regalo.SqlServer
             _logger = logger;
         }
 
-        public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
+        public void Save<T>(string eventStreamId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
             if (newEvents == null) throw new ArgumentNullException("newEvents");
-            Guid aggregateIdGuid;
-            if (!Guid.TryParse(aggregateId, out aggregateIdGuid)) throw new ArgumentException(string.Format("\"{0}\" is not a valid Guid", aggregateId), "aggregateId");
             
             using (var transaction = GetTransaction())
             using (var connection = GetConnection())
@@ -39,34 +37,34 @@ namespace Inforigami.Regalo.SqlServer
 
                 if (expectedVersion == EntityVersion.New)
                 {
-                    InsertAggregateRow(aggregateIdGuid, newEvents, connection);
+                    InsertEventStreamRow(eventStreamId, newEvents, connection);
                 }
                 else
                 {
-                    UpdateAggregateRow(aggregateIdGuid, expectedVersion, newEvents, connection);
+                    UpdateEventStreamRow(eventStreamId, expectedVersion, newEvents, connection);
                 }
 
-                InsertEvents(aggregateIdGuid, newEvents, connection);
+                InsertEvents(eventStreamId, newEvents, connection);
 
                 transaction.Complete();
             }
         }
 
-        public EventStream<T> Load<T>(string aggregateId)
+        public EventStream<T> Load<T>(string eventStreamId)
         {
-            return Load<T>(aggregateId, EntityVersion.Latest);
+            return Load<T>(eventStreamId, EntityVersion.Latest);
         }
 
-        public EventStream<T> Load<T>(string aggregateId, int version)
+        public EventStream<T> Load<T>(string eventStreamId, int version)
         {
-            if (string.IsNullOrWhiteSpace(aggregateId)) throw new ArgumentException("An aggregate ID is required", "aggregateId");
+            if (string.IsNullOrWhiteSpace(eventStreamId)) throw new ArgumentException("An event stream ID is required", "eventStreamId");
 
             if (version == EntityVersion.New)
             {
                 throw new ArgumentOutOfRangeException("version", "By definition you cannot load a stream when specifying the EntityVersion.New (-1) value.");
             }
 
-            _logger.Debug(this, "Loading " + typeof(T) + " version " + EntityVersion.GetName(version) + " from stream " + aggregateId);
+            _logger.Debug(this, "Loading " + typeof(T) + " version " + EntityVersion.GetName(version) + " from stream " + eventStreamId);
 
             using (var transaction = GetTransaction())
             using (var connection = GetConnection())
@@ -75,12 +73,12 @@ namespace Inforigami.Regalo.SqlServer
 
                 var command = connection.CreateCommand();
                 command.CommandType = CommandType.Text;
-                command.CommandText = @"select * from AggregateRootEvent where AggregateId = @aggregateId and Version <= @Version order by Version;";
+                command.CommandText = @"select * from EventStreamEvent where EventStreamId = @eventStreamId and Version <= @Version order by Version;";
 
-                var aggregateIdParameter = command.Parameters.Add("@AggregateId", SqlDbType.UniqueIdentifier);
+                var eventStreamIdParameter = command.Parameters.Add("@EventStreamId", SqlDbType.NVarChar, 1024);
                 var versionParameter     = command.Parameters.Add("@Version", SqlDbType.Int);
 
-                aggregateIdParameter.Value = Guid.Parse(aggregateId);
+                eventStreamIdParameter.Value = eventStreamId;
                 versionParameter.Value = version == EntityVersion.Latest ? int.MaxValue : version;
 
                 var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
@@ -88,7 +86,7 @@ namespace Inforigami.Regalo.SqlServer
                 var events = new List<IEvent>();
                 while (reader.Read())
                 {
-                    events.Add((IEvent)JsonConvert.DeserializeObject(reader.GetString(3), GetJsonSerialisationSettings()));
+                    events.Add((IEvent)JsonConvert.DeserializeObject(reader.GetString(2), GetJsonSerialisationSettings()));
                 }
 
                 if (events.Count == 0)
@@ -96,12 +94,12 @@ namespace Inforigami.Regalo.SqlServer
                     return null;
                 }
 
-                var result = new EventStream<T>(aggregateId);
+                var result = new EventStream<T>(eventStreamId);
                 result.Append(events);
 
                 if (version != EntityVersion.Latest && result.GetVersion() != version)
                 {
-                    var exception = new ArgumentOutOfRangeException("version", version, string.Format("Event for version {0} could not be found for stream {1}", version, aggregateId));
+                    var exception = new ArgumentOutOfRangeException("version", version, string.Format("Event for version {0} could not be found for stream {1}", version, eventStreamId));
                     exception.Data.Add("Existing stream", events);
                     throw exception;
                 }
@@ -112,26 +110,20 @@ namespace Inforigami.Regalo.SqlServer
             }
         }
 
-        public void Delete(string aggregateId, int version)
+        public void Delete(string eventStreamId, int version)
         {
             throw new NotImplementedException("Replaced with Delete<T>");
         }
 
-        public void Delete<T>(string aggregateId, int version)
+        public void Delete<T>(string eventStreamId, int version)
         {
-            Guid aggregateIdGuid;
-            if (!Guid.TryParse(aggregateId, out aggregateIdGuid))
-            {
-                throw new ArgumentException($"\"{aggregateId}\" is not a valid Guid", nameof(aggregateId));
-            }
-
             using (var transaction = GetTransaction())
             using (var connection = GetConnection())
             {
                 connection.Open();
 
-                DeleteEvents(aggregateIdGuid, connection);
-                DeleteAggregateRow(aggregateIdGuid, version, connection);
+                DeleteEvents(eventStreamId, connection);
+                DeleteEventStreamRow(eventStreamId, version, connection);
 
                 transaction.Complete();
             }
@@ -151,30 +143,30 @@ namespace Inforigami.Regalo.SqlServer
             return new TransactionScope(TransactionScopeOption.Required, new TransactionOptions{IsolationLevel = IsolationLevel.ReadCommitted});
         }
 
-        private void DeleteEvents(Guid aggregateId, SqlConnection connection)
+        private void DeleteEvents(string eventStreamId, SqlConnection connection)
         {
             var eventCommand = connection.CreateCommand();
 
             eventCommand.CommandType = CommandType.Text;
-            eventCommand.CommandText = @"delete from AggregateRootEvent where AggregateId = @AggregateId;";
+            eventCommand.CommandText = @"delete from EventStreamEvent where EventStreamId = @EventStreamId;";
 
-            var aggregateIdParameter = eventCommand.Parameters.Add("@AggregateId", SqlDbType.UniqueIdentifier);
-            aggregateIdParameter.Value = aggregateId;
+            var eventStreamIdParameter = eventCommand.Parameters.Add("@EventStreamId", SqlDbType.NVarChar, 1024);
+            eventStreamIdParameter.Value = eventStreamId;
 
             eventCommand.ExecuteNonQuery();
         }
 
-        private void DeleteAggregateRow(Guid aggregateId, int version, SqlConnection connection)
+        private void DeleteEventStreamRow(string eventStreamId, int version, SqlConnection connection)
         {
             var eventCommand = connection.CreateCommand();
 
             eventCommand.CommandType = CommandType.Text;
-            eventCommand.CommandText = @"delete from AggregateRoot where Id = @AggregateId and [Version] = @Version;";
+            eventCommand.CommandText = @"delete from EventStream where Id = @EventStreamId and [Version] = @Version;";
 
-            var aggregateIdParameter = eventCommand.Parameters.Add("@AggregateId", SqlDbType.UniqueIdentifier);
+            var eventStreamIdParameter = eventCommand.Parameters.Add("@EventStreamId", SqlDbType.NVarChar, 1024);
             var versionParameter     = eventCommand.Parameters.Add("@Version", SqlDbType.Int);
 
-            aggregateIdParameter.Value = aggregateId;
+            eventStreamIdParameter.Value = eventStreamId;
             versionParameter.Value     = version;
 
             var rowsDeleted = eventCommand.ExecuteNonQuery();
@@ -183,71 +175,69 @@ namespace Inforigami.Regalo.SqlServer
             {
                 var exception = new EventStoreConcurrencyException(
                     string.Format("Expected version {0} does not match actual version", version));
-                exception.Data.Add("Existing stream", aggregateId);
+                exception.Data.Add("Existing stream", eventStreamId);
                 throw exception;
             }
         }
 
-        private void InsertEvents(Guid aggregateId, IEnumerable<IEvent> newEvents, SqlConnection connection)
+        private void InsertEvents(string eventStreamId, IEnumerable<IEvent> newEvents, SqlConnection connection)
         {
             var eventCommand = connection.CreateCommand();
 
             eventCommand.CommandType = CommandType.Text;
-            eventCommand.CommandText = @"insert into AggregateRootEvent (Id, AggregateId, [Version], Data) values (@Id, @AggregateId, @Version, @Data);";
+            eventCommand.CommandText = @"insert into EventStreamEvent (EventStreamId, [Version], Data) values (@EventStreamId, @Version, @Data);";
 
-            var idParameter          = eventCommand.Parameters.Add("@Id", SqlDbType.UniqueIdentifier);
-            var aggregateIdParameter = eventCommand.Parameters.Add("@AggregateId", SqlDbType.UniqueIdentifier);
-            var versionParameter     = eventCommand.Parameters.Add("@Version", SqlDbType.Int);
-            var dataParameter        = eventCommand.Parameters.Add("@Data", SqlDbType.NVarChar, -1);
+            var eventStreamIdParameter = eventCommand.Parameters.Add("@EventStreamId", SqlDbType.NVarChar, 1024);
+            var versionParameter       = eventCommand.Parameters.Add("@Version", SqlDbType.Int);
+            var dataParameter          = eventCommand.Parameters.Add("@Data", SqlDbType.NVarChar, -1);
 
             eventCommand.Prepare();
 
             foreach (var evt in newEvents)
             {
-                idParameter.Value          = evt.MessageId;
-                aggregateIdParameter.Value = aggregateId;
-                versionParameter.Value     = evt.Version;
-                dataParameter.Value        = GetJson(evt);
+                eventStreamIdParameter.Value = eventStreamId;
+                versionParameter.Value       = evt.Version;
+                dataParameter.Value          = GetJson(evt);
 
                 eventCommand.ExecuteNonQuery();
             }
         }
 
-        private static void UpdateAggregateRow(Guid aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents, SqlConnection connection)
+        private static void UpdateEventStreamRow(string eventStreamId, int expectedVersion, IEnumerable<IEvent> newEvents, SqlConnection connection)
         {
-            var aggregateRootCommand = connection.CreateCommand();
+            var eventStreamCommand = connection.CreateCommand();
 
-            aggregateRootCommand.CommandType = CommandType.Text;
-            aggregateRootCommand.CommandText = @"update AggregateRoot set Version = @Version where Id = @Id and @Version = @ExpectedVersion;";
+            eventStreamCommand.CommandType = CommandType.Text;
+            eventStreamCommand.CommandText = @"update EventStream set Version = @Version where Id = @Id and Version = @ExpectedVersion;";
 
-            aggregateRootCommand.Parameters.AddWithValue("@Id", aggregateId);
-            aggregateRootCommand.Parameters.AddWithValue("@Version", newEvents.Last().Version);
-            aggregateRootCommand.Parameters.AddWithValue("@ExpectedVersion", expectedVersion);
+            eventStreamCommand.Parameters.AddWithValue("@Id", eventStreamId);
+            eventStreamCommand.Parameters.AddWithValue("@Version", newEvents.Last().Version);
+            eventStreamCommand.Parameters.AddWithValue("@ExpectedVersion", expectedVersion);
 
-            int rowsUpdated = aggregateRootCommand.ExecuteNonQuery();
+            int rowsUpdated = eventStreamCommand.ExecuteNonQuery();
 
             if (rowsUpdated == 0)
             {
-                throw new EventStoreConcurrencyException(string.Format("Aggregate root {0} was not found at version {1}.", aggregateId, expectedVersion));
+                throw new EventStoreConcurrencyException(string.Format("Event stream {0} was not found at version {1}.", eventStreamId, expectedVersion));
             }
         }
 
-        private static void InsertAggregateRow(Guid aggregateId, IEnumerable<IEvent> newEvents, SqlConnection connection)
+        private static void InsertEventStreamRow(string eventStreamId, IEnumerable<IEvent> newEvents, SqlConnection connection)
         {
             if (newEvents == null || !newEvents.Any())
             {
                 return;
             }
 
-            var aggregateRootCommand = connection.CreateCommand();
+            var eventStreamCommand = connection.CreateCommand();
 
-            aggregateRootCommand.CommandType = CommandType.Text;
-            aggregateRootCommand.CommandText = @"insert into AggregateRoot (Id, [Version]) values (@Id, @Version);";
+            eventStreamCommand.CommandType = CommandType.Text;
+            eventStreamCommand.CommandText = @"insert into EventStream (Id, [Version]) values (@Id, @Version);";
 
-            aggregateRootCommand.Parameters.AddWithValue("@Id", aggregateId);
-            aggregateRootCommand.Parameters.AddWithValue("@Version", newEvents.Last().Version);
+            eventStreamCommand.Parameters.AddWithValue("@Id", eventStreamId);
+            eventStreamCommand.Parameters.AddWithValue("@Version", newEvents.Last().Version);
 
-            aggregateRootCommand.ExecuteNonQuery();
+            eventStreamCommand.ExecuteNonQuery();
         }
 
         private SqlConnection GetConnection()

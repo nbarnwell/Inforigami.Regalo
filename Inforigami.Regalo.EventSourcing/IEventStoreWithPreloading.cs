@@ -5,6 +5,6 @@ namespace Inforigami.Regalo.EventSourcing
 {
     public interface IEventStoreWithPreloading : IEventStore
     {
-        void Preload(IEnumerable<Guid> aggregateIds);
+        void Preload(IEnumerable<string> aggregateIds);
     }
 }

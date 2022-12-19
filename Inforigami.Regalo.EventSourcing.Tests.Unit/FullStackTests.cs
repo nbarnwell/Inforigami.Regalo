@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Inforigami.Regalo.AzureTableStorage;
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.Core.Tests.DomainModel.SalesOrders;
+using Inforigami.Regalo.EventSourcing.Tests.Unit.Support;
 using Inforigami.Regalo.RavenDB;
+using Inforigami.Regalo.SqlServer;
 using NUnit.Framework;
 using Raven.Client.Documents;
 using Raven.TestDriver;
@@ -47,6 +50,7 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
         public void Store_and_reload()
         {
             var order = CreateSalesOrder();
+            AddLineItemsInBatch(order.Id);
             AddLineItems(order.Id);
             PlaceOrder(order.Id);
 
@@ -72,10 +76,10 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
             repository.Save(order);
         }
 
-        private void AddLineItems(Guid orderId)
+        private void AddLineItemsInBatch(Guid orderId)
         {
-            var repository   = CreateRepository();
-            var order = repository.Get(orderId, EntityVersion.Latest);
+            var repository = CreateRepository();
+            var order      = repository.Get(orderId, EntityVersion.Latest);
 
             for (int i = 0; i < 15; i++)
             {
@@ -83,6 +87,19 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
             }
 
             repository.Save(order);
+        }
+
+        private void AddLineItems(Guid orderId)
+        {
+            // This is to see if we fall foul of Raven's max requests per session limit
+            var repository = CreateRepository();
+            for (int i = 15; i < 60; i++)
+            {
+                var order = repository.Get(orderId, EntityVersion.Latest);
+                order.AddLine($"sku{i}", 1);
+                repository.Save(order);
+            }
+            _eventStore.Flush();
         }
 
         private SalesOrder CreateSalesOrder()
@@ -99,6 +116,7 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
                 new EventSourcingRepository<SalesOrder>(
                     _eventStore,
                     new StrictConcurrencyMonitor(),
+                    new AutomaticFlushStrategy(_eventStore),
                     new ConsoleLogger());
             return repository;
         }
@@ -107,8 +125,30 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
         {
             yield return new InMemoryEventStore(new ConsoleLogger());
 
-            var ravenTestDriver = new RavenTestDriverAdapter();
-            yield return new RavenEventStore(ravenTestDriver.CreateDocumentStore());
+            yield return new RavenEventStore(new RavenTestDriverAdapter().CreateDocumentStore());
+
+            yield return NewAzureTableStorageEventStore();
+
+            DatabaseInstaller.Install().ConfigureAwait(false).GetAwaiter().GetResult();
+            yield return new SqlServerEventStoreTestDataBuilder().Build();
+        }
+
+        private static AzureTableStorageEventStore NewAzureTableStorageEventStore()
+        {
+            var name = GetEnvironmentVariable("Inforigami_Regalo_AzureTableStorage_UnitTest_AzureStorageAccountName");
+            var key  = GetEnvironmentVariable("Inforigami_Regalo_AzureTableStorage_UnitTest_AzureStorageAccountKey");
+            return new AzureTableStorageEventStore(name, key, new ConsoleLogger());
+        }
+
+        private static string GetEnvironmentVariable(string envVarName)
+        {
+            var result = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                throw new InvalidOperationException(
+                    $@"Unable to find USER environment variable value for {envVarName}");
+            }
+            return result;
         }
 
         private class RavenTestDriverAdapter : RavenTestDriver

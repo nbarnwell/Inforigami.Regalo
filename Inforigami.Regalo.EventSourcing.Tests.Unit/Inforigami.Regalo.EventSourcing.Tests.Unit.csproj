@@ -9,6 +9,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
     <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="nunit" Version="3.13.3" />
@@ -21,7 +22,21 @@
     <ProjectReference Include="..\Inforigami.Regalo.Core.Tests.DomainModel\Inforigami.Regalo.Core.Tests.DomainModel.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.RavenDB\Inforigami.Regalo.RavenDB.csproj" />
+    <ProjectReference Include="..\Inforigami.Regalo.SqlServer\Inforigami.Regalo.SqlServer.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Testing\Inforigami.Regalo.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Inforigami.Regalo.SqlServer\InstallEventStreamTables.sql" Link="InstallEventStreamTables.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="CreateDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

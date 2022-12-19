@@ -31,18 +31,18 @@ namespace Inforigami.Regalo.EventStore
             _logger = logger;
         }
 
-        public void Save<T>(string aggregateId, int expectedVersion, IEnumerable<IEvent> newEvents)
+        public void Save<T>(string eventStreamId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
             var eventStoreExpectedVersion = expectedVersion == -1 ? ExpectedVersion.NoStream : expectedVersion;
 
             try
             {
-                _logger.Debug(this, "Saving " + typeof(T) + " to stream " + aggregateId);
+                _logger.Debug(this, "Saving " + typeof(T) + " to stream " + eventStreamId);
 
-                var transaction = GetTransaction(aggregateId, eventStoreExpectedVersion);
+                var transaction = GetTransaction(eventStreamId, eventStoreExpectedVersion);
                 transaction.WriteAsync(GetEventData(newEvents)).Wait();
 
-                CacheNewEvents(aggregateId, expectedVersion, newEvents);
+                CacheNewEvents(eventStreamId, expectedVersion, newEvents);
             }
             catch (WrongExpectedVersionException ex)
             {
@@ -78,15 +78,15 @@ namespace Inforigami.Regalo.EventStore
             }
         }
 
-        public EventStream<T> Load<T>(string aggregateId)
+        public EventStream<T> Load<T>(string eventStreamId)
         {
-            return Load<T>(aggregateId, EntityVersion.Latest);
+            return Load<T>(eventStreamId, EntityVersion.Latest);
         }
 
-        public EventStream<T> Load<T>(string aggregateId, int version)
+        public EventStream<T> Load<T>(string eventStreamId, int version)
         {
-            if (string.IsNullOrWhiteSpace(aggregateId))
-                throw new ArgumentException("An aggregate ID is required", "aggregateId");
+            if (string.IsNullOrWhiteSpace(eventStreamId))
+                throw new ArgumentException("An aggregate ID is required", "eventStreamId");
 
             if (version == EntityVersion.New)
             {
@@ -96,15 +96,15 @@ namespace Inforigami.Regalo.EventStore
             }
 
             var domainEvents =
-                LoadEventsFromEventStore<T>(aggregateId, version)
-                    .Concat(LoadEventsFromCache<T>(aggregateId, version));
+                LoadEventsFromEventStore<T>(eventStreamId, version)
+                    .Concat(LoadEventsFromCache<T>(eventStreamId, version));
 
             if (!domainEvents.Any())
             {
                 return null;
             }
 
-            var result = new EventStream<T>(aggregateId);
+            var result = new EventStream<T>(eventStreamId);
             result.Append(domainEvents);
 
             if (version != EntityVersion.Latest && result.GetVersion() != version)
@@ -112,7 +112,7 @@ namespace Inforigami.Regalo.EventStore
                 var exception = new ArgumentOutOfRangeException(
                     "version",
                     version,
-                    string.Format("Event for version {0} could not be found for stream {1}", EntityVersion.GetName(version), aggregateId));
+                    string.Format("Event for version {0} could not be found for stream {1}", EntityVersion.GetName(version), eventStreamId));
                 throw exception;
             }
 
@@ -165,14 +165,14 @@ namespace Inforigami.Regalo.EventStore
         }
 
         [Obsolete("Use Delete<T> instead", true)]
-        public void Delete(string aggregateId, int version)
+        public void Delete(string eventStreamId, int version)
         {
             throw new NotImplementedException("Replaced by Delete<T>");
         }
 
-        public void Delete<T>(string aggregateId, int expectedVersion)
+        public void Delete<T>(string eventStreamId, int expectedVersion)
         {
-            _eventStoreConnection.DeleteStreamAsync(aggregateId, expectedVersion).Wait();
+            _eventStoreConnection.DeleteStreamAsync(eventStreamId, expectedVersion).Wait();
         }
 
         public void Rollback()
