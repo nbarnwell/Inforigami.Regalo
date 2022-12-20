@@ -116,7 +116,6 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
                 new EventSourcingRepository<SalesOrder>(
                     _eventStore,
                     new StrictConcurrencyMonitor(),
-                    new AutomaticFlushStrategy(_eventStore),
                     new ConsoleLogger());
             return repository;
         }
@@ -158,7 +157,7 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
                 ConfigureServer(new TestServerOptions
                 {
                     ServerUrl        = "http://localhost:8080",
-                    FrameworkVersion = "6.0.11",
+                    FrameworkVersion = "6.0.12",
                     CommandLineArgs  = new[] { "Security.UnsecuredAccessAllowed=PublicNetwork" }.ToList()
                 });
             }

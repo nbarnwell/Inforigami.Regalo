@@ -176,7 +176,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             // Arrange
             IEventStore store = new SqlServerEventStoreTestDataBuilder().Build();
             var customerId = Guid.NewGuid();
-            var storedEvents = new IEvent[]
+            var storedEvents = new EventChain
                               {
                                   new CustomerSignedUp(customerId), 
                                   new SubscribedToNewsletter("latest"), 
@@ -194,7 +194,7 @@ namespace Inforigami.Regalo.SqlServer.Tests.Unit
             // Arrange
             IEventStore store = new SqlServerEventStoreTestDataBuilder().Build();
             var customerId = Guid.NewGuid();
-            var storedEvents = new IEvent[]
+            var storedEvents = new EventChain
                               {
                                   new CustomerSignedUp(customerId), 
                                   new SubscribedToNewsletter("latest"), 

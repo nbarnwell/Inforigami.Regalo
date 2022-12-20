@@ -21,7 +21,7 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             ConfigureServer(new TestServerOptions
                     {
                         ServerUrl        = "http://localhost:8080",
-                        FrameworkVersion = "6.0.11",
+                        FrameworkVersion = "6.0.12",
                         CommandLineArgs  = new[] { "Security.UnsecuredAccessAllowed=PublicNetwork" }.ToList()
                     });
         }
