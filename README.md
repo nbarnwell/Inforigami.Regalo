@@ -178,24 +178,30 @@ A library you can use to make unit testing of your Application Services (handler
 Depending on how you wish to store your event streams, you can choose one of the following:
 
 #### Inforigami.Regalo.AzureTableStorage  
-    An Azure Table Storage-based implementation of `Inforigami.Regalo.EventSourcing.IEventStore`.
+
+An Azure Table Storage-based implementation of `Inforigami.Regalo.EventSourcing.IEventStore`.
 
 #### Inforigami.Regalo.EventStore  
-    An EventStoreDB-based implementation of `Inforigami.Regalo.EventSourcing.IEventStore`.
+
+An EventStoreDB-based implementation of `Inforigami.Regalo.EventSourcing.IEventStore`.
 
 #### Inforigami.Regalo.RavenDB  
-    A RavenDB-based implementation of `Inforigami.Regalo.EventSourcing.IEventStore`.
+
+A RavenDB-based implementation of `Inforigami.Regalo.EventSourcing.IEventStore`.
 
 #### Inforigami.Regalo.SqlServer  
-    A SQL Server-based implementation of `Inforigami.Regalo.EventSourcing.IEventStore`.
+
+A SQL Server-based implementation of `Inforigami.Regalo.EventSourcing.IEventStore`.
 
 ## Projects used only in the development of Regalo
 
 #### Inforigami.Regalo.Core.ConsoleLoggerTest  
-    A test-harness for the basic console logging provided by `Inforigami.Regalo.Core.ConsoleLogger`.
+
+A test-harness for the basic console logging provided by `Inforigami.Regalo.Core.ConsoleLogger`.
 
 #### Inforigami.Regalo.Core.Tests.DomainModel  
-    A sample domain model that is also used by Regalo's own tests.
+
+A sample domain model that is also used by Regalo's own tests.
 
 # Principles
 
