@@ -11,10 +11,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    services:
-      # Docker Compose will handle these, no need to define here unless you want GitHub managed containers
-      # Leaving empty because we'll start them manually via docker compose
-
     steps:
     - uses: actions/checkout@v3
       with:
