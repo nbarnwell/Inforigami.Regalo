@@ -267,11 +267,11 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
 
         private static string GetEnvironmentVariable(string envVarName)
         {
-            var result = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            var result = Environment.GetEnvironmentVariable(envVarName);
             if (string.IsNullOrWhiteSpace(result))
             {
                 throw new InvalidOperationException(
-                    $@"Unable to find USER environment variable value for {envVarName}");
+                    $@"Unable to find environment variable value for {envVarName}");
             }
             return result;
         }
