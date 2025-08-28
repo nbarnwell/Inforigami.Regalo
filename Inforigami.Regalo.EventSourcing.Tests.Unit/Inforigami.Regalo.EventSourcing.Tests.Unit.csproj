@@ -1,12 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="CreateDatabase.sql" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="gitversion.msbuild" Version="5.11.0">

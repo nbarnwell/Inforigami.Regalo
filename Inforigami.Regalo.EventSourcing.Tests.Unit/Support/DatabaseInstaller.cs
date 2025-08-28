@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
@@ -19,8 +20,8 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit.Support
 
         public static async Task Install()
         {
-            await RunScript("UnitTestSetUpConnection", ".\\CreateDatabase.sql");
-            await RunScript("RegaloConnection", ".\\InstallEventStreamTables.sql");
+            await RunScript("UnitTestSetUpConnection", Path.Combine(AppContext.BaseDirectory, "CreateDatabase.sql"));
+            await RunScript("RegaloConnection", Path.Combine(AppContext.BaseDirectory, "InstallEventStreamTables.sql"));
         }
 
         private static async Task RunScript(string connectionName, string filename)
