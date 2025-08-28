@@ -9,7 +9,8 @@ using Inforigami.Regalo.RavenDB;
 using Inforigami.Regalo.SqlServer;
 using NUnit.Framework;
 using Raven.Client.Documents;
-using Raven.TestDriver;
+using Raven.Client.ServerWide;
+using Raven.Client.ServerWide.Operations;
 
 namespace Inforigami.Regalo.EventSourcing.Tests.Unit
 {
@@ -150,21 +151,30 @@ namespace Inforigami.Regalo.EventSourcing.Tests.Unit
             return result;
         }
 
-        private class RavenTestDriverAdapter : RavenTestDriver
+        private class RavenTestDriverAdapter
         {
+            private readonly IDocumentStore _documentStore;
+
             public RavenTestDriverAdapter()
             {
-                ConfigureServer(new TestServerOptions
+                _documentStore = new DocumentStore()
                 {
-                    ServerUrl        = "http://localhost:8080",
-                    FrameworkVersion = "6.0.12",
-                    CommandLineArgs  = new[] { "Security.UnsecuredAccessAllowed=PublicNetwork" }.ToList()
-                });
+                    Urls     = new[] { "http://localhost:8080" },
+                    Database = "Inforigami.Regalo.EventSourcing.Tests.Unit"
+                };
+                _documentStore.Initialize();
+
+                var record = _documentStore.Maintenance.Server.Send(new GetDatabaseRecordOperation(_documentStore.Database));
+                if (record == null)
+                {
+                    _documentStore.Maintenance.Server.Send(
+                        new CreateDatabaseOperation(new DatabaseRecord(_documentStore.Database)));
+                }
             }
 
             public IDocumentStore CreateDocumentStore()
             {
-                return GetDocumentStore();
+                return _documentStore;
             }
         }
     }

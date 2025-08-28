@@ -4,7 +4,7 @@ services:
 
   eventstore:
     container_name: eventstoredb
-    image: eventstore/eventstore:release-5.0.10
+    image: eventstore/eventstore:20.10.0-buster-slim
     ports:
       - '2113:2113'
       - '1113:1113'
@@ -14,11 +14,23 @@ services:
       EVENTSTORE_RUN_PROJECTIONS: all
       EVENTSTORE_START_STANDARD_PROJECTIONS: 'true'
       PROJECTION_THREADS: 8
+
   sqlserver:
     container_name: sqlserver
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - '1433:1433'
     environment:
       ACCEPT_EULA: Y
       MSSQL_SA_PASSWORD: Inforigami1
+
+  ravendb:
+    container_name: ravendb
+    image: ravendb/ravendb:7.1-ubuntu-latest
+    ports:
+      - '8080:8080'
+      - '8081:8081'
+    environment:
+      RAVEN_License_Eula_Accepted: 'true'
+      RAVEN_Setup_Mode: Initial
+      RAVEN_ServerUrl: http://0.0.0.0:8080

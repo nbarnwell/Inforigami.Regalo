@@ -8,9 +8,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.0.5" />
-    <PackageReference Include="RavenDB.Client" Version="5.4.4" />
+    <PackageReference Include="RavenDB.Client" Version="7.1.2" />
     <ProjectReference Include="..\Inforigami.Regalo.Core\Inforigami.Regalo.Core.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.EventSourcing\Inforigami.Regalo.EventSourcing.csproj" />
     <ProjectReference Include="..\Inforigami.Regalo.Interfaces\Inforigami.Regalo.Interfaces.csproj" />

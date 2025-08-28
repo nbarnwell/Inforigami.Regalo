@@ -7,28 +7,40 @@ using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.RavenDB.Tests.Unit.DomainModel.Customers;
 using Inforigami.Regalo.Testing;
 using Raven.Client.Documents;
-using Raven.Embedded;
-using Raven.TestDriver;
+using Raven.Client.Exceptions.Database;
 using Conventions = Inforigami.Regalo.Core.Conventions;
+using Raven.Client.ServerWide.Operations;
+using Raven.Client.ServerWide;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Inforigami.Regalo.RavenDB.Tests.Unit
 {
     [TestFixture]
-    public class PersistenceTests : RavenTestDriver
+    public class PersistenceTests
     {
-        public PersistenceTests()
+        private IDocumentStore _documentStore;
+
+        [OneTimeSetUp]
+        public void OneTimeSetup()
         {
-            ConfigureServer(new TestServerOptions
-                    {
-                        ServerUrl        = "http://localhost:8080",
-                        FrameworkVersion = "6.0.12",
-                        CommandLineArgs  = new[] { "Security.UnsecuredAccessAllowed=PublicNetwork" }.ToList()
-                    });
+            _documentStore = new DocumentStore()
+            {
+                Urls     = new[] { "http://localhost:8080" },
+                Database = "Inforigami.Regalo.RavenDB.Tests.Unit"
+            };
+            _documentStore.Initialize();
+
+            var record = _documentStore.Maintenance.Server.Send(new GetDatabaseRecordOperation(_documentStore.Database));
+            if (record == null)
+            {
+                _documentStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(_documentStore.Database)));
+            }
         }
 
         [SetUp]
         public void SetUp()
         {
+
             Resolver.Configure(type =>
                                {
                                    if (type == typeof(ILogger)) return new ConsoleLogger();
@@ -44,6 +56,11 @@ namespace Inforigami.Regalo.RavenDB.Tests.Unit
             Conventions.SetFindAggregateTypeForEventType(null);
 
             Resolver.Reset();
+        }
+
+        private IDocumentStore GetDocumentStore()
+        {
+            return _documentStore;
         }
 
         [Test]
