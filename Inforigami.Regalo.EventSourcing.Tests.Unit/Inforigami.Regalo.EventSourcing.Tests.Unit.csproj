@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="CreateDatabase.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="gitversion.msbuild" Version="5.11.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,14 +30,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\Inforigami.Regalo.SqlServer\InstallEventStreamTables.sql" Link="InstallEventStreamTables.sql" />
+    <Content Include="CreateDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Inforigami.Regalo.SqlServer\InstallEventStreamTables.sql" Link="InstallEventStreamTables.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="CreateDatabase.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
