@@ -7,7 +7,7 @@ $scriptDir = $MyInvocation.MyCommand.Path | split-path
 $outputDir = "$scriptDir\nugets"
 write-debug "outputDir = $outputDir"
 
-md $outputDir -f | out-null
+New-Item $outputDir -f | out-null
 
 gci "$outputDir\*" -filter *.nupkg | 
     Foreach-Object { 
