@@ -2,51 +2,49 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Transactions;
+
 using Inforigami.Regalo.Core;
 using Inforigami.Regalo.EventSourcing;
 using Inforigami.Regalo.Interfaces;
-using Microsoft.Data.SqlClient;
+
 using Newtonsoft.Json;
-using IsolationLevel = System.Transactions.IsolationLevel;
 
 namespace Inforigami.Regalo.SqlServer
 {
     public class SqlServerEventStore : IEventStore, IDisposable
     {
-        private readonly string _connectionString;
+        private readonly Func<ISqlSession> _sqlSessionFactory;
         private readonly ILogger _logger;
 
         public SqlServerEventStore(string connectionString, ILogger logger)
+            : this(() => new TransientSqlSession(connectionString), logger)
         {
-            if (connectionString == null) throw new ArgumentNullException("connectionString");
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
+        }
 
-            _connectionString = connectionString;
-            _logger = logger;
+        public SqlServerEventStore(Func<ISqlSession> sqlSessionFactory, ILogger logger)
+        {
+            _sqlSessionFactory = sqlSessionFactory ?? throw new ArgumentNullException("sqlSessionFactory");
+            _logger = logger ?? throw new ArgumentNullException("logger");
         }
 
         public void Save<T>(string eventStreamId, int expectedVersion, IEnumerable<IEvent> newEvents)
         {
             if (newEvents == null) throw new ArgumentNullException("newEvents");
-            
-            using (var transaction = GetTransaction())
-            using (var connection = GetConnection())
-            {
-                connection.Open();
 
+            using (var session = _sqlSessionFactory.Invoke())
+            {
                 if (expectedVersion == EntityVersion.New)
                 {
-                    InsertEventStreamRow(eventStreamId, newEvents, connection);
+                    InsertEventStreamRow(eventStreamId, newEvents, session);
                 }
                 else
                 {
-                    UpdateEventStreamRow(eventStreamId, expectedVersion, newEvents, connection);
+                    UpdateEventStreamRow(eventStreamId, expectedVersion, newEvents, session);
                 }
 
-                InsertEvents(eventStreamId, newEvents, connection);
+                InsertEvents(eventStreamId, newEvents, session);
 
-                transaction.Complete();
+                session.Complete();
             }
         }
 
@@ -66,27 +64,25 @@ namespace Inforigami.Regalo.SqlServer
 
             _logger.Debug(this, "Loading " + typeof(T) + " version " + EntityVersion.GetName(version) + " from stream " + eventStreamId);
 
-            using (var transaction = GetTransaction())
-            using (var connection = GetConnection())
+            using (var session = _sqlSessionFactory.Invoke())
             {
-                connection.Open();
-
-                var command = connection.CreateCommand();
+                var command = session.CreateCommand();
                 command.CommandType = CommandType.Text;
                 command.CommandText = @"select * from EventStreamEvent where EventStreamId = @eventStreamId and Version <= @Version order by Version;";
 
-                var eventStreamIdParameter = command.Parameters.Add("@EventStreamId", SqlDbType.NVarChar, 1024);
-                var versionParameter     = command.Parameters.Add("@Version", SqlDbType.Int);
+                var eventStreamIdParameter = command.AddParameter("@EventStreamId", DbType.String, 1024);
+                var versionParameter     = command.AddParameter("@Version", DbType.Int32);
 
                 eventStreamIdParameter.Value = eventStreamId;
                 versionParameter.Value = version == EntityVersion.Latest ? int.MaxValue : version;
 
-                var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
-
                 var events = new List<IEvent>();
-                while (reader.Read())
+                using (var reader = command.ExecuteReader(CommandBehavior.SequentialAccess))
                 {
-                    events.Add((IEvent)JsonConvert.DeserializeObject(reader.GetString(2), GetJsonSerialisationSettings()));
+                    while (reader.Read())
+                    {
+                        events.Add((IEvent)JsonConvert.DeserializeObject(reader.GetString(2), GetJsonSerialisationSettings()));
+                    }
                 }
 
                 if (events.Count == 0)
@@ -104,7 +100,7 @@ namespace Inforigami.Regalo.SqlServer
                     throw exception;
                 }
 
-                transaction.Complete();
+                session.Complete();
 
                 return result;
             }
@@ -117,15 +113,14 @@ namespace Inforigami.Regalo.SqlServer
 
         public void Delete<T>(string eventStreamId, int version)
         {
-            using (var transaction = GetTransaction())
-            using (var connection = GetConnection())
+            using (var session = _sqlSessionFactory.Invoke())
             {
-                connection.Open();
+                session.Connection.Open();
 
-                DeleteEvents(eventStreamId, connection);
-                DeleteEventStreamRow(eventStreamId, version, connection);
+                DeleteEvents(eventStreamId, session);
+                DeleteEventStreamRow(eventStreamId, version, session);
 
-                transaction.Complete();
+                session.Complete();
             }
         }
 
@@ -138,36 +133,31 @@ namespace Inforigami.Regalo.SqlServer
         {
         }
 
-        private static TransactionScope GetTransaction()
+        private void DeleteEvents(string eventStreamId, ISqlSession session)
         {
-            return new TransactionScope(TransactionScopeOption.Required, new TransactionOptions{IsolationLevel = IsolationLevel.ReadCommitted});
-        }
-
-        private void DeleteEvents(string eventStreamId, SqlConnection connection)
-        {
-            var eventCommand = connection.CreateCommand();
+            var eventCommand = session.CreateCommand();
 
             eventCommand.CommandType = CommandType.Text;
             eventCommand.CommandText = @"delete from EventStreamEvent where EventStreamId = @EventStreamId;";
 
-            var eventStreamIdParameter = eventCommand.Parameters.Add("@EventStreamId", SqlDbType.NVarChar, 1024);
+            var eventStreamIdParameter = eventCommand.AddParameter("@EventStreamId", DbType.String, 1024);
             eventStreamIdParameter.Value = eventStreamId;
 
             eventCommand.ExecuteNonQuery();
         }
 
-        private void DeleteEventStreamRow(string eventStreamId, int version, SqlConnection connection)
+        private void DeleteEventStreamRow(string eventStreamId, int version, ISqlSession session)
         {
-            var eventCommand = connection.CreateCommand();
+            var eventCommand = session.CreateCommand();
 
             eventCommand.CommandType = CommandType.Text;
             eventCommand.CommandText = @"delete from EventStream where Id = @EventStreamId and [Version] = @Version;";
 
-            var eventStreamIdParameter = eventCommand.Parameters.Add("@EventStreamId", SqlDbType.NVarChar, 1024);
-            var versionParameter     = eventCommand.Parameters.Add("@Version", SqlDbType.Int);
+            var eventStreamIdParameter = eventCommand.AddParameter("@EventStreamId", DbType.String, 1024);
+            var versionParameter       = eventCommand.AddParameter("@Version", DbType.Int32);
 
             eventStreamIdParameter.Value = eventStreamId;
-            versionParameter.Value     = version;
+            versionParameter.Value       = version;
 
             var rowsDeleted = eventCommand.ExecuteNonQuery();
 
@@ -180,16 +170,16 @@ namespace Inforigami.Regalo.SqlServer
             }
         }
 
-        private void InsertEvents(string eventStreamId, IEnumerable<IEvent> newEvents, SqlConnection connection)
+        private void InsertEvents(string eventStreamId, IEnumerable<IEvent> newEvents, ISqlSession session)
         {
-            var eventCommand = connection.CreateCommand();
+            var eventCommand = session.CreateCommand();
 
             eventCommand.CommandType = CommandType.Text;
             eventCommand.CommandText = @"insert into EventStreamEvent (EventStreamId, [Version], Data) values (@EventStreamId, @Version, @Data);";
 
-            var eventStreamIdParameter = eventCommand.Parameters.Add("@EventStreamId", SqlDbType.NVarChar, 1024);
-            var versionParameter       = eventCommand.Parameters.Add("@Version", SqlDbType.Int);
-            var dataParameter          = eventCommand.Parameters.Add("@Data", SqlDbType.NVarChar, -1);
+            var eventStreamIdParameter = eventCommand.AddParameter("@EventStreamId", DbType.String, 1024);
+            var versionParameter       = eventCommand.AddParameter("@Version", DbType.Int32);
+            var dataParameter          = eventCommand.AddParameter("@Data", DbType.String, -1);
 
             eventCommand.Prepare();
 
@@ -203,16 +193,16 @@ namespace Inforigami.Regalo.SqlServer
             }
         }
 
-        private static void UpdateEventStreamRow(string eventStreamId, int expectedVersion, IEnumerable<IEvent> newEvents, SqlConnection connection)
+        private static void UpdateEventStreamRow(string eventStreamId, int expectedVersion, IEnumerable<IEvent> newEvents, ISqlSession session)
         {
-            var eventStreamCommand = connection.CreateCommand();
+            var eventStreamCommand = session.CreateCommand();
 
             eventStreamCommand.CommandType = CommandType.Text;
             eventStreamCommand.CommandText = @"update EventStream set Version = @Version where Id = @Id and Version = @ExpectedVersion;";
 
-            eventStreamCommand.Parameters.AddWithValue("@Id", eventStreamId);
-            eventStreamCommand.Parameters.AddWithValue("@Version", newEvents.Last().Version);
-            eventStreamCommand.Parameters.AddWithValue("@ExpectedVersion", expectedVersion);
+            eventStreamCommand.AddParameterWithValue("@Id", eventStreamId);
+            eventStreamCommand.AddParameterWithValue("@Version", newEvents.Last().Version);
+            eventStreamCommand.AddParameterWithValue("@ExpectedVersion", expectedVersion);
 
             int rowsUpdated = eventStreamCommand.ExecuteNonQuery();
 
@@ -222,27 +212,22 @@ namespace Inforigami.Regalo.SqlServer
             }
         }
 
-        private static void InsertEventStreamRow(string eventStreamId, IEnumerable<IEvent> newEvents, SqlConnection connection)
+        private static void InsertEventStreamRow(string eventStreamId, IEnumerable<IEvent> newEvents, ISqlSession session)
         {
             if (newEvents == null || !newEvents.Any())
             {
                 return;
             }
 
-            var eventStreamCommand = connection.CreateCommand();
+            var eventStreamCommand = session.CreateCommand();
 
             eventStreamCommand.CommandType = CommandType.Text;
             eventStreamCommand.CommandText = @"insert into EventStream (Id, [Version]) values (@Id, @Version);";
 
-            eventStreamCommand.Parameters.AddWithValue("@Id", eventStreamId);
-            eventStreamCommand.Parameters.AddWithValue("@Version", newEvents.Last().Version);
+            eventStreamCommand.AddParameterWithValue("@Id", eventStreamId);
+            eventStreamCommand.AddParameterWithValue("@Version", newEvents.Last().Version);
 
             eventStreamCommand.ExecuteNonQuery();
-        }
-
-        private SqlConnection GetConnection()
-        {
-            return new SqlConnection(_connectionString);
         }
 
         private string GetJson(IEvent evt)
